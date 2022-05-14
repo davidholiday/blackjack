@@ -87,6 +87,11 @@
         </plugin>
       </plugins>
     </pluginManagement>
+
+    <!--
+     TODO
+     MOVE PLUGIN DATA FROM PLUGINMANAGEMENT INTO PLUGIN SECTION. THAT SEEMS TO DORK THINGS UP IN SOME WAYS...
+     -->
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
