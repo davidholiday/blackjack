@@ -1,6 +1,7 @@
 package com.github.davidholiday;
 
-public enum CardValues {
+public enum CardValue {
+    ZERO(0),
     ONE(1),
     TWO(2),
     THREE(3),
@@ -13,7 +14,7 @@ public enum CardValues {
     TEN(10),
     ELEVEN(11);
     private int value;
-    private CardValues(int value) {
+    private CardValue(int value) {
         this.value = value;
     }
 

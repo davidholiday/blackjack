@@ -1,6 +1,6 @@
 package com.github.davidholiday;
 
-public enum Suits {
+public enum CardSuit {
     NONE,
     HEARTS,
     DIAMONDS,
