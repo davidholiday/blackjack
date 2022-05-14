@@ -13,9 +13,12 @@ public enum CardValue {
     NINE(9),
     TEN(10),
     ELEVEN(11);
-    private int value;
+    private final int value;
     private CardValue(int value) {
         this.value = value;
     }
 
+    public int getValue() {
+        return value;
+    }
 }

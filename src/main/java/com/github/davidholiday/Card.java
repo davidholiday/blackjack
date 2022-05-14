@@ -1,10 +1,8 @@
 package com.github.davidholiday;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.github.davidholiday.CardType.*;
 
 public class Card {
 
@@ -18,11 +16,13 @@ public class Card {
 
     public CardType getCardType() { return cardType; }
     public CardSuit getCardSuit() { return cardSuit; }
-    public int[] getNumericCardValue() {
-        int value = 0;
-        for (CardType cardValue : this.cardType.values()) {
-            
-        }
+    public List<Integer> getNumericCardValue() {
+        return Arrays.asList(cardType.getValues())
+                     .stream()
+                     .map((x) -> x.getValue())
+                     .collect(Collectors.toList());
     }
+
+    public String toString() { return cardType.toString() + ":" + cardSuit.toString(); }
 
 }
