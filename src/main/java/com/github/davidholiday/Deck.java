@@ -1,7 +1,10 @@
 package com.github.davidholiday;
 
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,7 +43,7 @@ public class Deck extends CardCollection {
         return rv;
     }
 
-    public static void validateDeck(boolean withJokers, List<Card> deck) {
+    private static void validateDeck(boolean withJokers, List<Card> deck) {
         Map<CardType, Integer> typeMap = new HashMap<>();
         Map<CardSuit, Integer> suitMap = new HashMap<>();
 
@@ -147,7 +150,7 @@ public class Deck extends CardCollection {
         }
     }
 
-    public static String getCountDeltaErrorMessage(int expected, int actual, String what) {
+    private static String getCountDeltaErrorMessage(int expected, int actual, String what) {
         return MessageFormat.format("expected {0} {1} but found {2}", expected, what, actual);
     }
 
