@@ -2,6 +2,7 @@ package com.github.davidholiday;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Card {
@@ -25,4 +26,17 @@ public class Card {
 
     public String toString() { return cardType.toString() + ":" + cardSuit.toString(); }
 
+    // ty SO https://stackoverflow.com/a/27609
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Card card = (Card) o;
+        return cardType == card.cardType && cardSuit == card.cardSuit;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cardType, cardSuit);
+    }
 }
