@@ -17,13 +17,9 @@ public class App {
        String msg = MessageFormat.format("deck is: {0}", deck.getAllCards(false));
        LOG.info(msg);
 
-        Deck deckWithJokers = new Deck(true);
-        msg = MessageFormat.format("deckWithJokers is: {0}", deckWithJokers.getAllCards(false));
-        LOG.info(msg);
-
-        deckWithJokers.shuffle(10);
-        msg = MessageFormat.format("deckWithJokers is now: {0}", deckWithJokers.getAllCards(false));
-        LOG.info(msg);
+       deck.cut(20);
+       msg = MessageFormat.format("deck is: {0}", deck.getAllCards(false));
+       LOG.info(msg);
     }
 
 }

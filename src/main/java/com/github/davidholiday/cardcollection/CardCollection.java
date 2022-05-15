@@ -34,32 +34,48 @@ public abstract class CardCollection {
          for (int i = 0; i < count; i++) { shuffle(); }
     }
 
-    public Optional<Card> draw() {
+    public Card draw() {
         try {
-            return Optional.of(cardList.remove(0));
+            return cardList.remove(0);
         } catch (IndexOutOfBoundsException e) {
-            return Optional.empty();
+            String msg = "attempt to draw card from empty card collection";
+            LOG.error(msg);
+            throw new IndexOutOfBoundsException(msg);
         }
     }
 
-    public Optional<List<Card>> draw(int num) {
+    public List<Card> draw(int num) {
         try {
-            Optional<List<Card>> rv = Optional.of(
-                    new ArrayList<>(cardList.subList(0, num))
-            );
+            List<Card> rv = new ArrayList<>(cardList.subList(0, num));
             cardList.subList(0, num).clear();
             return rv;
         } catch (IndexOutOfBoundsException e) {
-            return Optional.empty();
+            String msg = MessageFormat.format(
+                    "attempt to draw {0} cards from card collection sized {1}",
+                    num,
+                    cardList.size()
+            );
+            LOG.error(msg);
+            throw new IndexOutOfBoundsException(msg);
         }
     }
 
-    public boolean cut(int index) {
-        Optional<List<Card>> cutHeadOptional = draw(index);
-        if (cutHeadOptional.isEmpty()) { return false; }
-        List<Card> cutHead = cutHeadOptional.get();
-        cardList.addAll(cutHead);
-        return true;
+    public void cut(int index) {
+        if (index < 0 || index > getCardListSize()) {
+            String msg = getCountDeltaErrorMessage(
+                    "0 >= [count] <= [card collection size]",
+                    "value for argument [count]",
+                    String.valueOf(index)
+            );
+            LOG.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+
+        List<Card> cutTail = new ArrayList<>(cardList.subList(index, getCardListSize()));
+        cardList.subList(index, getCardListSize()).clear();
+        List<Card> cutHead = getAllCards(true);
+        cutTail.addAll(cutHead);
+        addCards(cutTail);
     }
 
     public List<Card> getAllCards(boolean remove) {

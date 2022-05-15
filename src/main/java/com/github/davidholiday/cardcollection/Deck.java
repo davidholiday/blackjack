@@ -50,7 +50,7 @@ public class Deck extends CardCollection {
         return rv;
     }
 
-    private static void validateDeck(boolean withJokers, List<Card> deck) {
+    public static void validateDeck(boolean withJokers, List<Card> deck) {
         if (App.RUNTIME_INFO.ASSERTIONS_ENABLED == false) {
             LOG.warn("skipping deck validation because Java was invoked without flag to enable assertions");
             return;
@@ -76,20 +76,32 @@ public class Deck extends CardCollection {
 
         // should be 13 of each suit
         int expected_suit_count = 13;
-        errorMessage =
-                getCountDeltaErrorMessage(expected_suit_count, suitMap.get(CardSuit.HEARTS), CardSuit.HEARTS.name());
+        errorMessage = getCountDeltaErrorMessage(
+                expected_suit_count,
+                CardSuit.HEARTS.name(),
+                suitMap.get(CardSuit.HEARTS)
+        );
         assert suitMap.get(CardSuit.HEARTS) == expected_suit_count: errorMessage;
 
-        errorMessage =
-                getCountDeltaErrorMessage(expected_suit_count, suitMap.get(CardSuit.DIAMONDS), CardSuit.DIAMONDS.name());
+        errorMessage = getCountDeltaErrorMessage(
+                expected_suit_count,
+                CardSuit.DIAMONDS.name(),
+                suitMap.get(CardSuit.DIAMONDS)
+        );
         assert suitMap.get(CardSuit.DIAMONDS) == expected_suit_count: errorMessage;
 
-        errorMessage =
-                getCountDeltaErrorMessage(expected_suit_count, suitMap.get(CardSuit.CLUBS), CardSuit.CLUBS.name());
+        errorMessage = getCountDeltaErrorMessage(
+                expected_suit_count,
+                CardSuit.CLUBS.name(),
+                suitMap.get(CardSuit.CLUBS)
+        );
         assert suitMap.get(CardSuit.CLUBS) == expected_suit_count: errorMessage;
 
-        errorMessage =
-                getCountDeltaErrorMessage(expected_suit_count, suitMap.get(CardSuit.SPADES), CardSuit.SPADES.name());
+        errorMessage = getCountDeltaErrorMessage(
+                expected_suit_count,
+                CardSuit.SPADES.name(),
+                suitMap.get(CardSuit.SPADES)
+        );
         assert suitMap.get(CardSuit.SPADES) == expected_suit_count: errorMessage;
 
         // should be four of each type - one per suit
@@ -97,72 +109,99 @@ public class Deck extends CardCollection {
         int expected_count_by_type = 4;
         for (CardType cardType : CardType.values()) {
             if (cardType == CardType.JOKER || cardType == CardType.CUT) { continue; }
-            errorMessage =
-                    getCountDeltaErrorMessage(expected_count_by_type, typeMap.get(cardType), cardType.name());
+            errorMessage = getCountDeltaErrorMessage(
+                    expected_count_by_type,
+                    cardType.name(),
+                    typeMap.get(cardType)
+            );
             assert typeMap.get(cardType) == expected_count_by_type: errorMessage;
         }
 
         if (withJokers) {
             // should be two jokers
             int expected_joker_count = 2;
-            errorMessage =
-                    getCountDeltaErrorMessage(expected_joker_count, typeMap.get(CardType.JOKER), CardType.JOKER.name());
+            errorMessage = getCountDeltaErrorMessage(
+                    expected_joker_count,
+                    CardType.JOKER.name(),
+                    typeMap.get(CardType.JOKER)
+            );
             assert typeMap.get(CardType.JOKER) == expected_joker_count: errorMessage;
 
             // both of which should be the only cards with NONE as suit
-            errorMessage =
-                    getCountDeltaErrorMessage(expected_joker_count, suitMap.get(CardSuit.NONE), CardSuit.NONE.name());
+            errorMessage = getCountDeltaErrorMessage(
+                    expected_joker_count,
+                    CardSuit.NONE.name(),
+                    suitMap.get(CardSuit.NONE)
+            );
             assert suitMap.get(CardSuit.NONE) == expected_joker_count: errorMessage;
 
             // 2->A + Jokers = 14 card types
             int expected_unique_types = 14;
-            errorMessage =
-                    getCountDeltaErrorMessage(expected_unique_types, typeMap.keySet().size(), "unique card types");
+            errorMessage =getCountDeltaErrorMessage(
+                    expected_unique_types,
+                    "unique card types",
+                    typeMap.keySet().size()
+            );
             assert typeMap.keySet().size() == expected_unique_types: errorMessage;
 
             // The joker should be the only duplicate card in the deck
             int expected_size_as_set = 53;
             int actual_size_as_set = deck.stream().collect(Collectors.toSet()).size();
-            errorMessage =
-                    getCountDeltaErrorMessage(expected_size_as_set, actual_size_as_set, "unique cards in deck");
+            errorMessage = getCountDeltaErrorMessage(
+                    expected_size_as_set,
+                    "unique cards in deck",
+                    actual_size_as_set
+            );
             assert actual_size_as_set == expected_size_as_set: errorMessage;
 
             // Double check deck size
             int expected_deck_size = 54;
-            errorMessage =
-                    getCountDeltaErrorMessage(expected_deck_size, deck.size(), "cards in deck");
+            errorMessage = getCountDeltaErrorMessage(
+                    expected_deck_size,
+                    "cards in deck",
+                    deck.size()
+            );
             assert deck.size() == expected_deck_size: errorMessage;
         } else {
             // should be nothing in the deck that has a suit of NONE
             int expected_suit_none_count = 0;
             int actual_suit_none_count = suitMap.containsKey(CardSuit.NONE) ? suitMap.get(CardSuit.NONE) : 0;
-            errorMessage =
-                    getCountDeltaErrorMessage(expected_suit_none_count, actual_suit_none_count, CardSuit.NONE.name());
+            errorMessage = getCountDeltaErrorMessage(
+                    expected_suit_none_count,
+                    CardSuit.NONE.name(),
+                    actual_suit_none_count
+            );
             assert suitMap.containsKey(CardSuit.NONE) == false: errorMessage;
 
             // 2->A = 13 card types
             int expected_unique_types = 13;
-            errorMessage =
-                    getCountDeltaErrorMessage(expected_unique_types, typeMap.keySet().size(), "unique card types");
+            errorMessage = getCountDeltaErrorMessage(
+                    expected_unique_types,
+                    "unique card types",
+                    typeMap.keySet().size()
+            );
             assert typeMap.keySet().size() == expected_unique_types: errorMessage;
 
             // every card in the deck should be unique
             int expected_size_as_set = 52;
             int actual_size_as_set = deck.stream().collect(Collectors.toSet()).size();
-            errorMessage =
-                    getCountDeltaErrorMessage(expected_size_as_set, actual_size_as_set, "unique cards in deck");
+            errorMessage = getCountDeltaErrorMessage(
+                    expected_size_as_set,
+                    "unique cards in deck",
+                    actual_size_as_set
+            );
             assert actual_size_as_set == expected_size_as_set: errorMessage;
 
             // double check deck size
             int expected_deck_size = 52;
-            errorMessage =
-                    getCountDeltaErrorMessage(expected_deck_size, deck.size(), "cards in deck");
+            errorMessage = getCountDeltaErrorMessage(
+                    expected_deck_size,
+                    "cards in deck",
+                    deck.size()
+            );
             assert deck.size() == expected_deck_size: errorMessage;
         }
     }
-
-
-
 
     public Deck(boolean withJokers) {
         List<Card> cardList = makeDeck(withJokers);
