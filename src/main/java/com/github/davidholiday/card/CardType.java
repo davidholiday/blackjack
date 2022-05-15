@@ -1,4 +1,4 @@
-package com.github.davidholiday;
+package com.github.davidholiday.card;
 
 import java.util.Arrays;
 

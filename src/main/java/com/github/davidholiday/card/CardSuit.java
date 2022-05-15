@@ -1,4 +1,4 @@
-package com.github.davidholiday;
+package com.github.davidholiday.card;
 
 public enum CardSuit {
     NONE,

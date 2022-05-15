@@ -1,4 +1,4 @@
-package com.github.davidholiday;
+package com.github.davidholiday.cardcollection;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -8,8 +8,15 @@ import java.util.HashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.github.davidholiday.App;
+import com.github.davidholiday.card.Card;
+import com.github.davidholiday.card.CardSuit;
+import com.github.davidholiday.card.CardType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.github.davidholiday.util.MessageTemplates.getCountDeltaErrorMessage;
 
 public class Deck extends CardCollection {
 
@@ -44,6 +51,10 @@ public class Deck extends CardCollection {
     }
 
     private static void validateDeck(boolean withJokers, List<Card> deck) {
+        if (App.RUNTIME_INFO.ASSERTIONS_ENABLED == false) {
+            LOG.warn("skipping deck validation because Java was invoked without flag to enable assertions");
+            return;
+        }
         Map<CardType, Integer> typeMap = new HashMap<>();
         Map<CardSuit, Integer> suitMap = new HashMap<>();
 
@@ -150,9 +161,7 @@ public class Deck extends CardCollection {
         }
     }
 
-    private static String getCountDeltaErrorMessage(int expected, int actual, String what) {
-        return MessageFormat.format("expected {0} {1} but found {2}", expected, what, actual);
-    }
+
 
 
     public Deck(boolean withJokers) {

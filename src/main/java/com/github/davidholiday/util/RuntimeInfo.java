@@ -1,4 +1,4 @@
-package com.github.davidholiday;
+package com.github.davidholiday.util;
 
 import java.lang.management.ManagementFactory;
 

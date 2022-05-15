@@ -1,5 +1,7 @@
 package com.github.davidholiday;
 
+import com.github.davidholiday.cardcollection.Deck;
+import com.github.davidholiday.util.RuntimeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +21,7 @@ public class App {
         msg = MessageFormat.format("deckWithJokers is: {0}", deckWithJokers.getAllCards(false));
         LOG.info(msg);
 
-        deckWithJokers.shuffle();
+        deckWithJokers.shuffle(10);
         msg = MessageFormat.format("deckWithJokers is now: {0}", deckWithJokers.getAllCards(false));
         LOG.info(msg);
     }
