@@ -1,6 +1,7 @@
 package com.github.davidholiday;
 
 import com.github.davidholiday.cardcollection.Deck;
+import com.github.davidholiday.cardcollection.Shoe;
 import com.github.davidholiday.util.RuntimeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,14 @@ public class App {
 
        deck.cut(20);
        msg = MessageFormat.format("deck is: {0}", deck.getAllCards(false));
+       LOG.info(msg);
+
+       Shoe shoe = new Shoe(6);
+       msg = MessageFormat.format("show is: {0}", shoe.getAllCards(false));
+       LOG.info(msg);
+
+       shoe.cut();
+       msg = MessageFormat.format("show is: {0}", shoe.getAllCards(false));
        LOG.info(msg);
     }
 

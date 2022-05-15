@@ -1,14 +1,18 @@
 package com.github.davidholiday.cardcollection;
 
 import com.github.davidholiday.card.Card;
+import com.github.davidholiday.util.MessageTemplates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.SecureRandom;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.concurrent.ThreadLocalRandom;
 
-import static com.github.davidholiday.util.MessageTemplates.getCountDeltaErrorMessage;
+import static com.github.davidholiday.util.MessageTemplates.getErrorMessage;
 
 public abstract class CardCollection {
 
@@ -18,11 +22,15 @@ public abstract class CardCollection {
 
     private final SecureRandom secureRandom = new SecureRandom();
 
+    public int getRandomIntForRange(int floor, int ceiling) {
+        return ThreadLocalRandom.current().nextInt(floor, ceiling + 1);
+    }
+
     public void shuffle() { Collections.shuffle(cardList, secureRandom); }
 
     public void shuffle(int count) {
          if (count < 1) {
-             String msg = getCountDeltaErrorMessage(
+             String msg = MessageTemplates.getErrorMessage(
                      ">=1",
                      "value for argument [count]",
                      String.valueOf(count)
@@ -33,6 +41,8 @@ public abstract class CardCollection {
 
          for (int i = 0; i < count; i++) { shuffle(); }
     }
+
+    public void insert(Card card, int index) { cardList.add(index, card); }
 
     public Card draw() {
         try {
@@ -62,7 +72,7 @@ public abstract class CardCollection {
 
     public void cut(int index) {
         if (index < 0 || index > getCardListSize()) {
-            String msg = getCountDeltaErrorMessage(
+            String msg = MessageTemplates.getErrorMessage(
                     "0 >= [count] <= [card collection size]",
                     "value for argument [count]",
                     String.valueOf(index)
