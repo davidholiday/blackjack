@@ -3,13 +3,16 @@ package com.github.davidholiday;
 import com.github.davidholiday.card.Card;
 import com.github.davidholiday.card.CardSuit;
 import com.github.davidholiday.card.CardType;
+import com.github.davidholiday.cardcollection.CardCollection;
 import com.github.davidholiday.cardcollection.Deck;
+import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.cardcollection.Shoe;
 import com.github.davidholiday.util.RuntimeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
+import java.util.List;
 
 public class App {
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
@@ -17,26 +20,17 @@ public class App {
     public static final RuntimeInfo RUNTIME_INFO = new RuntimeInfo();
 
     public static void main( String[] args ) {
-       Deck deck = new Deck(false);
-       String msg = MessageFormat.format("deck is: {0}", deck.getAllCards(false));
-       LOG.info(msg);
-
-       deck.cut(20);
-       msg = MessageFormat.format("deck is: {0}", deck.getAllCards(false));
-       LOG.info(msg);
-
        Shoe shoe = new Shoe(6);
-       msg = MessageFormat.format("show is: {0}", shoe.getAllCards(false));
-       LOG.info(msg);
-
+       shoe.shuffle(10);
        shoe.cut();
-       msg = MessageFormat.format("show is: {0}", shoe.getAllCards(false));
+       String msg = MessageFormat.format("shoe is: {0}", shoe.getAllCards(false));
        LOG.info(msg);
 
-        Card cutCard = new Card(CardType.CUT, CardSuit.NONE);
-        shoe.remove(cutCard);
-        msg = MessageFormat.format("show is: {0}", shoe.getAllCards(false));
-        LOG.info(msg);
+       for (int i = 0; i < 50; i ++) {
+           int randy = shoe.getRandomIntForRange(2, 6);
+           Hand hand = new Hand(shoe.draw(randy));
+           LOG.info("hand is: " + hand.toString());
+       }
     }
 
 }

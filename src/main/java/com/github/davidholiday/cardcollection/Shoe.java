@@ -5,10 +5,9 @@ import com.github.davidholiday.card.CardSuit;
 import com.github.davidholiday.card.CardType;
 
 import com.github.davidholiday.util.MessageTemplates;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.github.davidholiday.util.MessageTemplates.getErrorMessage;
 
 public class Shoe extends CardCollection {
 

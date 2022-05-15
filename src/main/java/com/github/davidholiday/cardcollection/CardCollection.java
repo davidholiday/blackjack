@@ -79,6 +79,21 @@ public abstract class CardCollection {
         }
     }
 
+    public List<Card> peek(int num) {
+        try {
+            List<Card> rv = new ArrayList<>(cardList.subList(0, num));
+            return rv;
+        } catch (IndexOutOfBoundsException e) {
+            String msg = MessageFormat.format(
+                    "attempt to draw {0} cards from card collection sized {1}",
+                    num,
+                    cardList.size()
+            );
+            LOG.error(msg);
+            throw new IndexOutOfBoundsException(msg);
+        }
+    }
+
     public void cut(int index) {
         if (index < 0 || index > getCardListSize()) {
             String msg = MessageTemplates.getErrorMessage(
@@ -106,5 +121,10 @@ public abstract class CardCollection {
     public void addCards(List<Card> cardList) { this.cardList.addAll(cardList); }
 
     public int getCardListSize() { return cardList.size(); }
+
+    @Override
+    public String toString() {
+        return getAllCards(false).toString();
+    }
 
 }
