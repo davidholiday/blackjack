@@ -1,5 +1,8 @@
 package com.github.davidholiday;
 
+import com.github.davidholiday.card.Card;
+import com.github.davidholiday.card.CardSuit;
+import com.github.davidholiday.card.CardType;
 import com.github.davidholiday.cardcollection.Deck;
 import com.github.davidholiday.cardcollection.Shoe;
 import com.github.davidholiday.util.RuntimeInfo;
@@ -29,6 +32,11 @@ public class App {
        shoe.cut();
        msg = MessageFormat.format("show is: {0}", shoe.getAllCards(false));
        LOG.info(msg);
+
+        Card cutCard = new Card(CardType.CUT, CardSuit.NONE);
+        shoe.remove(cutCard);
+        msg = MessageFormat.format("show is: {0}", shoe.getAllCards(false));
+        LOG.info(msg);
     }
 
 }

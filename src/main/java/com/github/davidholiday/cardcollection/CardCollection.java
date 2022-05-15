@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import static com.github.davidholiday.util.MessageTemplates.getErrorMessage;
 
@@ -43,6 +44,14 @@ public abstract class CardCollection {
     }
 
     public void insert(Card card, int index) { cardList.add(index, card); }
+
+    public void remove(Card removeCard) {
+        int removeIndex = cardList.indexOf(removeCard);
+        while (removeIndex > -1) {
+            cardList.remove(removeIndex);
+            removeIndex = cardList.indexOf(removeCard);
+        }
+    }
 
     public Card draw() {
         try {
