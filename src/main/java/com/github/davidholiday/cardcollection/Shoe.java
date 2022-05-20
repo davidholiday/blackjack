@@ -3,7 +3,7 @@ package com.github.davidholiday.cardcollection;
 import com.github.davidholiday.card.Card;
 import com.github.davidholiday.card.CardSuit;
 import com.github.davidholiday.card.CardType;
-
+import com.github.davidholiday.util.GeneralUtils;
 import com.github.davidholiday.util.MessageTemplates;
 
 import org.slf4j.Logger;
@@ -29,10 +29,12 @@ public class Shoe extends CardCollection {
         }
 
         for (int i = 0; i < decks; i ++) {
-            addCards(Deck.makeDeck(false));
+            Deck d = new Deck(false);
+            addCards(d.getAllCards(true));
         }
 
         expectedFullShoeSize = getCardListSize();
+        validateDeck(decks, false, getAllCards(false));
     }
 
     public void cut() {
@@ -45,13 +47,13 @@ public class Shoe extends CardCollection {
         }
         int floor = 14;
         int ceiling = getCardListSize() - 15;
-        int cutIndex = getRandomIntForRange(floor, ceiling);
+        int cutIndex = GeneralUtils.getRandomIntForRange(floor, ceiling);
         cut(cutIndex);
 
         // insert cut card between 65% and 75% into the deck
         Double floorD = getCardListSize() * 0.65;
         Double ceilingD = getCardListSize() * 0.75;
-        int insertIndex = getRandomIntForRange(floorD.intValue(), ceilingD.intValue());
+        int insertIndex = GeneralUtils.getRandomIntForRange(floorD.intValue(), ceilingD.intValue());
         insert(cutCard, insertIndex);
     }
 

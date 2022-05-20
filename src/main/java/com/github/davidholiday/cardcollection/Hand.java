@@ -3,6 +3,7 @@ package com.github.davidholiday.cardcollection;
 import com.github.davidholiday.card.Card;
 import com.github.davidholiday.card.CardType;
 import com.github.davidholiday.card.CardValue;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

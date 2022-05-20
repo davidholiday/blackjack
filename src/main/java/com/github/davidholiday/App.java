@@ -8,6 +8,7 @@ import com.github.davidholiday.cardcollection.Deck;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.cardcollection.Shoe;
 import com.github.davidholiday.util.RuntimeInfo;
+import com.github.davidholiday.util.GeneralUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public class App {
        LOG.info(msg);
 
        for (int i = 0; i < 50; i ++) {
-           int randy = shoe.getRandomIntForRange(2, 6);
+           int randy = GeneralUtils.getRandomIntForRange(2, 6);
            Hand hand = new Hand(shoe.draw(randy));
            LOG.info("hand is: " + hand.toString());
        }
