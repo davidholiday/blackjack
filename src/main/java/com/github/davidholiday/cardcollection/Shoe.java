@@ -9,6 +9,9 @@ import com.github.davidholiday.util.MessageTemplates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.MessageFormat;
+import java.util.List;
+
 public class Shoe extends CardCollection {
 
     private final int expectedFullShoeSize;
@@ -57,5 +60,17 @@ public class Shoe extends CardCollection {
         insert(cutCard, insertIndex);
     }
 
+    @Override
+    public void addCards(List<Card> cardList) {
+        int currentDeckSize = this.getCardListSize();
+        int newDeckSize = cardList.size() + currentDeckSize;
+        if (newDeckSize > this.expectedFullShoeSize) {
+            String msg = MessageFormat.format(
+                    "attempt to add too many shoe to a deck with a max size of {0}", expectedFullShoeSize);
+            LOG.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+        super.addCards(cardList);
+    }
 
 }
