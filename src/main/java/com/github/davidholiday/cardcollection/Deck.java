@@ -52,7 +52,7 @@ public class Deck extends CardCollection {
             );
         }
 
-        if (App.RUNTIME_INFO.ASSERTIONS_ENABLED) { validateDeck(1, withJokers, rv); }
+        validateDeck(1, withJokers, rv);
         return rv;
     }
 

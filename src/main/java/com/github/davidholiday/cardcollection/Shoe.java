@@ -64,9 +64,9 @@ public class Shoe extends CardCollection {
     public void addCards(List<Card> cardList) {
         int currentDeckSize = this.getCardListSize();
         int newDeckSize = cardList.size() + currentDeckSize;
-        if (newDeckSize > this.expectedFullShoeSize) {
+        if (newDeckSize > this.expectedFullShoeSize && this.expectedFullShoeSize > 0) {
             String msg = MessageFormat.format(
-                    "attempt to add too many shoe to a deck with a max size of {0}", expectedFullShoeSize);
+                    "attempt to add too many cards to a shoe with a max size of {0}", expectedFullShoeSize);
             LOG.error(msg);
             throw new IllegalArgumentException(msg);
         }

@@ -1,0 +1,82 @@
+package com.github.davidholiday.game;
+
+import com.github.davidholiday.App;
+import com.github.davidholiday.card.CardSuit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.github.davidholiday.game.Rule.*;
+import static com.github.davidholiday.util.MessageTemplates.getErrorMessage;
+
+public class RuleSet {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RuleSet.class);
+
+    private final Set<Rule> ruleSet;
+
+    public RuleSet() {
+
+        // defaults set as per Wizard of Odds
+        // https://wizardofodds.com/games/blackjack/calculator/
+        Set<Rule> defaultRuleSet = Stream.of(
+                EIGHT_DECK_SHOE,
+                PLAYER_CAN_DOUBLE_AFTER_SPLIT,
+                PLAYER_CAN_DOUBLE_ON_ANY_FIRST_TWO_CARDS,
+                PLAYER_CAN_RESPLIT_TO_FOUR_HANDS,
+                PLAYER_LOSES_ONLY_ORIGINAL_BET_AGAINST_DEALER_BLACKJACK,
+                BLACKJACK_PAYS_THREE_TO_TWO
+        ).collect(Collectors.toSet());
+
+        validateRuleSet(defaultRuleSet);
+        ruleSet = defaultRuleSet;
+    }
+
+    public RuleSet(Set<Rule> ruleSet) {
+        validateRuleSet(ruleSet);
+        this.ruleSet = ruleSet;
+    }
+
+    public void validateRuleSet(Set<Rule> ruleSet) {
+        if (App.RUNTIME_INFO.ASSERTIONS_ENABLED == false) {
+            LOG.warn("skipping deck validation because Java was invoked without flag to enable assertions");
+            return;
+        }
+
+        String errorMessage = "";
+
+        // ensure ruleset contains one and only one deck definition
+        //
+        int expectedDeckRules = 1;
+        Long actualDeckRulesL = ruleSet.stream()
+                                       .filter((rule) -> Rule.getDeckRuleSet().contains(rule))
+                                       .count();
+
+        errorMessage = getErrorMessage(
+                expectedDeckRules,
+                "[(n)_DECK_SHOE] rules",
+                actualDeckRulesL.intValue()
+        );
+        assert expectedDeckRules == actualDeckRulesL.intValue(): errorMessage;
+
+
+        // ensure ruleset containes one and only one PLAYER_CAN_DOUBLE_ON definition
+        //
+        int expectedPlayerCanDoubleOnRules = 1;
+        Long actualPlayerCanDoubleOnRulesL = ruleSet.stream()
+                                                    .filter((rule) -> Rule.getDeckRuleSet().contains(rule))
+                                                    .count();
+
+        errorMessage = getErrorMessage(
+                expectedDeckRules,
+                "[PLAYER_CAN_DOUBLE_ON] Rules",
+                actualDeckRulesL.intValue());
+        assert expectedPlayerCanDoubleOnRules == actualPlayerCanDoubleOnRulesL.intValue(): errorMessage;
+    }
+
+
+}

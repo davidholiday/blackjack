@@ -7,6 +7,7 @@ import com.github.davidholiday.cardcollection.CardCollection;
 import com.github.davidholiday.cardcollection.Deck;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.cardcollection.Shoe;
+import com.github.davidholiday.game.RuleSet;
 import com.github.davidholiday.util.RuntimeInfo;
 import com.github.davidholiday.util.GeneralUtils;
 import org.slf4j.Logger;
@@ -27,11 +28,14 @@ public class App {
        String msg = MessageFormat.format("shoe is: {0}", shoe.getAllCards(false));
        LOG.info(msg);
 
-       for (int i = 0; i < 50; i ++) {
+       for (int i = 0; i < 5; i ++) {
            int randy = GeneralUtils.getRandomIntForRange(2, 6);
            Hand hand = new Hand(shoe.draw(randy));
            LOG.info("hand is: " + hand.toString());
        }
+
+       LOG.info("making ruleset to test validation method");
+       RuleSet ruleSet = new RuleSet();
     }
 
 }
