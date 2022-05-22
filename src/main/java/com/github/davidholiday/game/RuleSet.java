@@ -64,18 +64,48 @@ public class RuleSet {
         assert expectedDeckRules == actualDeckRulesL.intValue(): errorMessage;
 
 
-        // ensure ruleset containes one and only one PLAYER_CAN_DOUBLE_ON definition
+        // ensure ruleset contains one and only one PLAYER_CAN_DOUBLE_ON definition
         //
         int expectedPlayerCanDoubleOnRules = 1;
         Long actualPlayerCanDoubleOnRulesL = ruleSet.stream()
-                                                    .filter((rule) -> Rule.getDeckRuleSet().contains(rule))
+                                                    .filter((rule) -> Rule.getPlayerCanDoubleOnRuleSet().contains(rule))
                                                     .count();
 
         errorMessage = getErrorMessage(
-                expectedDeckRules,
+                expectedPlayerCanDoubleOnRules,
                 "[PLAYER_CAN_DOUBLE_ON] Rules",
-                actualDeckRulesL.intValue());
+                actualPlayerCanDoubleOnRulesL.intValue()
+        );
         assert expectedPlayerCanDoubleOnRules == actualPlayerCanDoubleOnRulesL.intValue(): errorMessage;
+
+
+        // ensure ruleset contains one and only one PLAYER_CAN_RESPLIT_TO definition
+        //
+        int expectedPlayerCanResplitToRules = 1;
+        Long actualPlayerCanResplitToRulesL = ruleSet.stream()
+                                                     .filter((rule) -> Rule.getPlayerCanResplitToRuleSet().contains(rule))
+                                                     .count();
+        errorMessage = getErrorMessage(
+                expectedPlayerCanResplitToRules,
+                "[PLAYER_CAN_RESPLIT_TO] Rules",
+                actualPlayerCanResplitToRulesL.intValue()
+        );
+        assert expectedPlayerCanResplitToRules == actualPlayerCanResplitToRulesL.intValue(): errorMessage;
+
+
+        // ensure ruleset contains one and only one BLACKJACK_PAYS definition
+        //
+        int expectedBlackJackPaysRules = 1;
+        Long actualBlackJackPaysRulesL = ruleSet.stream()
+                                                .filter((rule) -> Rule.getBlackJackPaysRuleSet().contains(rule))
+                                                .count();
+        errorMessage = getErrorMessage(
+                expectedBlackJackPaysRules,
+                "[BLACKJACK_PAYS] Rules",
+                actualBlackJackPaysRulesL.intValue()
+        );
+        assert expectedBlackJackPaysRules == actualBlackJackPaysRulesL.intValue(): errorMessage;
+
     }
 
 

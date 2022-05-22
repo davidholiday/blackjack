@@ -26,7 +26,6 @@ public enum Rule {
     PLAYER_CAN_HIT_SPLIT_ACES,
     PLAYER_LOSES_ONLY_ORIGINAL_BET_AGAINST_DEALER_BLACKJACK,
     PLAYER_CAN_LATE_SURRENDER,
-    PLAYER_CAN_EARLY_SURRENDER,
     BLACKJACK_PAYS_THREE_TO_TWO,
     BLACKJACK_PAYS_SIX_TO_FIVE;
 
@@ -48,18 +47,11 @@ public enum Rule {
         ).collect(Collectors.toSet());
     }
 
-    public static Set<Rule> getPlayerCanReplitToRuleSet() {
+    public static Set<Rule> getPlayerCanResplitToRuleSet() {
         return Stream.of(
                 PLAYER_CAN_RESPLIT_TO_TWO_HANDS,
                 PLAYER_CAN_RESPLIT_TO_THREE_HANDS,
                 PLAYER_CAN_RESPLIT_TO_FOUR_HANDS
-        ).collect(Collectors.toSet());
-    }
-
-    public static Set<Rule> getSurrenderRuleSet() {
-        return Stream.of(
-                PLAYER_CAN_LATE_SURRENDER,
-                PLAYER_CAN_EARLY_SURRENDER
         ).collect(Collectors.toSet());
     }
 
