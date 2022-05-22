@@ -1,14 +1,13 @@
 package com.github.davidholiday.game;
 
-import com.github.davidholiday.App;
-import com.github.davidholiday.card.CardSuit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.github.davidholiday.App;
 
 import static com.github.davidholiday.game.Rule.*;
 import static com.github.davidholiday.util.MessageTemplates.getErrorMessage;
