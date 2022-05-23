@@ -1,6 +1,7 @@
 package com.github.davidholiday.player;
 
 public enum PlayerPosition {
+    MCP,
     DEALER,
     FIRST_BASE,
     SHORT_STOP,
