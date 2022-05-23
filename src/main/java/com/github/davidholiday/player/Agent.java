@@ -14,15 +14,11 @@ public abstract class Agent {
 
     private final Strategy strategy;
 
-    private final Map<PlayerPosition, List<Card>> offeredCardsForMap = new HashMap<>();
-
-    private final Map<PlayerPosition, Integer> offeredMoneyForMap = new HashMap<>();
-
     private Optional<Integer> count;
 
     public Agent(Strategy strategy) { this.strategy = strategy; }
 
-    public abstract Map<PlayerPosition, Action> act(
+    public abstract AgentAction act(
 
             Game.GamePublic gamePublic
 
@@ -34,16 +30,27 @@ public abstract class Agent {
 //            Optional<Integer> count
     );
 
-    public abstract void collectOfferedCards();
 
-    public abstract Map<PlayerPosition, List<Card>> getOfferedCardsForMap();
+    public abstract class AgentAction {
+        /*
+        here should be
+        actionMap
+        offeredCardsMap
+        offeredMoneyMap
+         */
+    };
 
-    abstract void updateOfferedCardsForMap(PlayerPosition playerPosition, List<Card> newCardList);
 
-    public abstract void collectOfferedMoney();
-
-    public abstract Map<PlayerPosition, Integer> getOfferedMoneyMap();
-
-    abstract void updateOfferedMoneyMap(PlayerPosition playerPosition, Integer newAmount);
+//    public abstract void collectOfferedCards();
+//
+//    public abstract Map<PlayerPosition, List<Card>> getOfferedCardsForMap();
+//
+//    abstract void updateOfferedCardsForMap(PlayerPosition playerPosition, List<Card> newCardList);
+//
+//    public abstract void collectOfferedMoney();
+//
+//    public abstract Map<PlayerPosition, Integer> getOfferedMoneyMap();
+//
+//    abstract void updateOfferedMoneyMap(PlayerPosition playerPosition, Integer newAmount);
 
 }
