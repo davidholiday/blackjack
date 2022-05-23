@@ -15,7 +15,7 @@ public abstract class Agent {
 
     private final PlayStrategy playStrategy;
 
-    private Optional<Integer> count = Optional.empty();
+    private Optional<Map<String, Integer>> count = Optional.empty();
 
     public Agent(CountStrategy countStrategy, PlayStrategy playStrategy) {
         this.countStrategy = countStrategy;
@@ -46,17 +46,21 @@ public abstract class Agent {
 
     public String getPlayStrategyName() { return playStrategy.getName(); }
 
-    void updateCount(Hand hand, Game.GamePublic gamePublic) {
-        count = countStrategy.updateCount(hand, gamePublic);
-    }
-
-    public Optional<Integer> getCount() {
+    public Optional<Map<String, Integer>> getCount() {
         if (count.isPresent()) { return Optional.of(count.get()); }
         else { return Optional.empty(); }
     }
 
-    public Action evaluateHand(Hand hand, Game.GamePublic gamePublic) {
+    void updateCount(Hand hand, Game.GamePublic gamePublic) {
+        count = countStrategy.updateCount(hand, gamePublic);
+    }
+
+    Action getNextAction(Hand hand, Game.GamePublic gamePublic) {
         return playStrategy.evaluateHand(hand, count, gamePublic);
+    }
+
+    double wager(Game.GamePublic gamePublic) {
+        return playStrategy.wager(count, gamePublic);
     }
 
 }

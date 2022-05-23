@@ -7,6 +7,7 @@ import com.github.davidholiday.game.Game;
 import com.github.davidholiday.game.Rule;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -14,6 +15,8 @@ public interface PlayStrategy {
 
     String getName();
 
-    Action evaluateHand(Hand hand, Optional<Integer> count, Game.GamePublic gamePublic);
+    Action evaluateHand(Hand hand, Optional<Map<String, Integer>> count, Game.GamePublic gamePublic);
+
+    public abstract double wager(Optional<Map<String, Integer>> count, Game.GamePublic gamePublic);
 
 }
