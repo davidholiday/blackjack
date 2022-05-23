@@ -27,6 +27,8 @@ public class Hand extends CardCollection {
 
     private boolean isTwentyOne;
 
+    public Hand() {}
+
     public Hand(List<Card> cards) {
         addCards(cards);
     }

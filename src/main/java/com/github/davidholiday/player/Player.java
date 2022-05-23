@@ -5,7 +5,8 @@ import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.Game;
 import com.github.davidholiday.game.Rule;
-import com.github.davidholiday.player.strategy.Strategy;
+import com.github.davidholiday.player.strategy.count.CountStrategy;
+import com.github.davidholiday.player.strategy.play.PlayStrategy;
 
 import java.util.List;
 import java.util.Map;
@@ -14,37 +15,20 @@ import java.util.Set;
 
 public class Player extends Agent {
 
-    public Player(Strategy strategy) {
-        super(strategy);
+    private Hand hand = new Hand();
+
+    public Player(CountStrategy countStrategy, PlayStrategy playStrategy) {
+        super(countStrategy, playStrategy);
     }
 
     @Override
-    public Action act(
-            Action actionToAgent,
-            Optional<Map<PlayerPosition, Hand>> hands,
-            Set<Rule> ruleSet,
-            Optional<Integer> count
-    ) {
+    public AgentAction act(Game.GamePublic gamePublic) {
+        this.updateCount(hand, gamePublic);
+        Action action = this.evaluateHand(hand, gamePublic);
+        /*
+        build AgentAction obj
+         */
+
         return null;
-    }
-
-    @Override
-    public void takeOfferedCards(Optional<List<Card>> offeredCards) {
-
-    }
-
-    @Override
-    public Optional<Card> getOfferedCards() {
-        return Optional.empty();
-    }
-
-    @Override
-    public void takeOfferedMoney(Optional<Integer> offeredMoney) {
-
-    }
-
-    @Override
-    public Optional<Integer> getOfferedMoney() {
-        return Optional.empty();
     }
 }

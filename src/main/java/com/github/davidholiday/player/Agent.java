@@ -1,56 +1,62 @@
 package com.github.davidholiday.player;
 
 import com.github.davidholiday.card.Card;
-import com.github.davidholiday.cardcollection.CardCollection;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.Game;
-import com.github.davidholiday.game.Rule;
-import com.github.davidholiday.player.strategy.Strategy;
+import com.github.davidholiday.player.strategy.count.CountStrategy;
+import com.github.davidholiday.player.strategy.play.PlayStrategy;
 
 import java.util.*;
 
 public abstract class Agent {
 
-    private final Strategy strategy;
+    private final CountStrategy countStrategy;
 
-    private Optional<Integer> count;
+    private final PlayStrategy playStrategy;
 
-    public Agent(Strategy strategy) { this.strategy = strategy; }
+    private Optional<Integer> count = Optional.empty();
 
-    public abstract AgentAction act(
+    public Agent(CountStrategy countStrategy, PlayStrategy playStrategy) {
+        this.countStrategy = countStrategy;
+        this.playStrategy = playStrategy;
+    }
 
-            Game.GamePublic gamePublic
-
-//            Map<PlayerPosition, Action> actionMap,
-//            Map<PlayerPosition, Hand> handsMap,
-//            Map<PlayerPosition, List<Card>> offeredCardsMap,
-//            Map<PlayerPosition, Integer> offeredMoneyMap,
-//            Set<Rule> ruleSet,
-//            Optional<Integer> count
-    );
+    public abstract AgentAction act(Game.GamePublic gamePublic);
 
 
-    public abstract class AgentAction {
-        /*
-        here should be
-        actionMap
-        offeredCardsMap
-        offeredMoneyMap
-         */
+    public class AgentAction {
+
+        public final Map<PlayerPosition, Action> actionMap;
+        public final Map<PlayerPosition, List<Card>> offeredCardsMap;
+        public final Map<PlayerPosition, Integer> offeredMoneyMap;
+
+        public AgentAction (
+                Map<PlayerPosition, Action> actionMap,
+                Map<PlayerPosition, List<Card>> offeredCardsMap,
+                Map<PlayerPosition, Integer> offeredMoneyMap
+        ) {
+            this.actionMap = actionMap;
+            this.offeredCardsMap = offeredCardsMap;
+            this.offeredMoneyMap = offeredMoneyMap;
+        }
     };
 
+    public String getCountStrategyName() { return countStrategy.getName(); }
 
-//    public abstract void collectOfferedCards();
-//
-//    public abstract Map<PlayerPosition, List<Card>> getOfferedCardsForMap();
-//
-//    abstract void updateOfferedCardsForMap(PlayerPosition playerPosition, List<Card> newCardList);
-//
-//    public abstract void collectOfferedMoney();
-//
-//    public abstract Map<PlayerPosition, Integer> getOfferedMoneyMap();
-//
-//    abstract void updateOfferedMoneyMap(PlayerPosition playerPosition, Integer newAmount);
+    public String getPlayStrategyName() { return playStrategy.getName(); }
+
+    void updateCount(Hand hand, Game.GamePublic gamePublic) {
+        count = countStrategy.updateCount(hand, gamePublic);
+    }
+
+    public Optional<Integer> getCount() {
+        if (count.isPresent()) { return Optional.of(count.get()); }
+        else { return Optional.empty(); }
+    }
+
+    public Action evaluateHand(Hand hand, Game.GamePublic gamePublic) {
+        return playStrategy.evaluateHand(hand, count, gamePublic);
+    }
 
 }

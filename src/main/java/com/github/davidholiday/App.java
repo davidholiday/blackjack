@@ -36,6 +36,15 @@ public class App {
 
        LOG.info("making ruleset to test validation method");
        RuleSet ruleSet = new RuleSet();
+
+
+       /*
+
+
+       eventuall this method will have a stream of Game objects it will map a lambda onto to run [n] roudns of blackjack
+
+
+        */
     }
 
 }

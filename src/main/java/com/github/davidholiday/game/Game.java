@@ -24,6 +24,29 @@ Map<PlayerPosition, Agent> playerMap
 Optional<List<Cards>> getOfferedCardsFrom(PlayerPosition)
 
 
+//
+
+
+game object
+
+plays a round of blackjack
+    * has method to play [n] rounds
+    * has method to play [n] shoes
+
+handles recording of salient game data
+
+if a player goes bust then
+  * their bankroll is refreshed
+  * when they went bust is recorded
+  * if it happens mid game (ie they can't double down when they normally would) the
+    bust is counted as that hand.
+
+
+//
+
+
+
+
 */
 
     public class GamePublic {

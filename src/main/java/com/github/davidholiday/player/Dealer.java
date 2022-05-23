@@ -1,11 +1,14 @@
 package com.github.davidholiday.player;
 
 import com.github.davidholiday.card.Card;
+import com.github.davidholiday.cardcollection.DiscardTray;
 import com.github.davidholiday.cardcollection.Hand;
+import com.github.davidholiday.cardcollection.Shoe;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.Game;
 import com.github.davidholiday.game.Rule;
-import com.github.davidholiday.player.strategy.Strategy;
+import com.github.davidholiday.player.strategy.count.CountStrategy;
+import com.github.davidholiday.player.strategy.play.PlayStrategy;
 
 import java.util.List;
 import java.util.Map;
@@ -14,37 +17,24 @@ import java.util.Set;
 
 public class Dealer extends Agent {
 
-    public Dealer(Strategy strategy) {
-        super(strategy);
+    private final Shoe shoe;
+
+    private final DiscardTray discardTray = new DiscardTray();
+
+    private Hand hand = new Hand();
+
+    public Dealer(CountStrategy countStrategy, PlayStrategy playStrategy, int shoeSize) {
+        super(countStrategy, playStrategy);
+        shoe = new Shoe(shoeSize);
     }
 
     @Override
-    public Action act(
-            Action actionToAgent,
-            Optional<Map<PlayerPosition, Hand>> hands,
-            Set<Rule> ruleSet,
-            Optional<Integer> count
-    ) {
+    public AgentAction act(Game.GamePublic gamePublic) {
+        Action action = this.evaluateHand(hand, gamePublic);
+        /*
+        build AgentAction obj
+         */
+
         return null;
-    }
-
-    @Override
-    public void takeOfferedCards(Optional<List<Card>> offeredCards) {
-
-    }
-
-    @Override
-    public Optional<Card> getOfferedCards() {
-        return Optional.empty();
-    }
-
-    @Override
-    public void takeOfferedMoney(Optional<Integer> offeredMoney) {
-
-    }
-
-    @Override
-    public Optional<Integer> getOfferedMoney() {
-        return Optional.empty();
     }
 }
