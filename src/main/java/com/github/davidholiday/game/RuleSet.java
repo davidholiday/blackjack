@@ -3,6 +3,7 @@ package com.github.davidholiday.game;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,7 +17,7 @@ public class RuleSet {
 
     private static final Logger LOG = LoggerFactory.getLogger(RuleSet.class);
 
-    private final Set<Rule> ruleSet;
+    private final Set<Rule> unmodifiableRuleSet;
 
     public RuleSet() {
 
@@ -29,15 +30,15 @@ public class RuleSet {
                 PLAYER_CAN_RESPLIT_TO_FOUR_HANDS,
                 PLAYER_LOSES_ONLY_ORIGINAL_BET_AGAINST_DEALER_BLACKJACK,
                 BLACKJACK_PAYS_THREE_TO_TWO
-        ).collect(Collectors.toSet());
+        ).collect(Collectors.toUnmodifiableSet());
 
         validateRuleSet(defaultRuleSet);
-        ruleSet = defaultRuleSet;
+        unmodifiableRuleSet = defaultRuleSet;
     }
 
     public RuleSet(Set<Rule> ruleSet) {
         validateRuleSet(ruleSet);
-        this.ruleSet = ruleSet;
+        this.unmodifiableRuleSet = Collections.unmodifiableSet(ruleSet);
     }
 
     public void validateRuleSet(Set<Rule> ruleSet) {

@@ -27,14 +27,14 @@ public abstract class Agent {
 
     public class AgentAction {
 
-        public final Map<PlayerPosition, Action> actionMap;
-        public final Map<PlayerPosition, List<Card>> offeredCardsMap;
-        public final Map<PlayerPosition, Integer> offeredMoneyMap;
+        public final Map<AgentPosition, Action> actionMap;
+        public final Map<AgentPosition, List<Card>> offeredCardsMap;
+        public final Map<AgentPosition, Integer> offeredMoneyMap;
 
         public AgentAction (
-                Map<PlayerPosition, Action> actionMap,
-                Map<PlayerPosition, List<Card>> offeredCardsMap,
-                Map<PlayerPosition, Integer> offeredMoneyMap
+                Map<AgentPosition, Action> actionMap,
+                Map<AgentPosition, List<Card>> offeredCardsMap,
+                Map<AgentPosition, Integer> offeredMoneyMap
         ) {
             this.actionMap = actionMap;
             this.offeredCardsMap = offeredCardsMap;
