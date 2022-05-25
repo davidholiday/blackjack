@@ -3,6 +3,7 @@ package com.github.davidholiday.player;
 import com.github.davidholiday.card.Card;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.game.Action;
+import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.game.Game;
 import com.github.davidholiday.player.strategy.count.CountStrategy;
 import com.github.davidholiday.player.strategy.play.PlayStrategy;
@@ -21,7 +22,9 @@ public abstract class Agent {
 
     private double bankroll;
 
-    private Optional<Map<String, Integer>> count = Optional.empty();
+    private int count = 0;
+
+    private Queue<ActionToken> actionTokenQueue = new LinkedList<>();
 
     public Agent(CountStrategy countStrategy, PlayStrategy playStrategy, double bankroll) {
         this.countStrategy = countStrategy;
@@ -34,45 +37,31 @@ public abstract class Agent {
 
     }
 
-    public abstract AgentAction act(Game.GameStateToken gamePublic);
+    public void addActionToQueue(ActionToken action) {
+        actionTokenQueue.add(action);
+    }
 
+    public abstract ActionToken act(ActionToken actionToken);
 
-    public class AgentAction {
-
-        public final Map<AgentPosition, Action> actionMap;
-        public final Map<AgentPosition, List<Card>> offeredCardsMap;
-        public final Map<AgentPosition, Integer> offeredMoneyMap;
-
-        public AgentAction (
-                Map<AgentPosition, Action> actionMap,
-                Map<AgentPosition, List<Card>> offeredCardsMap,
-                Map<AgentPosition, Integer> offeredMoneyMap
-        ) {
-            this.actionMap = actionMap;
-            this.offeredCardsMap = offeredCardsMap;
-            this.offeredMoneyMap = offeredMoneyMap;
-        }
-    };
 
     public String getCountStrategyName() { return countStrategy.getName(); }
 
     public String getPlayStrategyName() { return playStrategy.getName(); }
 
-    public Optional<Map<String, Integer>> getCount() {
-        if (count.isPresent()) { return Optional.of(count.get()); }
-        else { return Optional.empty(); }
+    public int getCount() {
+        return count;
     }
 
-    void updateCount(Hand hand, Game.GameStateToken gamePublic) {
-        count = countStrategy.updateCount(hand, gamePublic);
+    void updateCount(ActionToken actionToken) {
+        count = countStrategy.updateCount(actionToken);
     }
 
-    Action getNextAction(Hand hand, Game.GameStateToken gamePublic) {
-        return playStrategy.evaluateHand(hand, count, gamePublic);
+    Action getNextPlay(Hand hand, ActionToken actionToken) {
+        return playStrategy.evaluateHand(hand, count, actionToken);
     }
 
-    double wager(Game.GameStateToken gamePublic) {
-        return playStrategy.wager(count, gamePublic);
+    double wager(ActionToken actionToken) {
+        return playStrategy.wager(count, actionToken);
     }
 
     public void updateBankroll(double updateBy) {

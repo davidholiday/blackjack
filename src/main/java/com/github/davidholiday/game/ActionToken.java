@@ -14,14 +14,14 @@ public class ActionToken {
     private RuleSet ruleSet;
 
     public static class Builder {
-        private Map<AgentPosition, Hand> playerHandsMap = new HashMap<>();;
+        private Map<AgentPosition, Hand> playerHandMap = new HashMap<>();;
         private Action action = Action.NONE;
         private List<Card> offeredCards = new ArrayList<>();
         private double offeredMoney = 0;
         private RuleSet ruleSet;
 
         public Builder(Game game, Action action) {
-            this.playerHandsMap = game.getPlayerHandMap();
+            this.playerHandMap = game.getPlayerHandMap();
             this.ruleSet = game.getRuleSet();
             this.action = action;
         }
@@ -33,7 +33,7 @@ public class ActionToken {
         public Builder() {}
 
         public Builder withPlayerHandsMap(Map<AgentPosition, Hand> playerHandsMap) {
-            this.playerHandsMap = playerHandsMap;
+            this.playerHandMap = playerHandsMap;
             return this;
         }
 
@@ -49,7 +49,7 @@ public class ActionToken {
 
         public Builder withOfferedMoney(double offeredMoney) {
             if (offeredMoney < 0) {
-                String msg = "offeredMoney argument must be greater than zero but was " + offeredMoney
+                String msg = "offeredMoney argument must be greater than zero but was " + offeredMoney;
                 throw new IllegalArgumentException(msg);
             }
             this.offeredMoney = offeredMoney;
@@ -58,19 +58,37 @@ public class ActionToken {
 
         public ActionToken build() {
             ActionToken actionToken = new ActionToken();
-            actionToken.playerHandMap = this.playerHandsMap;
+            actionToken.playerHandMap = this.playerHandMap;
             actionToken.action = this.action;
             actionToken.offeredCards = this.offeredCards;
             actionToken.offeredMoney = this.offeredMoney;
+            actionToken.ruleSet = this.ruleSet;
             return actionToken;
         }
-
 
     }
 
     private ActionToken() {}
 
+    public Map<AgentPosition, Hand> getPlayerHandMap() {
+        return Collections.unmodifiableMap(playerHandMap);
+    }
 
+    public Action getAction() {
+        return action;
+    }
+
+    public List<Card> getOfferedCards() {
+        return Collections.unmodifiableList(offeredCards);
+    }
+
+    public double getOfferedMoney() {
+        return offeredMoney;
+    }
+
+    public Optional<RuleSet> getRuleSet() {
+        return Optional.ofNullable(ruleSet);
+    }
 }
 
 

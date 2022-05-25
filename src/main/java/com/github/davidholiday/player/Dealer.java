@@ -4,6 +4,7 @@ import com.github.davidholiday.cardcollection.DiscardTray;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.cardcollection.Shoe;
 import com.github.davidholiday.game.Action;
+import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.game.Game;
 import com.github.davidholiday.player.strategy.count.CountStrategy;
 import com.github.davidholiday.player.strategy.play.PlayStrategy;
@@ -26,13 +27,9 @@ public class Dealer extends Agent {
         this.shoe = shoe;
     }
 
-    @Override
-    public AgentAction act(Game.GameStateToken gamePublic) {
-        Action action = this.getNextAction(hand, gamePublic);
-        /*
-        build AgentAction obj
-         */
 
+    @Override
+    public ActionToken act(ActionToken actionToken) {
         return null;
     }
 
