@@ -15,7 +15,7 @@ public class Player extends Agent {
     }
 
     @Override
-    public AgentAction act(Game.GamePublic gamePublic) {
+    public AgentAction act(Game.GameStateToken gamePublic) {
 
         this.updateCount(hand, gamePublic);
 

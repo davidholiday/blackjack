@@ -1,7 +1,6 @@
 package com.github.davidholiday.player;
 
 import com.github.davidholiday.card.Card;
-import com.github.davidholiday.cardcollection.Deck;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.Game;
@@ -35,7 +34,7 @@ public abstract class Agent {
 
     }
 
-    public abstract AgentAction act(Game.GamePublic gamePublic);
+    public abstract AgentAction act(Game.GameStateToken gamePublic);
 
 
     public class AgentAction {
@@ -64,15 +63,15 @@ public abstract class Agent {
         else { return Optional.empty(); }
     }
 
-    void updateCount(Hand hand, Game.GamePublic gamePublic) {
+    void updateCount(Hand hand, Game.GameStateToken gamePublic) {
         count = countStrategy.updateCount(hand, gamePublic);
     }
 
-    Action getNextAction(Hand hand, Game.GamePublic gamePublic) {
+    Action getNextAction(Hand hand, Game.GameStateToken gamePublic) {
         return playStrategy.evaluateHand(hand, count, gamePublic);
     }
 
-    double wager(Game.GamePublic gamePublic) {
+    double wager(Game.GameStateToken gamePublic) {
         return playStrategy.wager(count, gamePublic);
     }
 

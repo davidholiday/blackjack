@@ -3,7 +3,6 @@ package com.github.davidholiday.game;
 
 import com.github.davidholiday.card.Card;
 import com.github.davidholiday.cardcollection.Hand;
-import com.github.davidholiday.player.Agent;
 import com.github.davidholiday.player.AgentPosition;
 import com.github.davidholiday.player.Dealer;
 import com.github.davidholiday.player.Player;
@@ -11,16 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Game {
 
     private static final Logger LOG = LoggerFactory.getLogger(Game.class);
-
-    private RuleSet ruleSet;
     private Dealer dealer;
     private Map<AgentPosition, Player> playerMap;
+
+    private RuleSet ruleSet;
 
     public static class Builder {
         private RuleSet ruleSet;
@@ -65,34 +62,15 @@ public class Game {
     }
     private Game() {}
 
-    public class GamePublic {
-        public final Map<AgentPosition, Hand> playerHandMap;
-        public final Queue<Action> actionQueue;
-        public final List<Card> offeredCards;
-        public final int offeredMoney;
-        public final Set<Rule> ruleSet;
-
-        public GamePublic(Map<AgentPosition, Hand> playerHandMap,
-                          Queue<Action> actionQueue,
-                          List<Card> offeredCards,
-                          int offeredMoney,
-                          Set<Rule> ruleSet) {
-
-            this.playerHandMap = playerHandMap;
-            this.actionQueue = actionQueue;
-            this.offeredCards = offeredCards;
-            this.offeredMoney = offeredMoney;
-            this.ruleSet = ruleSet;
-        }
-
-    }
-
     public void playRounds(int rounds) {
         for (int i = 0; i < rounds; i ++) {
+            Map<AgentPosition, Hand> playerHandMap = getPlayerHandMap();
             Map<AgentPosition, Queue<Action>> actionQueueMap = getActionQueueMap();
 
         }
     }
+
+    public RuleSet getRuleSet() { return ruleSet; }
 
     public Map<AgentPosition, Hand> getPlayerHandMap() {
         Map<AgentPosition, Hand> playerHandMap = new HashMap<>();

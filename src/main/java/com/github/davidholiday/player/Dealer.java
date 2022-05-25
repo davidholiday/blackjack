@@ -27,7 +27,7 @@ public class Dealer extends Agent {
     }
 
     @Override
-    public AgentAction act(Game.GamePublic gamePublic) {
+    public AgentAction act(Game.GameStateToken gamePublic) {
         Action action = this.getNextAction(hand, gamePublic);
         /*
         build AgentAction obj
