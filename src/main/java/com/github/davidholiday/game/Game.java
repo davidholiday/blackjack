@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Game {
 
@@ -18,12 +20,12 @@ public class Game {
 
     private RuleSet ruleSet;
     private Dealer dealer;
-    private Map<AgentPosition, Agent> playerMap;
+    private Map<AgentPosition, Player> playerMap;
 
     public static class Builder {
         private RuleSet ruleSet;
         private Dealer dealer;
-        private Map<AgentPosition, Agent> playerMap;
+        private Map<AgentPosition, Player> playerMap;
 
         public Builder(RuleSet ruleSet, Dealer dealer) {
             this.ruleSet = ruleSet;
@@ -31,7 +33,7 @@ public class Game {
             this.playerMap = new HashMap<>();
         }
 
-        public Builder withPlayerAtPosition(Agent player, AgentPosition agentPosition) {
+        public Builder withPlayerAtPosition(Player player, AgentPosition agentPosition) {
             if (agentPosition == AgentPosition.DEALER
                     || agentPosition == AgentPosition.FIRST_BASE
                     || agentPosition == AgentPosition.SHORT_STOP
@@ -65,19 +67,19 @@ public class Game {
 
     public class GamePublic {
         public final Map<AgentPosition, Hand> playerHandMap;
-        public final Map<AgentPosition, Queue<Action>> actionMap;
+        public final Queue<Action> actionQueue;
         public final List<Card> offeredCards;
         public final int offeredMoney;
         public final Set<Rule> ruleSet;
 
         public GamePublic(Map<AgentPosition, Hand> playerHandMap,
-                          Map<AgentPosition, Queue<Action>> actionMap,
+                          Queue<Action> actionQueue,
                           List<Card> offeredCards,
                           int offeredMoney,
                           Set<Rule> ruleSet) {
 
             this.playerHandMap = playerHandMap;
-            this.actionMap = actionMap;
+            this.actionQueue = actionQueue;
             this.offeredCards = offeredCards;
             this.offeredMoney = offeredMoney;
             this.ruleSet = ruleSet;
@@ -86,7 +88,23 @@ public class Game {
     }
 
     public void playRounds(int rounds) {
+        for (int i = 0; i < rounds; i ++) {
+            Map<AgentPosition, Queue<Action>> actionQueueMap = getActionQueueMap();
 
+        }
     }
+
+    public Map<AgentPosition, Hand> getPlayerHandMap() {
+        Map<AgentPosition, Hand> playerHandMap = new HashMap<>();
+        this.playerMap.forEach((k, v) -> playerHandMap.put(k, v.getHand()));
+        return playerHandMap;
+    }
+
+    public Map<AgentPosition, Queue<Action>> getActionQueueMap() {
+        Map<AgentPosition, Queue<Action>> actionQueueMap = new HashMap<>();
+        this.playerMap.forEach((k, v) -> actionQueueMap.put(k, new LinkedList<>()));
+        return actionQueueMap;
+    }
+
 
 }
