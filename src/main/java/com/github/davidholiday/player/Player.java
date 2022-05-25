@@ -10,8 +10,8 @@ public class Player extends Agent {
 
     private Hand hand = new Hand();
 
-    public Player(CountStrategy countStrategy, PlayStrategy playStrategy) {
-        super(countStrategy, playStrategy);
+    public Player(CountStrategy countStrategy, PlayStrategy playStrategy, int bankroll) {
+        super(countStrategy, playStrategy, bankroll);
     }
 
     @Override
@@ -36,4 +36,9 @@ public class Player extends Agent {
 
         return null;
     }
+
+    public Hand getHand() {
+        return new Hand(hand);
+    }
+
 }

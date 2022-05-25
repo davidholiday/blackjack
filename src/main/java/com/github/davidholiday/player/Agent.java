@@ -15,11 +15,19 @@ public abstract class Agent {
 
     private final PlayStrategy playStrategy;
 
+    private final int bankroll;
+
     private Optional<Map<String, Integer>> count = Optional.empty();
 
-    public Agent(CountStrategy countStrategy, PlayStrategy playStrategy) {
+    public Agent(CountStrategy countStrategy, PlayStrategy playStrategy, int bankroll) {
         this.countStrategy = countStrategy;
         this.playStrategy = playStrategy;
+
+        if (bankroll < 0) {
+            throw new IllegalArgumentException("bankroll argument must be a positive number!");
+        }
+        this.bankroll = bankroll;
+
     }
 
     public abstract AgentAction act(Game.GamePublic gamePublic);

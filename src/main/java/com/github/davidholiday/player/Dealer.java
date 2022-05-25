@@ -16,9 +16,9 @@ public class Dealer extends Agent {
 
     private Hand hand = new Hand();
 
-    public Dealer(CountStrategy countStrategy, PlayStrategy playStrategy, int shoeSize) {
-        super(countStrategy, playStrategy);
-        shoe = new Shoe(shoeSize);
+    public Dealer(CountStrategy countStrategy, PlayStrategy playStrategy, int bankroll, Shoe shoe) {
+        super(countStrategy, playStrategy, bankroll);
+        this.shoe = shoe;
     }
 
     @Override
