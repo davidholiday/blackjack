@@ -9,19 +9,18 @@ import com.github.davidholiday.player.strategy.play.PlayStrategy;
 
 public class Player extends Agent {
 
-    private Hand hand = new Hand();
 
     public Player(CountStrategy countStrategy, PlayStrategy playStrategy, int bankroll) {
         super(countStrategy, playStrategy, bankroll);
     }
 
-
-    public Hand getHand() {
-        return new Hand(hand);
-    }
-
     @Override
     public ActionToken act(ActionToken actionToken) {
+        updateCount(actionToken);
+        Action action = getNextPlay(actionToken);
+
+        // switch/case based on action to build actionToken...
+
         return null;
     }
 }

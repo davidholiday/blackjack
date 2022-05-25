@@ -7,9 +7,14 @@ import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.game.Game;
 import com.github.davidholiday.player.strategy.count.CountStrategy;
+import com.github.davidholiday.player.strategy.count.NoCountStrategy;
 import com.github.davidholiday.player.strategy.play.PlayStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Deque;
+import java.util.Map;
+import java.util.Queue;
 
 public class Dealer extends Agent {
 
@@ -19,17 +24,32 @@ public class Dealer extends Agent {
 
     private final DiscardTray discardTray = new DiscardTray();
 
-    private Hand hand = new Hand();
-
-
-    public Dealer(CountStrategy countStrategy, PlayStrategy playStrategy, Shoe shoe) {
-        super(countStrategy, playStrategy, Integer.MAX_VALUE);
+    public Dealer(PlayStrategy playStrategy, Shoe shoe) {
+        super(new NoCountStrategy(), playStrategy, Integer.MAX_VALUE);
         this.shoe = shoe;
+    }
+
+
+    public Map<AgentPosition, Deque<Action>> dealRound(Map<AgentPosition, Deque<Action>> actionDequeMap) {
+        // look through actionDequeMap keys() to
+        //   - deal
+        //   - then to handle each player hand
+        //     - make sure to record each interaction in the actionDequeMap
+        //   - then handle own hand if applicable
+        //
+        // then return actionDequeMap to caller for flight recording
+
+        return null;
     }
 
 
     @Override
     public ActionToken act(ActionToken actionToken) {
+
+        // switch/case on action
+        //
+        // in in 'deal' mode, evaluate
+
         return null;
     }
 

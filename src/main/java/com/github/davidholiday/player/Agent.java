@@ -16,6 +16,8 @@ public abstract class Agent {
 
     private static final Logger LOG = LoggerFactory.getLogger(Agent.class);
 
+    private final Hand hand;
+
     private final CountStrategy countStrategy;
 
     private final PlayStrategy playStrategy;
@@ -27,6 +29,7 @@ public abstract class Agent {
     private Queue<ActionToken> actionTokenQueue = new LinkedList<>();
 
     public Agent(CountStrategy countStrategy, PlayStrategy playStrategy, double bankroll) {
+        this.hand = new Hand();
         this.countStrategy = countStrategy;
         this.playStrategy = playStrategy;
 
@@ -37,12 +40,15 @@ public abstract class Agent {
 
     }
 
+    public abstract ActionToken act(ActionToken actionToken);
+
     public void addActionToQueue(ActionToken action) {
         actionTokenQueue.add(action);
     }
 
-    public abstract ActionToken act(ActionToken actionToken);
-
+    public Hand getHand() {
+        return new Hand(hand);
+    }
 
     public String getCountStrategyName() { return countStrategy.getName(); }
 
@@ -53,10 +59,10 @@ public abstract class Agent {
     }
 
     void updateCount(ActionToken actionToken) {
-        count = countStrategy.updateCount(actionToken);
+        count = countStrategy.updateCount(hand, actionToken);
     }
 
-    Action getNextPlay(Hand hand, ActionToken actionToken) {
+    Action getNextPlay(ActionToken actionToken) {
         return playStrategy.evaluateHand(hand, count, actionToken);
     }
 

@@ -13,6 +13,6 @@ public interface CountStrategy {
 
     public String getName();
 
-    public int updateCount(ActionToken actionToken);
+    public int updateCount(Hand hand, ActionToken actionToken);
 
 }
