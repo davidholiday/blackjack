@@ -14,6 +14,7 @@ public class ActionToken {
     private RuleSet ruleSet;
 
     public static class Builder {
+
         private Map<AgentPosition, Hand> playerHandMap = new HashMap<>();;
         private Action action = Action.NONE;
         private List<Card> offeredCards = new ArrayList<>();
@@ -21,7 +22,6 @@ public class ActionToken {
         private RuleSet ruleSet;
 
         public Builder(Game game, Action action) {
-            this.playerHandMap = game.getPlayerHandMap();
             this.ruleSet = game.getRuleSet();
             this.action = action;
         }

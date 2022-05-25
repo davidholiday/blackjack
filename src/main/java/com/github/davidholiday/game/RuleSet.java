@@ -108,5 +108,8 @@ public class RuleSet {
 
     }
 
+    public Stream<Rule> getRuleSetStream() {
+        return unmodifiableRuleSet.stream();
+    }
 
 }
