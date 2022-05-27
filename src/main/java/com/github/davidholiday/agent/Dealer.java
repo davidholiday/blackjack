@@ -7,6 +7,7 @@ import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.game.RuleSet;
 import com.github.davidholiday.agent.strategy.count.NoCountStrategy;
 import com.github.davidholiday.agent.strategy.play.PlayStrategy;
+import com.github.davidholiday.util.GeneralUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +34,11 @@ public class Dealer extends Agent {
         // in in 'deal' mode, evaluate
         switch (actionToken.getAction()) {
             case GAME_START:
-                break;
-            case GAME_END:
-                break;
-
+                return new ActionToken.Builder()
+                                      .withActionSource(AgentPosition.DEALER)
+                                      .withActionTarget(AgentPosition.GAME)
+                                      .withAction(Action.GAME_END)
+                                      .build();
         }
 
         Action action = getNextPlay(actionToken);
@@ -53,5 +55,5 @@ public class Dealer extends Agent {
         }
     }
 
-    public int getShoeSize() { return shoe.getCardListSize(); }
+    public int getShoeSize() { return shoe.getCardListSize() / GeneralUtils.DECK_SIZE_NO_JOKERS; }
 }

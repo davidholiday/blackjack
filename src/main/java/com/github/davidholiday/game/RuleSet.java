@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,12 +20,32 @@ public class RuleSet {
 
     private final Set<Rule> unmodifiableRuleSet;
 
+    public static class Builder {
+
+        private Set<Rule> ruleSetJava;
+
+        public Builder() {
+            ruleSetJava = new HashSet<>();
+        }
+
+        public Builder withRule(Rule rule) {
+            ruleSetJava.add(rule);
+            return this;
+        }
+
+        public RuleSet build() {
+            // ruleset is evaluated in RuleSet constructor
+            return new RuleSet(ruleSetJava);
+        }
+
+    }
+
     public RuleSet() {
 
         // defaults set as per Wizard of Odds
         // https://wizardofodds.com/games/blackjack/calculator/
         Set<Rule> defaultRuleSet = Stream.of(
-                EIGHT_DECK_SHOE,
+                SIX_DECK_SHOE,
                 PLAYER_CAN_DOUBLE_AFTER_SPLIT,
                 PLAYER_CAN_DOUBLE_ON_ANY_FIRST_TWO_CARDS,
                 PLAYER_CAN_RESPLIT_TO_FOUR_HANDS,
@@ -42,10 +63,10 @@ public class RuleSet {
     }
 
     public void validateRuleSet(Set<Rule> ruleSet) {
-        if (App.RUNTIME_INFO.ASSERTIONS_ENABLED == false) {
-            LOG.warn("skipping deck validation because Java was invoked without flag to enable assertions");
-            return;
-        }
+//        if (App.RUNTIME_INFO.ASSERTIONS_ENABLED == false) {
+//            LOG.warn("skipping deck validation because Java was invoked without flag to enable assertions");
+//            return;
+//        }
 
         String errorMessage = "";
 
@@ -61,7 +82,10 @@ public class RuleSet {
                 "[(n)_DECK_SHOE] rules",
                 actualDeckRulesL.intValue()
         );
-        assert expectedDeckRules == actualDeckRulesL.intValue(): errorMessage;
+//        assert expectedDeckRules == actualDeckRulesL.intValue(): errorMessage;
+        if (expectedDeckRules != actualDeckRulesL.intValue()) {
+            throw new IllegalArgumentException(errorMessage);
+        }
 
 
         // ensure ruleset contains one and only one PLAYER_CAN_DOUBLE_ON definition
@@ -76,8 +100,10 @@ public class RuleSet {
                 "[PLAYER_CAN_DOUBLE_ON] Rules",
                 actualPlayerCanDoubleOnRulesL.intValue()
         );
-        assert expectedPlayerCanDoubleOnRules == actualPlayerCanDoubleOnRulesL.intValue(): errorMessage;
-
+//        assert expectedPlayerCanDoubleOnRules == actualPlayerCanDoubleOnRulesL.intValue(): errorMessage;
+        if (expectedPlayerCanDoubleOnRules != actualPlayerCanDoubleOnRulesL.intValue()) {
+            throw new IllegalArgumentException(errorMessage);
+        }
 
         // ensure ruleset contains one and only one PLAYER_CAN_RESPLIT_TO definition
         //
@@ -90,7 +116,10 @@ public class RuleSet {
                 "[PLAYER_CAN_RESPLIT_TO] Rules",
                 actualPlayerCanResplitToRulesL.intValue()
         );
-        assert expectedPlayerCanResplitToRules == actualPlayerCanResplitToRulesL.intValue(): errorMessage;
+//        assert expectedPlayerCanResplitToRules == actualPlayerCanResplitToRulesL.intValue(): errorMessage;
+        if (expectedPlayerCanResplitToRules != actualPlayerCanResplitToRulesL.intValue()) {
+            throw new IllegalArgumentException(errorMessage);
+        }
 
 
         // ensure ruleset contains one and only one BLACKJACK_PAYS definition
@@ -104,12 +133,20 @@ public class RuleSet {
                 "[BLACKJACK_PAYS] Rules",
                 actualBlackJackPaysRulesL.intValue()
         );
-        assert expectedBlackJackPaysRules == actualBlackJackPaysRulesL.intValue(): errorMessage;
+//        assert expectedBlackJackPaysRules == actualBlackJackPaysRulesL.intValue(): errorMessage;
+        if (expectedBlackJackPaysRules != actualBlackJackPaysRulesL.intValue()) {
+            throw new IllegalArgumentException(errorMessage);
+        }
 
     }
 
     public Stream<Rule> getRuleSetStream() {
         return unmodifiableRuleSet.stream();
+    }
+
+    @Override
+    public String toString() {
+        return unmodifiableRuleSet.toString();
     }
 
 }

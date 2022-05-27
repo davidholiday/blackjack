@@ -5,6 +5,7 @@ import com.github.davidholiday.card.Card;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.agent.AgentPosition;
 
+import java.text.MessageFormat;
 import java.util.*;
 
 public class ActionToken {
@@ -12,7 +13,7 @@ public class ActionToken {
     private Action action;
     private List<Card> offeredCards;
     private double offeredMoney;
-
+    private AgentPosition actionSource;
     private AgentPosition actionTarget;
     private RuleSet ruleSet;
 
@@ -23,6 +24,7 @@ public class ActionToken {
         private List<Card> offeredCards = new ArrayList<>();
         private double offeredMoney = 0;
 
+        private AgentPosition actionSource = AgentPosition.NONE;
         private AgentPosition actionTarget = AgentPosition.NONE;
         private RuleSet ruleSet;
 
@@ -39,6 +41,11 @@ public class ActionToken {
 
         public Builder withPlayerHandsMap(Map<AgentPosition, Hand> playerHandsMap) {
             this.playerHandMap = playerHandsMap;
+            return this;
+        }
+
+        public Builder withActionSource(AgentPosition actionSource) {
+            this.actionSource = actionSource;
             return this;
         }
 
@@ -66,9 +73,15 @@ public class ActionToken {
             return this;
         }
 
+        public Builder withRuleSet(RuleSet ruleSet) {
+            this.ruleSet = ruleSet;
+            return this;
+        }
+
         public ActionToken build() {
             ActionToken actionToken = new ActionToken();
             actionToken.playerHandMap = this.playerHandMap;
+            actionToken.actionSource = this.actionSource;
             actionToken.actionTarget = this.actionTarget;
             actionToken.action = this.action;
             actionToken.offeredCards = this.offeredCards;
@@ -80,6 +93,19 @@ public class ActionToken {
     }
 
     private ActionToken() {}
+
+    // TODO maybe to JSON?
+    @Override
+    public String toString() {
+        return super.toString() + " " +
+                " playerHandMap:  " + playerHandMap.entrySet() +
+                " actionSource: " + actionSource +
+                " actionTarget: " + actionTarget +
+                " action: " + action +
+                " offeredCards: " + offeredCards +
+                " offeredMoney: " + offeredMoney +
+                " ruleSet: " + ruleSet;
+    }
 
     public Map<AgentPosition, Hand> getPlayerHandMap() {
         return Collections.unmodifiableMap(playerHandMap);

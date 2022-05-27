@@ -2,6 +2,8 @@ package com.github.davidholiday.game;
 
 import com.github.davidholiday.agent.Agent;
 import com.github.davidholiday.agent.AgentPosition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +15,7 @@ public class ActionBroker {
 
     private final List<ActionToken> flightRecorder = new ArrayList<>();
 
+    private static final Logger LOG = LoggerFactory.getLogger(ActionBroker.class);
 
     public List<ActionToken> getFlightRecorder() {
         return flightRecorder.stream()
@@ -29,10 +32,12 @@ public class ActionBroker {
             throw new IllegalArgumentException("action target: " + actionTarget + " not found in agentMap");
         }
 
+        LOG.info("received actionToken: " + actionToken);
         flightRecorder.add(actionToken);
         ActionToken nextActionToken = agentMap.get(actionTarget)
                                               .act(actionToken);
 
+        LOG.info("received reply actionToken: " + nextActionToken);
         flightRecorder.add(nextActionToken);
         return nextActionToken;
     }

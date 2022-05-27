@@ -2,17 +2,17 @@ package com.github.davidholiday.game;
 
 
 import com.github.davidholiday.agent.Agent;
+import com.github.davidholiday.agent.strategy.play.NoOpDealerStrategy;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.agent.AgentPosition;
 import com.github.davidholiday.agent.Dealer;
 import com.github.davidholiday.agent.Player;
+import com.github.davidholiday.cardcollection.Shoe;
 import com.github.davidholiday.util.MessageTemplates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Game {
 
@@ -25,15 +25,14 @@ public class Game {
     private RuleSet ruleSet;
 
     public static class Builder {
-        private RuleSet ruleSet;
-        private Dealer dealer;
+        private RuleSet ruleSet = new RuleSet();
+
+        private NoOpDealerStrategy noOpPlayStrategy = new NoOpDealerStrategy();
+        private Shoe shoe = new Shoe(6);
+        private Dealer dealer = new Dealer(noOpPlayStrategy, shoe);
         private Map<AgentPosition, Player> playerMap;
 
-        public Builder(RuleSet ruleSet, Dealer dealer) {
-            checkRulesAndShoe(ruleSet, dealer);
-
-            this.ruleSet = ruleSet;
-            this.dealer = dealer;
+        public Builder() {
             this.playerMap = new HashMap<>();
         }
 
@@ -55,11 +54,23 @@ public class Game {
             return this;
         }
 
+        public Builder withDealer(Dealer dealer) {
+            this.dealer = dealer;
+            return this;
+        }
+
+        public Builder withRuleSet(RuleSet ruleSet) {
+            this.ruleSet = ruleSet;
+            return this;
+        }
 
         public Game build() {
             Game game = new Game();
+
             game.ruleSet = ruleSet;
             game.dealer = dealer;
+            checkRulesAndShoe(ruleSet, dealer);
+
             game.playerMap = Collections.unmodifiableMap(playerMap);
 
             Map<AgentPosition, Agent> agentMap = new HashMap<>();
@@ -71,7 +82,6 @@ public class Game {
 
             return game;
         }
-
 
         private void checkRulesAndShoe(RuleSet ruleSet, Dealer dealer) {
 
@@ -133,7 +143,9 @@ public class Game {
         for (int i = 0; i < rounds; i ++) {
             ActionToken actionToken = new ActionToken.Builder()
                                                      .withAction(Action.GAME_START)
+                                                     .withActionSource(AgentPosition.GAME)
                                                      .withActionTarget(AgentPosition.DEALER)
+                                                     .withRuleSet(getRuleSet())
                                                      .build();
 
             ActionToken currentActionToken = actionBroker.send(actionToken, agentMap);
