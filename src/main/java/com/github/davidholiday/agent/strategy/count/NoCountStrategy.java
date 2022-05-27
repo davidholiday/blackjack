@@ -1,4 +1,4 @@
-package com.github.davidholiday.player.strategy.count;
+package com.github.davidholiday.agent.strategy.count;
 
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.game.ActionToken;

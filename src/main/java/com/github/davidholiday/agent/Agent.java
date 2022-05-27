@@ -1,12 +1,10 @@
-package com.github.davidholiday.player;
+package com.github.davidholiday.agent;
 
-import com.github.davidholiday.card.Card;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
-import com.github.davidholiday.game.Game;
-import com.github.davidholiday.player.strategy.count.CountStrategy;
-import com.github.davidholiday.player.strategy.play.PlayStrategy;
+import com.github.davidholiday.agent.strategy.count.CountStrategy;
+import com.github.davidholiday.agent.strategy.play.PlayStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

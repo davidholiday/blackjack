@@ -1,8 +1,9 @@
 package com.github.davidholiday.game;
 
+import com.github.davidholiday.agent.Player;
 import com.github.davidholiday.card.Card;
 import com.github.davidholiday.cardcollection.Hand;
-import com.github.davidholiday.player.AgentPosition;
+import com.github.davidholiday.agent.AgentPosition;
 
 import java.util.*;
 
@@ -11,6 +12,8 @@ public class ActionToken {
     private Action action;
     private List<Card> offeredCards;
     private double offeredMoney;
+
+    private AgentPosition actionTarget;
     private RuleSet ruleSet;
 
     public static class Builder {
@@ -19,6 +22,8 @@ public class ActionToken {
         private Action action = Action.NONE;
         private List<Card> offeredCards = new ArrayList<>();
         private double offeredMoney = 0;
+
+        private AgentPosition actionTarget = AgentPosition.NONE;
         private RuleSet ruleSet;
 
         public Builder(Game game, Action action) {
@@ -34,6 +39,11 @@ public class ActionToken {
 
         public Builder withPlayerHandsMap(Map<AgentPosition, Hand> playerHandsMap) {
             this.playerHandMap = playerHandsMap;
+            return this;
+        }
+
+        public Builder withActionTarget(AgentPosition actionTarget) {
+            this.actionTarget = actionTarget;
             return this;
         }
 
@@ -59,6 +69,7 @@ public class ActionToken {
         public ActionToken build() {
             ActionToken actionToken = new ActionToken();
             actionToken.playerHandMap = this.playerHandMap;
+            actionToken.actionTarget = this.actionTarget;
             actionToken.action = this.action;
             actionToken.offeredCards = this.offeredCards;
             actionToken.offeredMoney = this.offeredMoney;
@@ -77,6 +88,8 @@ public class ActionToken {
     public Action getAction() {
         return action;
     }
+
+    public AgentPosition getActionTarget() { return actionTarget; }
 
     public List<Card> getOfferedCards() {
         return Collections.unmodifiableList(offeredCards);

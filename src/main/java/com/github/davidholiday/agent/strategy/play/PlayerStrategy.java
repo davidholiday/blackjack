@@ -1,12 +1,8 @@
-package com.github.davidholiday.player.strategy.play;
+package com.github.davidholiday.agent.strategy.play;
 
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
-import com.github.davidholiday.game.Game;
-
-import java.util.Map;
-import java.util.Optional;
 
 public abstract class PlayerStrategy implements PlayStrategy {
 

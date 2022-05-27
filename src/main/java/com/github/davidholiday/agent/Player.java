@@ -1,11 +1,9 @@
-package com.github.davidholiday.player;
+package com.github.davidholiday.agent;
 
-import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
-import com.github.davidholiday.game.Game;
-import com.github.davidholiday.player.strategy.count.CountStrategy;
-import com.github.davidholiday.player.strategy.play.PlayStrategy;
+import com.github.davidholiday.agent.strategy.count.CountStrategy;
+import com.github.davidholiday.agent.strategy.play.PlayStrategy;
 
 public class Player extends Agent {
 
@@ -17,9 +15,9 @@ public class Player extends Agent {
     @Override
     public ActionToken act(ActionToken actionToken) {
         updateCount(actionToken);
-        Action action = getNextPlay(actionToken);
 
         // switch/case based on action to build actionToken...
+
 
         return null;
     }

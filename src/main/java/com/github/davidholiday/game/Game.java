@@ -1,13 +1,11 @@
 package com.github.davidholiday.game;
 
 
-import com.github.davidholiday.card.Card;
+import com.github.davidholiday.agent.Agent;
 import com.github.davidholiday.cardcollection.Hand;
-import com.github.davidholiday.player.Agent;
-import com.github.davidholiday.player.AgentPosition;
-import com.github.davidholiday.player.Dealer;
-import com.github.davidholiday.player.Player;
-import com.github.davidholiday.util.GeneralUtils;
+import com.github.davidholiday.agent.AgentPosition;
+import com.github.davidholiday.agent.Dealer;
+import com.github.davidholiday.agent.Player;
 import com.github.davidholiday.util.MessageTemplates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +19,8 @@ public class Game {
     private static final Logger LOG = LoggerFactory.getLogger(Game.class);
     private Dealer dealer;
     private Map<AgentPosition, Player> playerMap;
+
+    private Map<AgentPosition, Agent> agentMap;
 
     private RuleSet ruleSet;
 
@@ -60,7 +60,14 @@ public class Game {
             Game game = new Game();
             game.ruleSet = ruleSet;
             game.dealer = dealer;
-            game.playerMap = playerMap;
+            game.playerMap = Collections.unmodifiableMap(playerMap);
+
+            Map<AgentPosition, Agent> agentMap = new HashMap<>();
+            agentMap.put(AgentPosition.DEALER, dealer);
+            for (AgentPosition agentPosition : playerMap.keySet()) {
+                agentMap.put(agentPosition, playerMap.get(agentPosition));
+            }
+            game.agentMap = Collections.unmodifiableMap(agentMap);
 
             return game;
         }
@@ -122,12 +129,18 @@ public class Game {
 
     public void playRounds(int rounds) {
 
-
+        ActionBroker actionBroker = new ActionBroker();
         for (int i = 0; i < rounds; i ++) {
-            dealer.start(ruleSet, playerMap); // TODO this needs to recieve some kind of flight recording from dealer for serialization
-            //
-            // serialize flight recorder data
-            //
+            ActionToken actionToken = new ActionToken.Builder()
+                                                     .withAction(Action.GAME_START)
+                                                     .withActionTarget(AgentPosition.DEALER)
+                                                     .build();
+
+            ActionToken currentActionToken = actionBroker.send(actionToken, agentMap);
+            while (currentActionToken.getActionTarget() != AgentPosition.GAME) {
+                currentActionToken = actionBroker.send(currentActionToken, agentMap);
+            }
+
         }
     }
 

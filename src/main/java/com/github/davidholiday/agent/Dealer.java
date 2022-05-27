@@ -1,15 +1,12 @@
-package com.github.davidholiday.player;
+package com.github.davidholiday.agent;
 
 import com.github.davidholiday.cardcollection.DiscardTray;
-import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.cardcollection.Shoe;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
-import com.github.davidholiday.game.Game;
 import com.github.davidholiday.game.RuleSet;
-import com.github.davidholiday.player.strategy.count.CountStrategy;
-import com.github.davidholiday.player.strategy.count.NoCountStrategy;
-import com.github.davidholiday.player.strategy.play.PlayStrategy;
+import com.github.davidholiday.agent.strategy.count.NoCountStrategy;
+import com.github.davidholiday.agent.strategy.play.PlayStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,36 +25,22 @@ public class Dealer extends Agent {
         this.shoe = shoe;
     }
 
-
-    public void start(RuleSet ruleSet, Map<AgentPosition, Player> playerMap) {
-
-
-        // it makes sense to have the dealer handle the interchanges. if you have Game class do it, then
-        // GAME class has to worry about being a message broker. In this case that's overkill because
-        // all interactions in this game are through the dealer...
-//        // look through actionDequeMap keys() to
-//        //   - deal
-//        //   - BJ + Insurance?
-//        //   - then to handle each player hand
-//        //     - make sure to record each interaction in the actionDequeMap
-//        //   - then handle own hand if applicable
-//        //
-
-
-        // TODO this needs to return some kind of flight recording to GAME for serialization
-
-    }
-
-
-
-
-
     @Override
     public ActionToken act(ActionToken actionToken) {
 
         // switch/case on action
         //
         // in in 'deal' mode, evaluate
+        switch (actionToken.getAction()) {
+            case GAME_START:
+                break;
+            case GAME_END:
+                break;
+
+        }
+
+        Action action = getNextPlay(actionToken);
+
 
         return null;
     }

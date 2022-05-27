@@ -1,6 +1,7 @@
-package com.github.davidholiday.player;
+package com.github.davidholiday.agent;
 
 public enum AgentPosition {
+    GAME,
     DEALER,
     FIRST_BASE,
     SHORT_STOP,
@@ -11,5 +12,6 @@ public enum AgentPosition {
     PLAYER_FOUR,
     PLAYER_FIVE,
     PLAYER_SIX,
-    PLAYER_SEVEN
+    PLAYER_SEVEN,
+    NONE
 }
