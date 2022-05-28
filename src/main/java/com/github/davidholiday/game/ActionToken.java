@@ -4,6 +4,7 @@ import com.github.davidholiday.agent.Player;
 import com.github.davidholiday.card.Card;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.agent.AgentPosition;
+import com.github.davidholiday.util.GeneralUtils;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -17,6 +18,10 @@ public class ActionToken {
     private AgentPosition actionTarget;
     private RuleSet ruleSet;
 
+    private int discardTrayCardSize;
+
+    private int discardTrayDeckSize;
+
     public static class Builder {
 
         private Map<AgentPosition, Hand> playerHandMap = new HashMap<>();;
@@ -26,11 +31,29 @@ public class ActionToken {
 
         private AgentPosition actionSource = AgentPosition.NONE;
         private AgentPosition actionTarget = AgentPosition.NONE;
-        private RuleSet ruleSet;
+        private RuleSet ruleSet = new RuleSet(new HashSet<Rule>());
+
+        private int discardTrayCardSize = 0;
+
+        private int discardTrayDeckSize = 0;
+
+        public Builder(ActionToken actionToken) {
+            this.playerHandMap = actionToken.playerHandMap;
+            this.action = actionToken.action;
+            this.offeredCards = actionToken.offeredCards;
+            this.offeredMoney = actionToken.offeredMoney;
+            this.actionSource = actionToken.actionSource;
+            this.actionTarget = actionToken.actionTarget;
+            this.ruleSet = actionToken.ruleSet;
+            this.discardTrayCardSize = actionToken.discardTrayCardSize;
+            this.discardTrayDeckSize = actionToken.discardTrayDeckSize;
+        }
 
         public Builder(Game game, Action action) {
             this.ruleSet = game.getRuleSet();
             this.action = action;
+            this.discardTrayCardSize = game.getDiscardTrayCardSize();
+            this.discardTrayDeckSize = game.getDiscardTrayDeckSize();
         }
 
         public Builder(Action action) {
@@ -78,6 +101,26 @@ public class ActionToken {
             return this;
         }
 
+        public Builder withDiscardTrayCardSize(int discardTrayCardSize) {
+            if (discardTrayCardSize < 0) {
+                String msg = "discardTrayCardSize can not be set to negative value: " + discardTrayCardSize;
+                throw new IllegalArgumentException(msg);
+            }
+            this.discardTrayCardSize = discardTrayCardSize;
+
+            return this;
+        }
+
+        public Builder withDiscardTrayDeckSize(int discardTrayDeckSize) {
+            if (discardTrayCardSize < 0) {
+                String msg = "discardTrayCardSize can not be set to negative value: " + discardTrayCardSize;
+                throw new IllegalArgumentException(msg);
+            }
+            this.discardTrayCardSize = discardTrayCardSize;
+
+            return this;
+        }
+
         public ActionToken build() {
             ActionToken actionToken = new ActionToken();
             actionToken.playerHandMap = this.playerHandMap;
@@ -87,6 +130,22 @@ public class ActionToken {
             actionToken.offeredCards = this.offeredCards;
             actionToken.offeredMoney = this.offeredMoney;
             actionToken.ruleSet = this.ruleSet;
+
+            boolean bothDiscardSizeValuesZero = this.discardTrayCardSize == 0 && this.discardTrayDeckSize == 0;
+            boolean cardDividedByDeckSizeCorrect =
+                    bothDiscardSizeValuesZero ?
+                    true :
+                    this.discardTrayCardSize / this.discardTrayDeckSize == GeneralUtils.DECK_SIZE_NO_JOKERS;
+
+            if (bothDiscardSizeValuesZero == false && cardDividedByDeckSizeCorrect == false) {
+                String msg = "discardTrayCardSize: " + discardTrayCardSize
+                        + " / discardTrayDeckSize: " + discardTrayDeckSize
+                        + " != " + GeneralUtils.DECK_SIZE_NO_JOKERS;
+                throw new IllegalArgumentException(msg);
+            }
+
+            actionToken.discardTrayCardSize = this.discardTrayCardSize;
+            actionToken.discardTrayDeckSize = this.discardTrayDeckSize;
             return actionToken;
         }
 
@@ -125,9 +184,15 @@ public class ActionToken {
         return offeredMoney;
     }
 
-    public Optional<RuleSet> getRuleSet() {
-        return Optional.ofNullable(ruleSet);
+    public RuleSet getRuleSet() {
+        return ruleSet;
     }
+
+    public int getDiscardTrayCardSize() { return discardTrayCardSize; }
+
+    public int getDiscardTrayDeckSize() { return discardTrayDeckSize; }
+
+
 }
 
 

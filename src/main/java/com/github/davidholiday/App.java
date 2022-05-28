@@ -26,8 +26,8 @@ public class App {
         Shoe shoe = new Shoe(6);
         shoe.shuffle(10);
         shoe.cut();
-        String msg = MessageFormat.format("shoe is: {0}", shoe.getAllCards(false));
-        LOG.info(msg);
+//        String msg = MessageFormat.format("shoe is: {0}", shoe.getAllCards(false));
+//        LOG.info(msg);
 
         for (int i = 0; i < 5; i ++) {
             int randy = GeneralUtils.getRandomIntForRange(2, 6);

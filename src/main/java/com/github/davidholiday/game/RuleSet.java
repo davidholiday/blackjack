@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.github.davidholiday.App;
 
 import static com.github.davidholiday.game.Rule.*;
 import static com.github.davidholiday.util.MessageTemplates.getErrorMessage;
@@ -58,9 +57,17 @@ public class RuleSet {
     }
 
     public RuleSet(Set<Rule> ruleSet) {
-        validateRuleSet(ruleSet);
+        if (ruleSet.size() != 0) {
+            validateRuleSet(ruleSet);
+        }
         this.unmodifiableRuleSet = Collections.unmodifiableSet(ruleSet);
     }
+
+
+    public void validateRuleSet() {
+        this.validateRuleSet(this.unmodifiableRuleSet);
+    }
+
 
     public void validateRuleSet(Set<Rule> ruleSet) {
 //        if (App.RUNTIME_INFO.ASSERTIONS_ENABLED == false) {
@@ -143,6 +150,8 @@ public class RuleSet {
     public Stream<Rule> getRuleSetStream() {
         return unmodifiableRuleSet.stream();
     }
+
+    public boolean isEmpty() { return unmodifiableRuleSet.isEmpty(); }
 
     @Override
     public String toString() {

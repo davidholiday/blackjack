@@ -4,6 +4,8 @@ import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
 
+import java.util.stream.Collectors;
+
 public abstract class DealerStrategy implements PlayStrategy {
 
     @Override

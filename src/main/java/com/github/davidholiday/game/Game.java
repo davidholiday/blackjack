@@ -85,6 +85,10 @@ public class Game {
 
         private void checkRulesAndShoe(RuleSet ruleSet, Dealer dealer) {
 
+            // it's possible to make an empty ruleset. this double checks that not only is the ruleset populated,
+            // but that it's populated with a gameplay-legal set of rules
+            ruleSet.validateRuleSet();
+
             // we rely on the RuleSet validation logic to ensure there is a decksize
             // rule in the set and that there is only one of them...
             Rule rule = ruleSet.getRuleSetStream()
@@ -94,32 +98,32 @@ public class Game {
 
             switch (rule) {
                 case ONE_DECK_SHOE:
-                    if (dealer.getShoeSize() != 1) {
-                        String msg = getShoeErrorMessage(rule, dealer.getShoeSize());
+                    if (dealer.getShoeDeckSize() != 1) {
+                        String msg = getShoeErrorMessage(rule, dealer.getShoeDeckSize());
                         throw new IllegalStateException(msg);
                     }
                     break;
                 case TWO_DECK_SHOE:
-                    if (dealer.getShoeSize() != 2) {
-                        String msg = getShoeErrorMessage(rule, dealer.getShoeSize());
+                    if (dealer.getShoeDeckSize() != 2) {
+                        String msg = getShoeErrorMessage(rule, dealer.getShoeDeckSize());
                         throw new IllegalStateException(msg);
                     }
                     break;
                 case FOUR_DECK_SHOE:
-                    if (dealer.getShoeSize() != 4) {
-                        String msg = getShoeErrorMessage(rule, dealer.getShoeSize());
+                    if (dealer.getShoeDeckSize() != 4) {
+                        String msg = getShoeErrorMessage(rule, dealer.getShoeDeckSize());
                         throw new IllegalStateException(msg);
                     }
                     break;
                 case SIX_DECK_SHOE:
-                    if (dealer.getShoeSize() != 6) {
-                        String msg = getShoeErrorMessage(rule, dealer.getShoeSize());
+                    if (dealer.getShoeDeckSize() != 6) {
+                        String msg = getShoeErrorMessage(rule, dealer.getShoeDeckSize());
                         throw new IllegalStateException(msg);
                     }
                     break;
                 case EIGHT_DECK_SHOE:
-                    if (dealer.getShoeSize() != 8) {
-                        String msg = getShoeErrorMessage(rule, dealer.getShoeSize());
+                    if (dealer.getShoeDeckSize() != 8) {
+                        String msg = getShoeErrorMessage(rule, dealer.getShoeDeckSize());
                         throw new IllegalStateException(msg);
                     }
                     break;
@@ -166,5 +170,12 @@ public class Game {
     }
 
 
+    public int getDiscardTrayCardSize() {
+        return dealer.getDiscardTrayCardSize();
+    }
+
+    public int getDiscardTrayDeckSize() {
+        return dealer.getDiscardTrayDeckSize();
+    }
 
 }
