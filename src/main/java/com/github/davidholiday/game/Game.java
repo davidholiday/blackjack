@@ -16,6 +16,8 @@ import java.util.*;
 
 public class Game {
 
+    public static final int CIRCUIT_BREAKER_FOR_ROUNDS = 1000;
+
     private static final Logger LOG = LoggerFactory.getLogger(Game.class);
     private Dealer dealer;
     private Map<AgentPosition, Player> playerMap;
@@ -153,8 +155,11 @@ public class Game {
                                                      .build();
 
             ActionToken currentActionToken = actionBroker.send(actionToken, agentMap);
+            int cycleCount = 0;
             while (currentActionToken.getActionTarget() != AgentPosition.GAME) {
+                if (cycleCount > CIRCUIT_BREAKER_FOR_ROUNDS) { break; }
                 currentActionToken = actionBroker.send(currentActionToken, agentMap);
+                cycleCount ++;
             }
 
         }
