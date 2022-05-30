@@ -11,7 +11,7 @@ public abstract class DealerStrategy implements PlayStrategy {
     @Override
     public Action evaluateHand(Hand hand, int count, ActionToken actionToken) {
         if (actionToken.getRuleSet().isEmpty()) {
-            throw new IllegalArgumentException("DealerStrategy requires RuleSet to be present in actionToken argument");
+            throw new IllegalArgumentException("DealerStrategy requires RuleSet in actionToken to be populated.");
         }
         Action action = evaluateForSoft(hand, actionToken);
         if (action != Action.NONE) { return action; }

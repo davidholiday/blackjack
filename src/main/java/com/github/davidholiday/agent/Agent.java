@@ -2,6 +2,7 @@ package com.github.davidholiday.agent;
 
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.game.Action;
+import com.github.davidholiday.game.ActionBroker;
 import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.agent.strategy.count.CountStrategy;
 import com.github.davidholiday.agent.strategy.play.PlayStrategy;
@@ -65,7 +66,9 @@ public abstract class Agent {
     }
 
     double wager(ActionToken actionToken) {
-        return playStrategy.wager(count, actionToken);
+        double wager = playStrategy.wager(count, actionToken);
+        updateBankroll(-wager);
+        return wager;
     }
 
     public void updateBankroll(double updateBy) {

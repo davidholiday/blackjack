@@ -9,6 +9,7 @@ import com.github.davidholiday.agent.Dealer;
 import com.github.davidholiday.agent.Player;
 import com.github.davidholiday.cardcollection.Shoe;
 import com.github.davidholiday.util.MessageTemplates;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,12 +20,15 @@ public class Game {
     public static final int CIRCUIT_BREAKER_FOR_ROUNDS = 1000;
 
     private static final Logger LOG = LoggerFactory.getLogger(Game.class);
+
     private Dealer dealer;
     private Map<AgentPosition, Player> playerMap;
 
     private Map<AgentPosition, Agent> agentMap;
 
     private RuleSet ruleSet;
+
+    private ActionBroker actionBroker;
 
     public static class Builder {
         private RuleSet ruleSet = new RuleSet();
@@ -81,7 +85,7 @@ public class Game {
                 agentMap.put(agentPosition, playerMap.get(agentPosition));
             }
             game.agentMap = Collections.unmodifiableMap(agentMap);
-
+            game.actionBroker = new ActionBroker(game.agentMap);
             return game;
         }
 
@@ -94,9 +98,9 @@ public class Game {
             // we rely on the RuleSet validation logic to ensure there is a decksize
             // rule in the set and that there is only one of them...
             Rule rule = ruleSet.getRuleSetStream()
-                    .filter((r) -> Rule.getDeckRuleSet().contains(r))
-                    .findFirst()
-                    .get();
+                               .filter((r) -> Rule.getDeckRuleSet().contains(r))
+                               .findFirst()
+                               .get();
 
             switch (rule) {
                 case ONE_DECK_SHOE:
@@ -145,20 +149,20 @@ public class Game {
 
     public void playRounds(int rounds) {
 
-        ActionBroker actionBroker = new ActionBroker();
         for (int i = 0; i < rounds; i ++) {
             ActionToken actionToken = new ActionToken.Builder()
                                                      .withAction(Action.GAME_START)
                                                      .withActionSource(AgentPosition.GAME)
                                                      .withActionTarget(AgentPosition.DEALER)
                                                      .withRuleSet(getRuleSet())
+                                                     .withPlayerHandMap(getPlayerHandMap())
                                                      .build();
 
-            ActionToken currentActionToken = actionBroker.send(actionToken, agentMap);
+            ActionToken currentActionToken = actionBroker.send(actionToken);
             int cycleCount = 0;
             while (currentActionToken.getActionTarget() != AgentPosition.GAME) {
                 if (cycleCount > CIRCUIT_BREAKER_FOR_ROUNDS) { break; }
-                currentActionToken = actionBroker.send(currentActionToken, agentMap);
+                currentActionToken = actionBroker.send(currentActionToken);
                 cycleCount ++;
             }
 
@@ -171,6 +175,7 @@ public class Game {
     public Map<AgentPosition, Hand> getPlayerHandMap() {
         Map<AgentPosition, Hand> playerHandMap = new HashMap<>();
         playerMap.forEach((k, v) -> playerHandMap.put(k, v.getHand()));
+        playerHandMap.put(AgentPosition.DEALER, dealer.getDealerHandForPlayer());
         return playerHandMap;
     }
 

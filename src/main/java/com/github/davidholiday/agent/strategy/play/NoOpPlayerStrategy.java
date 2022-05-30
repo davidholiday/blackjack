@@ -16,7 +16,7 @@ public class NoOpPlayerStrategy extends PlayerStrategy {
 
     @Override
     public double wager(int count, ActionToken actionToken) {
-        return 0;
+        return 5.0;
     }
 
     @Override

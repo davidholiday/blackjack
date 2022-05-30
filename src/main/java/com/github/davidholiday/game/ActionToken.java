@@ -1,12 +1,10 @@
 package com.github.davidholiday.game;
 
-import com.github.davidholiday.agent.Player;
 import com.github.davidholiday.card.Card;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.agent.AgentPosition;
 import com.github.davidholiday.util.GeneralUtils;
 
-import java.text.MessageFormat;
 import java.util.*;
 
 public class ActionToken {
@@ -62,8 +60,8 @@ public class ActionToken {
 
         public Builder() {}
 
-        public Builder withPlayerHandsMap(Map<AgentPosition, Hand> playerHandsMap) {
-            this.playerHandMap = playerHandsMap;
+        public Builder withPlayerHandMap(Map<AgentPosition, Hand> playerHandMap) {
+            this.playerHandMap = playerHandMap;
             return this;
         }
 
@@ -163,7 +161,8 @@ public class ActionToken {
                 " action: " + action +
                 " offeredCards: " + offeredCards +
                 " offeredMoney: " + offeredMoney +
-                " ruleSet: " + ruleSet;
+                " ruleSet: " + ruleSet +
+                " discardTrayCardSize: " + discardTrayCardSize;
     }
 
     public Map<AgentPosition, Hand> getPlayerHandMap() {
@@ -175,6 +174,8 @@ public class ActionToken {
     }
 
     public AgentPosition getActionTarget() { return actionTarget; }
+
+    public AgentPosition getActionSource() { return actionSource; }
 
     public List<Card> getOfferedCards() {
         return Collections.unmodifiableList(offeredCards);

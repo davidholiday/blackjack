@@ -40,6 +40,18 @@ public class Shoe extends CardCollection {
         validateDeck(decks, false, getAllCards(false));
     }
 
+    @Override
+    public void shuffle() {
+        this.remove(cutCard);
+        super.shuffle();
+    }
+
+    @Override
+    public void shuffle(int count) {
+        this.remove(cutCard);
+        super.shuffle(count);
+    }
+
     public void cut() {
         // "most casinos will tell you to place the cut card between the first and last 15 cards of the deck"
         // https://youtu.be/kmM3CjMPuz8?t=657
@@ -72,5 +84,7 @@ public class Shoe extends CardCollection {
         }
         super.addCards(cardList);
     }
+
+    public Card getCutCard() { return this.cutCard; }
 
 }

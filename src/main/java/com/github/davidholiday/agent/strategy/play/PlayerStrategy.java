@@ -10,7 +10,7 @@ public abstract class PlayerStrategy implements PlayStrategy {
     @Override
     public Action evaluateHand(Hand hand, int count, ActionToken actionToken) {
         if (actionToken.getRuleSet().isEmpty()) {
-            throw new IllegalArgumentException("PlayerStrategy requires RuleSet to be present in actionToken argument");
+            throw new IllegalArgumentException("PlayerStrategy requires RuleSet in actionToken to be populated.");
         }
         Action action = evaluateForSurrender(hand, count, actionToken);
         if (action != Action.NONE) { return action; }

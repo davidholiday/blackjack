@@ -16,8 +16,16 @@ public class Player extends Agent {
     public ActionToken act(ActionToken actionToken) {
         updateCount(actionToken);
 
-        // switch/case based on action to build actionToken...
+        switch (actionToken.getAction()) {
+            case REQUEST_WAGER:
+                return new ActionToken.Builder(actionToken)
+                                      .withActionTarget(actionToken.getActionSource())
+                                      .withActionSource(actionToken.getActionTarget())
+                                      .withAction(Action.WAGER)
+                                      .withOfferedMoney(wager(actionToken))
+                                      .build();
 
+        }
 
         return null;
     }

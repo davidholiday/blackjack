@@ -5,13 +5,12 @@ import com.github.davidholiday.agent.AgentPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ActionBroker {
+
+    private final Map<AgentPosition, Agent> agentMap;
 
     private final List<ActionToken> flightRecorder = new ArrayList<>();
 
@@ -22,9 +21,38 @@ public class ActionBroker {
                              .collect(Collectors.toList());
     }
 
+    public ActionBroker() {
+        this.agentMap = new HashMap<>();
+    }
+
+    public ActionBroker(Map<AgentPosition, Agent> agentMap) {
+        this.agentMap = agentMap;
+    }
+
+    public void addAgent(AgentPosition agentPosition, Agent agent) {
+        agentMap.put(agentPosition, agent);
+    }
 
     // pneumatic tube transport
     // https://en.wikipedia.org/wiki/Pneumatic_tube
+
+    public ActionToken send(ActionToken actionToken) {
+
+        AgentPosition actionTarget = actionToken.getActionTarget();
+        if (this.agentMap.containsKey(actionTarget) == false) {
+            throw new IllegalArgumentException("action target: " + actionTarget + " not found in agentMap");
+        }
+
+        LOG.info("received actionToken: " + actionToken);
+        flightRecorder.add(actionToken);
+        ActionToken nextActionToken = agentMap.get(actionTarget)
+                                              .act(actionToken);
+
+        LOG.info("received reply actionToken: " + nextActionToken);
+        flightRecorder.add(nextActionToken);
+        return nextActionToken;
+    }
+
     public ActionToken send(ActionToken actionToken, Map<AgentPosition, Agent> agentMap) {
 
         AgentPosition actionTarget = actionToken.getActionTarget();
