@@ -3,6 +3,7 @@ package com.github.davidholiday.game;
 public enum Action {
     GAME_START,
     GAME_END,
+    DEALER_NEXT_ACTION,
     DEAL_CARD,
     TAKE_CARD,
     OFFER_INSURANCE,

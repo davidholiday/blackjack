@@ -162,6 +162,13 @@ public class Game {
             int cycleCount = 0;
             while (currentActionToken.getActionTarget() != AgentPosition.GAME) {
                 if (cycleCount > CIRCUIT_BREAKER_FOR_ROUNDS) { break; }
+
+                // ensures no agent mangles with the ruleset or playerhandmap values
+                currentActionToken = new ActionToken.Builder(currentActionToken)
+                                                    .withRuleSet(getRuleSet())
+                                                    .withPlayerHandMap(getPlayerHandMap())
+                                                    .build();
+
                 currentActionToken = actionBroker.send(currentActionToken);
                 cycleCount ++;
             }

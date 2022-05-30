@@ -39,6 +39,7 @@ public class App {
         NoCountStrategy noCountStrategy = new NoCountStrategy();
         NoOpPlayerStrategy noOpPlayerStrategy = new NoOpPlayerStrategy();
         Player playerOne = new Player(noCountStrategy, noOpPlayerStrategy, 99999);
+        Player playerTwo = new Player(noCountStrategy, noOpPlayerStrategy, 66666);
         RuleSet ruleSet = new RuleSet.Builder()
                                      .withRule(Rule.BLACKJACK_PAYS_THREE_TO_TWO)
                                      .withRule(Rule.SIX_DECK_SHOE)
@@ -48,6 +49,7 @@ public class App {
 
         Game game = new Game.Builder()
                             .withPlayerAtPosition(playerOne, AgentPosition.PLAYER_ONE)
+                            .withPlayerAtPosition(playerTwo, AgentPosition.PLAYER_TWO)
                             .withRuleSet(ruleSet)
                             .build();
 

@@ -52,34 +52,32 @@ public class Dealer extends Agent {
                     reshuffleFlag = false;
                     LOG.info("done with reshuffle!");
                 }
-
                 playerWagerMap.clear();
+                // fall into DEALER_NEXT_ACTION
 
+            case DEALER_NEXT_ACTION:
+                // fall into REQUEST_WAGER
+
+            case REQUEST_WAGER:
                 Optional<ActionToken> solicitWagerActionToken = getSolicitWagerActionToken(actionToken);
                 if (solicitWagerActionToken.isPresent()) {
                     return solicitWagerActionToken.get();
-                } else {
-                    return new ActionToken.Builder(actionToken)
-                                          .withActionSource(AgentPosition.DEALER)
-                                          .withActionTarget(AgentPosition.GAME)
-                                          .withAction(Action.GAME_END)
-                                          .build();
                 }
+            // remaining DEALER initiated actions here
+                return getEndGameActionToken();
+
 
             case WAGER:
                 playerWagerMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
                 LOG.info("playerWagerMap is now: " + playerWagerMap);
-                return new ActionToken.Builder()
-                                      .withActionSource(AgentPosition.DEALER)
-                                      .withActionTarget(AgentPosition.GAME)
-                                      .withAction(Action.GAME_END)
-                                      .build();
+                return getDealerNextActionToken(actionToken);
+
+            default:
+                return getEndGameActionToken();
 
 
         }
 
-        Action action = getNextPlay(actionToken);
-        return null;
     }
 
 
@@ -147,6 +145,24 @@ public class Dealer extends Agent {
         }
 
         return Optional.empty();
+    }
+
+    private ActionToken getDealerNextActionToken(ActionToken actionToken) {
+        return new ActionToken.Builder()
+                              .withAction(Action.DEALER_NEXT_ACTION)
+                              .withRuleSet(actionToken.getRuleSet())
+                              .withPlayerHandMap(actionToken.getPlayerHandMap())
+                              .withActionSource(AgentPosition.DEALER)
+                              .withActionTarget(AgentPosition.DEALER)
+                              .build();
+    }
+
+    private ActionToken getEndGameActionToken() {
+        return new ActionToken.Builder()
+                              .withActionSource(AgentPosition.DEALER)
+                              .withActionTarget(AgentPosition.GAME)
+                              .withAction(Action.GAME_END)
+                              .build();
     }
 
 }
