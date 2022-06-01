@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Hand extends CardCollection {
 
@@ -131,6 +132,20 @@ public class Hand extends CardCollection {
     private boolean updateIsTwentyOne() {
         if (handValue == 21 | aceSpecialHandValue == 21) { return true; }
         else { return false; }
+    }
+
+
+    // ty SO https://stackoverflow.com/a/27609
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return getAllCards(false) == ((Hand) o).getAllCards(false);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getAllCards(false));
     }
 
 }

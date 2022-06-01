@@ -193,6 +193,25 @@ public class ActionToken {
 
     public int getDiscardTrayDeckSize() { return discardTrayDeckSize; }
 
+    public static ActionToken getDealerNextActionToken(ActionToken actionToken) {
+        // specifically not including player offering of cards or money in this token
+        return new ActionToken.Builder()
+                              .withAction(Action.DEALER_NEXT_ACTION)
+                              .withRuleSet(actionToken.getRuleSet())
+                              .withPlayerHandMap(actionToken.getPlayerHandMap())
+                              .withActionSource(actionToken.getActionSource())
+                              .withActionTarget(AgentPosition.DEALER)
+                              .build();
+    }
+
+    public static ActionToken getEndGameActionToken() {
+        return new ActionToken.Builder()
+                              .withActionSource(AgentPosition.DEALER)
+                              .withActionTarget(AgentPosition.GAME)
+                              .withAction(Action.GAME_END)
+                              .build();
+    }
+
 
 }
 

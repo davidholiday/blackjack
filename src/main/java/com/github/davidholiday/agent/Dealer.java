@@ -9,7 +9,6 @@ import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.agent.strategy.count.NoCountStrategy;
 import com.github.davidholiday.agent.strategy.play.PlayStrategy;
-import com.github.davidholiday.game.Game;
 import com.github.davidholiday.util.GeneralUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.github.davidholiday.agent.AgentPosition.*;
 
 public class Dealer extends Agent {
 
@@ -30,6 +33,19 @@ public class Dealer extends Agent {
     private final Map<AgentPosition, Double> playerWagerMap = new HashMap<>();
 
     private boolean reshuffleFlag = true;
+
+    private List<AgentPosition> dealOrder =
+            Stream.of(
+                PLAYER_ONE,
+                PLAYER_TWO,
+                PLAYER_THREE,
+                PLAYER_FOUR,
+                PLAYER_FIVE,
+                PLAYER_SIX,
+                PLAYER_SEVEN,
+                DEALER
+        ).collect(Collectors.toList());
+
 
     public Dealer(PlayStrategy playStrategy, Shoe shoe) {
         super(new NoCountStrategy(), playStrategy, Integer.MAX_VALUE);
@@ -44,6 +60,7 @@ public class Dealer extends Agent {
         // in in 'deal' mode, evaluate
         switch (actionToken.getAction()) {
             case GAME_START:
+                playerWagerMap.clear();
 
                 if (reshuffleFlag) {
                     LOG.info("reshuffle flag is set - shuffling and cutting shoe...");
@@ -52,28 +69,35 @@ public class Dealer extends Agent {
                     reshuffleFlag = false;
                     LOG.info("done with reshuffle!");
                 }
-                playerWagerMap.clear();
                 // fall into DEALER_NEXT_ACTION
 
             case DEALER_NEXT_ACTION:
                 // fall into REQUEST_WAGER
 
             case REQUEST_WAGER:
-                Optional<ActionToken> solicitWagerActionToken = getSolicitWagerActionToken(actionToken);
-                if (solicitWagerActionToken.isPresent()) {
-                    return solicitWagerActionToken.get();
+                Optional<ActionToken> solicitWagerActionTokenO = getSolicitWagerActionToken(actionToken);
+                if (solicitWagerActionTokenO.isPresent()) {
+                    return solicitWagerActionTokenO.get();
+                }
+            case DEAL_HAND:
+                Optional<ActionToken> dealHandActionTokenO = getDealHandActionToken(actionToken);
+                if (dealHandActionTokenO.isPresent()) {
+                    return dealHandActionTokenO.get();
                 }
             // remaining DEALER initiated actions here
-                return getEndGameActionToken();
+                return ActionToken.getEndGameActionToken();
 
 
-            case WAGER:
+            case SUBMIT_WAGER:
                 playerWagerMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
                 LOG.info("playerWagerMap is now: " + playerWagerMap);
-                return getDealerNextActionToken(actionToken);
+                return ActionToken.getDealerNextActionToken(actionToken);
+            case TAKE_CARD:
+                addCardsToHand(actionToken.getOfferedCards());
+                return ActionToken.getDealerNextActionToken(actionToken);
 
             default:
-                return getEndGameActionToken();
+                return ActionToken.getEndGameActionToken();
 
 
         }
@@ -81,18 +105,18 @@ public class Dealer extends Agent {
     }
 
 
-    public Hand getDealerHandForPlayer() {
-        if (this.getHand().getCardListSize() > 1) {
-            List<Card> dealerCardListForPlayer = this.getHand()
-                                                     .getAllCards(false)
-                                                     .subList(1, this.getHand().getCardListSize());
-
-            Hand dealerHandForPlayer = new Hand(dealerCardListForPlayer);
-            return dealerHandForPlayer;
-        }
-
-        return new Hand();
-    }
+//    public Hand getDealerHandForPlayer() {
+//        if (this.getHand().getCardListSize() > 1) {
+//            List<Card> dealerCardListForPlayer = this.getHand()
+//                                                     .getAllCards(false)
+//                                                     .subList(1, this.getHand().getCardListSize());
+//
+//            Hand dealerHandForPlayer = new Hand(dealerCardListForPlayer);
+//            return dealerHandForPlayer;
+//        }
+//
+//        return new Hand();
+//    }
 
     @Override
     public void updateBankroll(double updateBy) {
@@ -147,22 +171,24 @@ public class Dealer extends Agent {
         return Optional.empty();
     }
 
-    private ActionToken getDealerNextActionToken(ActionToken actionToken) {
-        return new ActionToken.Builder()
-                              .withAction(Action.DEALER_NEXT_ACTION)
-                              .withRuleSet(actionToken.getRuleSet())
-                              .withPlayerHandMap(actionToken.getPlayerHandMap())
-                              .withActionSource(AgentPosition.DEALER)
-                              .withActionTarget(AgentPosition.DEALER)
-                              .build();
+    private Optional<ActionToken> getDealHandActionToken(ActionToken actionToken) {
+        for (AgentPosition agentPosition : dealOrder) {
+            if (actionToken.getPlayerHandMap().containsKey(agentPosition)) {
+                if (actionToken.getPlayerHandMap().get(agentPosition).getCardListSize() < 2) {
+
+                    ActionToken dealHandActionToken = new ActionToken.Builder(actionToken)
+                                                                     .withAction(Action.TAKE_CARD)
+                                                                     .withActionSource(DEALER)
+                                                                     .withActionTarget(agentPosition)
+                                                                     .withOfferedCards(draw(1))
+                                                                     .build();
+                    return Optional.of(dealHandActionToken);
+                }
+            }
+        }
+        return Optional.empty();
     }
 
-    private ActionToken getEndGameActionToken() {
-        return new ActionToken.Builder()
-                              .withActionSource(AgentPosition.DEALER)
-                              .withActionTarget(AgentPosition.GAME)
-                              .withAction(Action.GAME_END)
-                              .build();
-    }
+
 
 }

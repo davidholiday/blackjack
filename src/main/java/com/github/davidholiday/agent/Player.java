@@ -18,15 +18,23 @@ public class Player extends Agent {
 
         switch (actionToken.getAction()) {
             case REQUEST_WAGER:
-                return new ActionToken.Builder(actionToken)
+                return new ActionToken.Builder()
+                                      .withRuleSet(actionToken.getRuleSet())
+                                      .withPlayerHandMap(actionToken.getPlayerHandMap())
                                       .withActionTarget(actionToken.getActionSource())
                                       .withActionSource(actionToken.getActionTarget())
-                                      .withAction(Action.WAGER)
+                                      .withAction(Action.SUBMIT_WAGER)
                                       .withOfferedMoney(wager(actionToken))
                                       .build();
+
+            case TAKE_CARD:
+                addCardsToHand(actionToken.getOfferedCards());
+                return ActionToken.getDealerNextActionToken(actionToken);
 
         }
 
         return null;
     }
+
+
 }

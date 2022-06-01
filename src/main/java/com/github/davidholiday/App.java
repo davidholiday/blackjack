@@ -24,17 +24,17 @@ public class App {
     public static final RuntimeInfo RUNTIME_INFO = new RuntimeInfo();
 
     public static void main( String[] args ) {
-        Shoe shoe = new Shoe(6);
-        shoe.shuffle(10);
-        shoe.cut();
-//        String msg = MessageFormat.format("shoe is: {0}", shoe.getAllCards(false));
-//        LOG.info(msg);
-
-        for (int i = 0; i < 5; i ++) {
-            int randy = GeneralUtils.getRandomIntForRange(2, 6);
-            Hand hand = new Hand(shoe.draw(randy));
-            LOG.info("hand is: " + hand.toString());
-        }
+//        Shoe shoe = new Shoe(6);
+//        shoe.shuffle(10);
+//        shoe.cut();
+////        String msg = MessageFormat.format("shoe is: {0}", shoe.getAllCards(false));
+////        LOG.info(msg);
+//
+//        for (int i = 0; i < 5; i ++) {
+//            int randy = GeneralUtils.getRandomIntForRange(2, 6);
+//            Hand hand = new Hand(shoe.draw(randy));
+//            LOG.info("hand is: " + hand.toString());
+//        }
 
         NoCountStrategy noCountStrategy = new NoCountStrategy();
         NoOpPlayerStrategy noOpPlayerStrategy = new NoOpPlayerStrategy();

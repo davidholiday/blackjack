@@ -70,11 +70,6 @@ public class RuleSet {
 
 
     public void validateRuleSet(Set<Rule> ruleSet) {
-//        if (App.RUNTIME_INFO.ASSERTIONS_ENABLED == false) {
-//            LOG.warn("skipping deck validation because Java was invoked without flag to enable assertions");
-//            return;
-//        }
-
         String errorMessage = "";
 
         // ensure ruleset contains one and only one deck definition
@@ -89,7 +84,6 @@ public class RuleSet {
                 "[(n)_DECK_SHOE] rules",
                 actualDeckRulesL.intValue()
         );
-//        assert expectedDeckRules == actualDeckRulesL.intValue(): errorMessage;
         if (expectedDeckRules != actualDeckRulesL.intValue()) {
             throw new IllegalArgumentException(errorMessage);
         }
@@ -107,7 +101,6 @@ public class RuleSet {
                 "[PLAYER_CAN_DOUBLE_ON] Rules",
                 actualPlayerCanDoubleOnRulesL.intValue()
         );
-//        assert expectedPlayerCanDoubleOnRules == actualPlayerCanDoubleOnRulesL.intValue(): errorMessage;
         if (expectedPlayerCanDoubleOnRules != actualPlayerCanDoubleOnRulesL.intValue()) {
             throw new IllegalArgumentException(errorMessage);
         }
@@ -123,7 +116,6 @@ public class RuleSet {
                 "[PLAYER_CAN_RESPLIT_TO] Rules",
                 actualPlayerCanResplitToRulesL.intValue()
         );
-//        assert expectedPlayerCanResplitToRules == actualPlayerCanResplitToRulesL.intValue(): errorMessage;
         if (expectedPlayerCanResplitToRules != actualPlayerCanResplitToRulesL.intValue()) {
             throw new IllegalArgumentException(errorMessage);
         }
@@ -140,8 +132,22 @@ public class RuleSet {
                 "[BLACKJACK_PAYS] Rules",
                 actualBlackJackPaysRulesL.intValue()
         );
-//        assert expectedBlackJackPaysRules == actualBlackJackPaysRulesL.intValue(): errorMessage;
         if (expectedBlackJackPaysRules != actualBlackJackPaysRulesL.intValue()) {
+            throw new IllegalArgumentException(errorMessage);
+        }
+
+        // ensure ruleset contains one and only one PLAYER_CAN_SURRENDER definition
+        //
+        int expectedMaxSurrenderRuleCount = 1;
+        Long actualSurrenderRuleCountL = ruleSet.stream()
+                                                .filter((rule) -> Rule.getSurrenderRuleSet().contains(rule))
+                                                .count();
+        errorMessage = getErrorMessage(
+                expectedMaxSurrenderRuleCount,
+                "max of [PLAYER_CAN_SURRENDER] Rules",
+                actualSurrenderRuleCountL.intValue()
+        );
+        if (actualSurrenderRuleCountL.intValue() > expectedMaxSurrenderRuleCount) {
             throw new IllegalArgumentException(errorMessage);
         }
 

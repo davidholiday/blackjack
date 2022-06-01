@@ -163,11 +163,17 @@ public class Game {
             while (currentActionToken.getActionTarget() != AgentPosition.GAME) {
                 if (cycleCount > CIRCUIT_BREAKER_FOR_ROUNDS) { break; }
 
-                // ensures no agent mangles with the ruleset or playerhandmap values
-                currentActionToken = new ActionToken.Builder(currentActionToken)
-                                                    .withRuleSet(getRuleSet())
-                                                    .withPlayerHandMap(getPlayerHandMap())
-                                                    .build();
+                // ensures token that gets passed has correct ruleset and playerhandmap values
+                boolean ruleSetOk = currentActionToken.getRuleSet() == getRuleSet();
+                boolean playerHandMapOk = currentActionToken.getPlayerHandMap().equals(getPlayerHandMap());
+                if (ruleSetOk == false || playerHandMapOk == false) {
+                    LOG.info("creating new actionToken instance with correct ruleSet and playerHandMap");
+
+                    currentActionToken = new ActionToken.Builder(currentActionToken)
+                                                        .withRuleSet(getRuleSet())
+                                                        .withPlayerHandMap(getPlayerHandMap())
+                                                        .build();
+                }
 
                 currentActionToken = actionBroker.send(currentActionToken);
                 cycleCount ++;
@@ -182,7 +188,9 @@ public class Game {
     public Map<AgentPosition, Hand> getPlayerHandMap() {
         Map<AgentPosition, Hand> playerHandMap = new HashMap<>();
         playerMap.forEach((k, v) -> playerHandMap.put(k, v.getHand()));
-        playerHandMap.put(AgentPosition.DEALER, dealer.getDealerHandForPlayer());
+        LOG.info(playerHandMap+"");
+        playerHandMap.put(AgentPosition.DEALER, dealer.getHand());
+        LOG.info(playerHandMap+"");
         return playerHandMap;
     }
 

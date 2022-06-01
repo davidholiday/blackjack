@@ -25,6 +25,7 @@ public enum Rule {
     PLAYER_CAN_RESPLIT_ACES,
     PLAYER_CAN_HIT_SPLIT_ACES,
     PLAYER_LOSES_ONLY_ORIGINAL_BET_AGAINST_DEALER_BLACKJACK,
+    PLAYER_CAN_EARLY_SURRENDER,
     PLAYER_CAN_LATE_SURRENDER,
     BLACKJACK_PAYS_THREE_TO_TWO,
     BLACKJACK_PAYS_SIX_TO_FIVE;
@@ -62,5 +63,11 @@ public enum Rule {
         ).collect(Collectors.toSet());
     }
 
+    public static Set<Rule> getSurrenderRuleSet() {
+        return Stream.of(
+                PLAYER_CAN_EARLY_SURRENDER,
+                PLAYER_CAN_LATE_SURRENDER
+        ).collect(Collectors.toSet());
+    }
 
 }

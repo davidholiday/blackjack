@@ -6,6 +6,8 @@ public enum Action {
     DEALER_NEXT_ACTION,
     DEAL_CARD,
     TAKE_CARD,
+    DEAL_HAND,
+    REQUEST_PLAY,
     OFFER_INSURANCE,
     TAKE_INSURANCE,
     SURRENDER,
@@ -19,7 +21,7 @@ public enum Action {
     STAND,
     RESPOND_TO_STAND,
     REQUEST_WAGER,
-    WAGER,
+    SUBMIT_WAGER,
     SETTLE_WAGER,
     NONE
 }

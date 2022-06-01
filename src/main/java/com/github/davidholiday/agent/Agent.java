@@ -1,8 +1,8 @@
 package com.github.davidholiday.agent;
 
+import com.github.davidholiday.card.Card;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.game.Action;
-import com.github.davidholiday.game.ActionBroker;
 import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.agent.strategy.count.CountStrategy;
 import com.github.davidholiday.agent.strategy.play.PlayStrategy;
@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class Agent {
 
@@ -47,6 +49,14 @@ public abstract class Agent {
 
     public Hand getHand() {
         return new Hand(hand);
+    }
+
+    public void addCardToHand(Card card) {
+        hand.addCards(Stream.of(card).collect(Collectors.toList()));
+    }
+
+    public void addCardsToHand(List<Card> cardList) {
+        hand.addCards(cardList);
     }
 
     public String getCountStrategyName() { return countStrategy.getName(); }
