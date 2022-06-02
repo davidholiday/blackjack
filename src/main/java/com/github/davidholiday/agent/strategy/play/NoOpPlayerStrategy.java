@@ -8,16 +8,16 @@ public class NoOpPlayerStrategy extends PlayerStrategy {
 
     public static final String NAME = "NO_OP_PLAYER_STRATEGY";
 
-
     @Override
     public String getName() {
         return NAME;
     }
 
     @Override
-    public double wager(int count, ActionToken actionToken) {
-        return 5.0;
-    }
+    public double wager(int count, ActionToken actionToken) { return 5.0; }
+
+    @Override
+    public double evaluateForInsurance(Hand hand, int count, ActionToken actionToken) { return 0.0; }
 
     @Override
     public Action evaluateForSurrender(Hand hand, int count, ActionToken actionToken) {

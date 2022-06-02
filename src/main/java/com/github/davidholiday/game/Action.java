@@ -4,6 +4,7 @@ public enum Action {
     GAME_START,
     GAME_END,
     DEALER_NEXT_ACTION,
+    DEALER_PLAY_HAND,
     DEAL_CARD,
     TAKE_CARD,
     DEAL_HAND,

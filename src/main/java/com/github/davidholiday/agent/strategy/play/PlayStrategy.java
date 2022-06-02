@@ -10,6 +10,6 @@ public interface PlayStrategy {
 
     Action evaluateHand(Hand hand, int count, ActionToken actionToken);
 
-    public abstract double wager(int count, ActionToken actionToken);
+    double wager(int count, ActionToken actionToken);
 
 }

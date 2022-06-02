@@ -166,12 +166,16 @@ public class Game {
                 // ensures token that gets passed has correct ruleset and playerhandmap values
                 boolean ruleSetOk = currentActionToken.getRuleSet() == getRuleSet();
                 boolean playerHandMapOk = currentActionToken.getPlayerHandMap().equals(getPlayerHandMap());
-                if (ruleSetOk == false || playerHandMapOk == false) {
-                    LOG.info("creating new actionToken instance with correct ruleSet and playerHandMap");
+                boolean discardTrayCardCountOk = currentActionToken.getDiscardTrayCardSize() == getDiscardTrayCardSize();
+                if (ruleSetOk == false || playerHandMapOk == false || discardTrayCardCountOk == false) {
+                    LOG.info(
+                        "creating new actionToken instance with correct ruleSet, playerHandMap, and discardTrayCount"
+                    );
 
                     currentActionToken = new ActionToken.Builder(currentActionToken)
                                                         .withRuleSet(getRuleSet())
                                                         .withPlayerHandMap(getPlayerHandMap())
+                                                        .withDiscardTrayCardSize(getDiscardTrayCardSize())
                                                         .build();
                 }
 

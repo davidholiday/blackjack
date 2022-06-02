@@ -24,6 +24,8 @@ public abstract class PlayerStrategy implements PlayStrategy {
         return evaluateForHard(hand, count, actionToken);
     }
 
+    public abstract double evaluateForInsurance(Hand hand, int count, ActionToken actionToken);
+
     public abstract Action evaluateForSurrender(Hand hand, int count, ActionToken actionToken);
 
     public abstract Action evaluateForSplit(Hand hand, int count, ActionToken actionToken);

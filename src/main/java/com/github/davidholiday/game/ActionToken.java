@@ -33,7 +33,7 @@ public class ActionToken {
 
         private int discardTrayCardSize = 0;
 
-        private int discardTrayDeckSize = 0;
+        //private int discardTrayDeckSize = 0;
 
         public Builder(ActionToken actionToken) {
             this.playerHandMap = actionToken.playerHandMap;
@@ -44,14 +44,14 @@ public class ActionToken {
             this.actionTarget = actionToken.actionTarget;
             this.ruleSet = actionToken.ruleSet;
             this.discardTrayCardSize = actionToken.discardTrayCardSize;
-            this.discardTrayDeckSize = actionToken.discardTrayDeckSize;
+            //this.discardTrayDeckSize = actionToken.discardTrayDeckSize;
         }
 
         public Builder(Game game, Action action) {
             this.ruleSet = game.getRuleSet();
             this.action = action;
             this.discardTrayCardSize = game.getDiscardTrayCardSize();
-            this.discardTrayDeckSize = game.getDiscardTrayDeckSize();
+            //this.discardTrayDeckSize = game.getDiscardTrayDeckSize();
         }
 
         public Builder(Action action) {
@@ -128,22 +128,22 @@ public class ActionToken {
             actionToken.offeredCards = this.offeredCards;
             actionToken.offeredMoney = this.offeredMoney;
             actionToken.ruleSet = this.ruleSet;
-
-            boolean bothDiscardSizeValuesZero = this.discardTrayCardSize == 0 && this.discardTrayDeckSize == 0;
-            boolean cardDividedByDeckSizeCorrect =
-                    bothDiscardSizeValuesZero ?
-                    true :
-                    this.discardTrayCardSize / this.discardTrayDeckSize == GeneralUtils.DECK_SIZE_NO_JOKERS;
-
-            if (bothDiscardSizeValuesZero == false && cardDividedByDeckSizeCorrect == false) {
-                String msg = "discardTrayCardSize: " + discardTrayCardSize
-                        + " / discardTrayDeckSize: " + discardTrayDeckSize
-                        + " != " + GeneralUtils.DECK_SIZE_NO_JOKERS;
-                throw new IllegalArgumentException(msg);
-            }
-
             actionToken.discardTrayCardSize = this.discardTrayCardSize;
-            actionToken.discardTrayDeckSize = this.discardTrayDeckSize;
+//            boolean bothDiscardSizeValuesZero = this.discardTrayCardSize == 0 && this.discardTrayDeckSize == 0;
+//            boolean cardDividedByDeckSizeCorrect =
+//                    bothDiscardSizeValuesZero ?
+//                    true :
+//                    this.discardTrayCardSize / this.discardTrayDeckSize == GeneralUtils.DECK_SIZE_NO_JOKERS;
+//
+//            if (bothDiscardSizeValuesZero == false && cardDividedByDeckSizeCorrect == false) {
+//                String msg = "discardTrayCardSize: " + discardTrayCardSize
+//                        + " / discardTrayDeckSize: " + discardTrayDeckSize
+//                        + " != " + GeneralUtils.DECK_SIZE_NO_JOKERS;
+//                throw new IllegalArgumentException(msg);
+//            }
+//
+//            actionToken.discardTrayCardSize = this.discardTrayCardSize;
+//            actionToken.discardTrayDeckSize = this.discardTrayDeckSize;
             return actionToken;
         }
 

@@ -81,12 +81,23 @@ public class Dealer extends Agent {
                     return solicitWagerActionToken.get();
                 }
             case DEAL_HAND:
-                Optional<ActionToken> dealHandActionTokenO = getDealHandActionToken(actionToken);
-                if (dealHandActionTokenO.isPresent()) {
-                    return dealHandActionTokenO.get();
+                Optional<ActionToken> takeCardActionToken = getTakeCardActionToken(actionToken);
+                if (takeCardActionToken.isPresent()) {
+                    return takeCardActionToken.get();
                 }
-            // remaining DEALER initiated actions here
                 return ActionToken.getEndGameActionToken();
+            case OFFER_INSURANCE:
+                Optional<ActionToken> offerInsuranceActionToken = getOfferInsuranceActionToken(actionToken);
+                if (offerInsuranceActionToken.isPresent()) {
+                    return offerInsuranceActionToken.get();
+                }
+//            case REQUEST_PLAY:
+//                Optional<ActionToken> requestPlayActionToken = getRequestPlayActionToken(actionToken);
+//                if (requestPlayActionToken.isPresent()) {
+//                    return requestPlayActionToken.get();
+//                }
+            // remaining DEALER initiated actions here
+
 
 
             case SUBMIT_WAGER:
@@ -170,21 +181,25 @@ public class Dealer extends Agent {
         return Optional.empty();
     }
 
-    private Optional<ActionToken> getDealHandActionToken(ActionToken actionToken) {
+    private Optional<ActionToken> getTakeCardActionToken(ActionToken actionToken) {
         for (AgentPosition agentPosition : dealOrder) {
             if (actionToken.getPlayerHandMap().containsKey(agentPosition)) {
                 if (actionToken.getPlayerHandMap().get(agentPosition).getCardListSize() < 2) {
 
-                    ActionToken dealHandActionToken = new ActionToken.Builder(actionToken)
+                    ActionToken takeCardActionToken = new ActionToken.Builder(actionToken)
                                                                      .withAction(Action.TAKE_CARD)
                                                                      .withActionSource(DEALER)
                                                                      .withActionTarget(agentPosition)
                                                                      .withOfferedCards(draw(1))
                                                                      .build();
-                    return Optional.of(dealHandActionToken);
+                    return Optional.of(takeCardActionToken);
                 }
             }
         }
+        return Optional.empty();
+    }
+
+    private Optional<ActionToken> getOfferInsuranceActionToken(ActionToken actionToken) {
         return Optional.empty();
     }
 

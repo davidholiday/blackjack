@@ -71,8 +71,31 @@ public abstract class Agent {
         count = countStrategy.updateCount(hand, actionToken);
     }
 
-    Action getNextPlay(ActionToken actionToken) {
-        return playStrategy.evaluateHand(hand, count, actionToken);
+    ActionToken getNextPlay(ActionToken actionToken) {
+        Action nextAction = playStrategy.evaluateHand(hand, count, actionToken);
+
+        switch (nextAction){
+            case TAKE_INSURANCE:
+                break;
+            case SURRENDER:
+                break;
+            case SPLIT:
+                break;
+            case DOUBLE_DOWN:
+                break;
+            case HIT:
+                break;
+            case STAND:
+                break;
+        }
+
+        // should never fall into this block
+        LOG.warn("*!* code path should not have reached this point. returning NONE action *!*");
+        return new ActionToken.Builder(actionToken)
+                              .withAction(Action.NONE)
+                              .withActionSource(actionToken.getActionTarget())
+                              .withActionTarget(actionToken.getActionSource())
+                              .build();
     }
 
     double wager(ActionToken actionToken) {

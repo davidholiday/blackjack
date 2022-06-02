@@ -7,6 +7,7 @@ import com.github.davidholiday.agent.strategy.play.PlayStrategy;
 
 public class Player extends Agent {
 
+    private double current_wager = 0;
 
     public Player(CountStrategy countStrategy, PlayStrategy playStrategy, int bankroll) {
         super(countStrategy, playStrategy, bankroll);
@@ -17,10 +18,10 @@ public class Player extends Agent {
         updateCount(actionToken);
 
         switch (actionToken.getAction()) {
+
             case REQUEST_WAGER:
-                return new ActionToken.Builder()
-                                      .withRuleSet(actionToken.getRuleSet())
-                                      .withPlayerHandMap(actionToken.getPlayerHandMap())
+                current_wager = wager(actionToken);
+                return new ActionToken.Builder(actionToken)
                                       .withActionTarget(actionToken.getActionSource())
                                       .withActionSource(actionToken.getActionTarget())
                                       .withAction(Action.SUBMIT_WAGER)
@@ -30,7 +31,12 @@ public class Player extends Agent {
             case TAKE_CARD:
                 addCardsToHand(actionToken.getOfferedCards());
                 return ActionToken.getDealerNextActionToken(actionToken);
+            case OFFER_INSURANCE:
 
+            case REQUEST_PLAY:
+                return  getNextPlay(actionToken);
+
+            // on BUST or end of game reset current_wager
         }
 
         return null;
