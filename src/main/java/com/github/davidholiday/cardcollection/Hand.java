@@ -65,7 +65,7 @@ public class Hand extends CardCollection {
                 " >> is 21: " + isTwentyOne();
     }
 
-    private void updateHandValue() {
+    public void updateHandValue() {
         int newHandValue = 0;
         int newAceSpecialHandValue = 0;
         for (Card card : getAllCards(false)) {

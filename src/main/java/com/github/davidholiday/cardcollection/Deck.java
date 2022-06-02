@@ -37,7 +37,7 @@ public class Deck extends CardCollection {
         for (CardSuit cardSuit : CardSuit.values()) {
             if (cardSuit == CardSuit.NONE) { continue; }
             for (CardType cardType : CardType.values()) {
-                if (cardType == CardType.CUT || cardType == CardType.JOKER) { continue; }
+                if (cardType == CardType.CUT || cardType == CardType.JOKER || cardType == CardType.HIDDEN) { continue; }
                 Card card = new Card(cardType, cardSuit);
                 rv.add(card);
             }

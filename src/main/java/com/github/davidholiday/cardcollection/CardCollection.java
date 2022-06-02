@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.security.SecureRandom;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import static com.github.davidholiday.util.MessageTemplates.getErrorMessage;
@@ -25,10 +24,10 @@ public abstract class CardCollection {
     private final SecureRandom secureRandom = new SecureRandom();
 
     void validateDeck(int numDecks, boolean withJokers, List<Card> deck) {
-        if (App.RUNTIME_INFO.ASSERTIONS_ENABLED == false) {
-            LOG.warn("skipping deck validation because Java was invoked without flag to enable assertions");
-            return;
-        }
+//        if (App.RUNTIME_INFO.ASSERTIONS_ENABLED == false) {
+//            LOG.warn("skipping deck validation because Java was invoked without flag to enable assertions");
+//            return;
+//        }
 
         if (numDecks < 1) { throw new IllegalArgumentException("numDecks must be greater than zero"); }
 
@@ -58,40 +57,45 @@ public abstract class CardCollection {
                 CardSuit.HEARTS.name(),
                 suitMap.get(CardSuit.HEARTS)
         );
-        assert suitMap.get(CardSuit.HEARTS) == expected_suit_count: errorMessage;
+        if (suitMap.get(CardSuit.HEARTS) != expected_suit_count) { throw new IllegalStateException(errorMessage); }
+        //assert suitMap.get(CardSuit.HEARTS) == expected_suit_count: errorMessage;
 
         errorMessage = getErrorMessage(
                 expected_suit_count,
                 CardSuit.DIAMONDS.name(),
                 suitMap.get(CardSuit.DIAMONDS)
         );
-        assert suitMap.get(CardSuit.DIAMONDS) == expected_suit_count: errorMessage;
+        if (suitMap.get(CardSuit.DIAMONDS) != expected_suit_count) { throw new IllegalStateException(errorMessage); }
+        //assert suitMap.get(CardSuit.DIAMONDS) == expected_suit_count: errorMessage;
 
         errorMessage = getErrorMessage(
                 expected_suit_count,
                 CardSuit.CLUBS.name(),
                 suitMap.get(CardSuit.CLUBS)
         );
-        assert suitMap.get(CardSuit.CLUBS) == expected_suit_count: errorMessage;
+        if (suitMap.get(CardSuit.CLUBS) != expected_suit_count) { throw new IllegalStateException(errorMessage); }
+        //assert suitMap.get(CardSuit.CLUBS) == expected_suit_count: errorMessage;
 
         errorMessage = getErrorMessage(
                 expected_suit_count,
                 CardSuit.SPADES.name(),
                 suitMap.get(CardSuit.SPADES)
         );
-        assert suitMap.get(CardSuit.SPADES) == expected_suit_count: errorMessage;
+        if (suitMap.get(CardSuit.SPADES) != expected_suit_count) { throw new IllegalStateException(errorMessage); }
+        //assert suitMap.get(CardSuit.SPADES) == expected_suit_count: errorMessage;
 
         // should be four of each type - one per suit
         // we'll deal with jokers in the following block
         int expected_count_by_type = 4 * numDecks;
         for (CardType cardType : CardType.values()) {
-            if (cardType == CardType.JOKER || cardType == CardType.CUT) { continue; }
+            if (cardType == CardType.JOKER || cardType == CardType.CUT || cardType == CardType.HIDDEN) { continue; }
             errorMessage = getErrorMessage(
                     expected_count_by_type,
                     cardType.name(),
                     typeMap.get(cardType)
             );
-            assert typeMap.get(cardType) == expected_count_by_type: errorMessage;
+            if (typeMap.get(cardType) != expected_count_by_type) { throw new IllegalStateException(errorMessage); }
+            //assert typeMap.get(cardType) == expected_count_by_type: errorMessage;
         }
 
         if (withJokers) {
@@ -102,7 +106,8 @@ public abstract class CardCollection {
                     CardType.JOKER.name(),
                     typeMap.get(CardType.JOKER)
             );
-            assert typeMap.get(CardType.JOKER) == expected_joker_count: errorMessage;
+            if (typeMap.get(CardType.JOKER) == expected_joker_count) { throw new IllegalStateException(errorMessage); }
+            //assert typeMap.get(CardType.JOKER) == expected_joker_count: errorMessage;
 
             // both of which should be the only cards with NONE as suit
             errorMessage = getErrorMessage(
@@ -110,7 +115,8 @@ public abstract class CardCollection {
                     CardSuit.NONE.name(),
                     suitMap.get(CardSuit.NONE)
             );
-            assert suitMap.get(CardSuit.NONE) == expected_joker_count: errorMessage;
+            if (suitMap.get(CardSuit.NONE) == expected_joker_count) { throw new IllegalStateException(errorMessage); }
+            //assert suitMap.get(CardSuit.NONE) == expected_joker_count: errorMessage;
 
             // 2->A + Jokers = 14 card types
             int expected_unique_types = 14;
@@ -119,7 +125,8 @@ public abstract class CardCollection {
                     "unique card types",
                     typeMap.keySet().size()
             );
-            assert typeMap.keySet().size() == expected_unique_types: errorMessage;
+            if (typeMap.keySet().size() != expected_unique_types) { throw new IllegalStateException(errorMessage); }
+            //assert typeMap.keySet().size() == expected_unique_types: errorMessage;
 
             // The joker should be the only duplicate card in the deck
             int expected_size_as_set = 53;
@@ -129,7 +136,8 @@ public abstract class CardCollection {
                     "unique cards in deck",
                     actual_size_as_set
             );
-            assert actual_size_as_set == expected_size_as_set: errorMessage;
+            if (actual_size_as_set != expected_size_as_set) { throw new IllegalStateException(errorMessage); }
+            //assert actual_size_as_set == expected_size_as_set: errorMessage;
 
             // Double check deck size
             int expected_deck_size = 54 * numDecks;
@@ -138,7 +146,8 @@ public abstract class CardCollection {
                     "cards in deck",
                     deck.size()
             );
-            assert deck.size() == expected_deck_size: errorMessage;
+            if (deck.size() != expected_deck_size) { throw new IllegalStateException(errorMessage); }
+            //assert deck.size() == expected_deck_size: errorMessage;
         } else {
             // should be nothing in the deck that has a suit of NONE
             int expected_suit_none_count = 0;
@@ -148,7 +157,8 @@ public abstract class CardCollection {
                     CardSuit.NONE.name(),
                     actual_suit_none_count
             );
-            assert suitMap.containsKey(CardSuit.NONE) == false: errorMessage;
+            if (suitMap.containsKey(CardSuit.NONE) != false) { throw new IllegalStateException(errorMessage); }
+            //assert suitMap.containsKey(CardSuit.NONE) == false: errorMessage;
 
             // 2->A = 13 card types
             int expected_unique_types = 13;
@@ -157,7 +167,8 @@ public abstract class CardCollection {
                     "unique card types",
                     typeMap.keySet().size()
             );
-            assert typeMap.keySet().size() == expected_unique_types: errorMessage;
+            if (typeMap.keySet().size() != expected_unique_types) { throw new IllegalStateException(errorMessage); }
+            //assert typeMap.keySet().size() == expected_unique_types: errorMessage;
 
             // every card in the deck should be unique
             int expected_size_as_set = 52;
@@ -167,7 +178,8 @@ public abstract class CardCollection {
                     "unique cards in deck",
                     actual_size_as_set
             );
-            assert actual_size_as_set == expected_size_as_set: errorMessage;
+            if (actual_size_as_set != expected_size_as_set) { throw new IllegalStateException(errorMessage); }
+            //assert actual_size_as_set == expected_size_as_set: errorMessage;
 
             // double check deck size
             int expected_deck_size = 52 * numDecks;
@@ -176,7 +188,8 @@ public abstract class CardCollection {
                     "cards in deck",
                     deck.size()
             );
-            assert deck.size() == expected_deck_size: errorMessage;
+            if (deck.size() != expected_deck_size) { throw new IllegalStateException(errorMessage); }
+            //assert deck.size() == expected_deck_size: errorMessage;
         }
     }
 
@@ -197,6 +210,8 @@ public abstract class CardCollection {
     }
 
     public void insert(Card card, int index) { cardList.add(index, card); }
+
+    public void replace(Card card, int index) { cardList.set(index, card); }
 
     public void remove(Card removeCard) {
         int removeIndex = cardList.indexOf(removeCard);

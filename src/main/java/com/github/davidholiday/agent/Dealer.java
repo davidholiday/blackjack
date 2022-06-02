@@ -1,6 +1,7 @@
 package com.github.davidholiday.agent;
 
 import com.github.davidholiday.card.Card;
+import com.github.davidholiday.card.CardSuit;
 import com.github.davidholiday.card.CardType;
 import com.github.davidholiday.cardcollection.DiscardTray;
 import com.github.davidholiday.cardcollection.Hand;
@@ -34,6 +35,8 @@ public class Dealer extends Agent {
 
     private boolean reshuffleFlag = true;
 
+    private boolean hideHoleCard = true;
+
     private List<AgentPosition> dealOrder =
             Stream.of(
                 PLAYER_ONE,
@@ -55,9 +58,6 @@ public class Dealer extends Agent {
     @Override
     public ActionToken act(ActionToken actionToken) {
 
-        // switch/case on action
-        //
-        // in in 'deal' mode, evaluate
         switch (actionToken.getAction()) {
             case GAME_START:
                 playerWagerMap.clear();
@@ -117,6 +117,18 @@ public class Dealer extends Agent {
 //
 //        return new Hand();
 //    }
+
+    @Override
+    public Hand getHand() {
+        if (hideHoleCard == false) { return super.getHand(); }
+        Hand hand = super.getHand();
+        if (hand.getCardListSize() > 0) {
+            Card card = new Card(CardType.HIDDEN, CardSuit.NONE);
+            hand.replace(card, 0);
+            hand.updateHandValue();
+        }
+        return hand;
+    }
 
     @Override
     public void updateBankroll(double updateBy) {

@@ -188,9 +188,7 @@ public class Game {
     public Map<AgentPosition, Hand> getPlayerHandMap() {
         Map<AgentPosition, Hand> playerHandMap = new HashMap<>();
         playerMap.forEach((k, v) -> playerHandMap.put(k, v.getHand()));
-        LOG.info(playerHandMap+"");
         playerHandMap.put(AgentPosition.DEALER, dealer.getHand());
-        LOG.info(playerHandMap+"");
         return playerHandMap;
     }
 

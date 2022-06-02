@@ -17,7 +17,8 @@ public enum CardType {
     QUEEN(new CardValue[] {CardValue.TEN}),
     KING(new CardValue[] {CardValue.TEN}),
     JOKER(new CardValue[] {CardValue.ZERO}),
-    CUT(new CardValue[] {CardValue.ZERO});
+    CUT(new CardValue[] {CardValue.ZERO}),
+    HIDDEN(new CardValue[] {CardValue.ZERO});
 
     private final CardValue[] values;
     private CardType(CardValue[] values) {
