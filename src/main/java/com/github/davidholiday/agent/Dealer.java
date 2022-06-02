@@ -61,6 +61,7 @@ public class Dealer extends Agent {
         switch (actionToken.getAction()) {
             case GAME_START:
                 playerWagerMap.clear();
+                hideHoleCard = true;
 
                 if (reshuffleFlag) {
                     LOG.info("reshuffle flag is set - shuffling and cutting shoe...");
@@ -75,9 +76,9 @@ public class Dealer extends Agent {
                 // fall into REQUEST_WAGER
 
             case REQUEST_WAGER:
-                Optional<ActionToken> solicitWagerActionTokenO = getSolicitWagerActionToken(actionToken);
-                if (solicitWagerActionTokenO.isPresent()) {
-                    return solicitWagerActionTokenO.get();
+                Optional<ActionToken> solicitWagerActionToken = getSolicitWagerActionToken(actionToken);
+                if (solicitWagerActionToken.isPresent()) {
+                    return solicitWagerActionToken.get();
                 }
             case DEAL_HAND:
                 Optional<ActionToken> dealHandActionTokenO = getDealHandActionToken(actionToken);
@@ -103,20 +104,6 @@ public class Dealer extends Agent {
         }
 
     }
-
-
-//    public Hand getDealerHandForPlayer() {
-//        if (this.getHand().getCardListSize() > 1) {
-//            List<Card> dealerCardListForPlayer = this.getHand()
-//                                                     .getAllCards(false)
-//                                                     .subList(1, this.getHand().getCardListSize());
-//
-//            Hand dealerHandForPlayer = new Hand(dealerCardListForPlayer);
-//            return dealerHandForPlayer;
-//        }
-//
-//        return new Hand();
-//    }
 
     @Override
     public Hand getHand() {
@@ -166,20 +153,20 @@ public class Dealer extends Agent {
     }
 
     private Optional<ActionToken> getSolicitWagerActionToken(ActionToken actionToken) {
-        for (AgentPosition agentPosition : actionToken.getPlayerHandMap().keySet()) {
-            if (agentPosition == AgentPosition.DEALER) { continue; }
-            if (playerWagerMap.containsKey(agentPosition)) { continue; }
+        for (AgentPosition agentPosition : dealOrder) {
+            if (actionToken.getPlayerHandMap().containsKey(agentPosition)) {
+                if (agentPosition == AgentPosition.DEALER) { continue; }
+                if (playerWagerMap.containsKey(agentPosition)) { continue; }
 
-            ActionToken requestWagerActionToken = new ActionToken.Builder(actionToken)
-                                                                 .withAction(Action.REQUEST_WAGER)
-                                                                 .withActionSource(AgentPosition.DEALER)
-                                                                 .withActionTarget(agentPosition)
-                                                                 .build();
+                ActionToken requestWagerActionToken = new ActionToken.Builder(actionToken)
+                                                                     .withAction(Action.REQUEST_WAGER)
+                                                                     .withActionSource(AgentPosition.DEALER)
+                                                                     .withActionTarget(agentPosition)
+                                                                     .build();
 
-            return Optional.of(requestWagerActionToken);
-
+                return Optional.of(requestWagerActionToken);
+            }
         }
-
         return Optional.empty();
     }
 
@@ -200,7 +187,5 @@ public class Dealer extends Agent {
         }
         return Optional.empty();
     }
-
-
 
 }

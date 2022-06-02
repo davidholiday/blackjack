@@ -55,14 +55,18 @@ public class Hand extends CardCollection {
 
     public boolean isTwentyOne() { return isTwentyOne; }
 
-    @Override
-    public String toString() {
+    public String toStringFull() {
         return super.toString() + " >> " + handValue + ":" + aceSpecialHandValue +
                 " >> is soft: " + isSoft() +
                 " >> is pair: " + isPair() +
                 " >> is blackjack: " + isBlackJack() +
                 " >> is bust: " + isBust() +
                 " >> is 21: " + isTwentyOne();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " >> " + handValue + ":" + aceSpecialHandValue;
     }
 
     public void updateHandValue() {

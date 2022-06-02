@@ -154,15 +154,14 @@ public class ActionToken {
     // TODO maybe to JSON?
     @Override
     public String toString() {
-        return super.toString() + " " +
-                " playerHandMap:  " + playerHandMap.entrySet() +
-                " actionSource: " + actionSource +
-                " actionTarget: " + actionTarget +
-                " action: " + action +
-                " offeredCards: " + offeredCards +
-                " offeredMoney: " + offeredMoney +
-                " ruleSet: " + ruleSet +
-                " discardTrayCardSize: " + discardTrayCardSize;
+        return " playerHandMap:  " + playerHandMap.entrySet() +
+               " actionSource: " + actionSource +
+               " actionTarget: " + actionTarget +
+               " action: " + action +
+               " offeredCards: " + offeredCards +
+               " offeredMoney: " + offeredMoney +
+               //" ruleSet: " + ruleSet +
+               " discardTrayCardSize: " + discardTrayCardSize;
     }
 
     public Map<AgentPosition, Hand> getPlayerHandMap() {
