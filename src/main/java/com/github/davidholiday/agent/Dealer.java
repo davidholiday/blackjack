@@ -74,10 +74,8 @@ public class Dealer extends Agent {
                     LOG.info("done with reshuffle!");
                 }
                 // fall into DEALER_NEXT_ACTION
-
             case DEALER_NEXT_ACTION:
                 // fall into REQUEST_WAGER
-
             case REQUEST_WAGER:
                 Optional<ActionToken> solicitWagerActionToken = getSolicitWagerActionToken(actionToken);
                 if (solicitWagerActionToken.isPresent()) {
@@ -93,6 +91,7 @@ public class Dealer extends Agent {
                 if (offerInsuranceActionToken.isPresent()) {
                     return offerInsuranceActionToken.get();
                 }
+            case SETTLE_INSURANCE_BETS:
                 return ActionToken.getEndGameActionToken();
 //            case REQUEST_PLAY:
 //                Optional<ActionToken> requestPlayActionToken = getRequestPlayActionToken(actionToken);
