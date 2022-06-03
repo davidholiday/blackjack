@@ -12,6 +12,10 @@ public abstract class PlayerStrategy implements PlayStrategy {
         if (actionToken.getRuleSet().isEmpty()) {
             throw new IllegalArgumentException("PlayerStrategy requires RuleSet in actionToken to be populated.");
         }
+
+//        Action action = evaluateForInsurance(hand, count, actionToken);
+//        if (action != Action.NONE) { return action; }
+
         Action action = evaluateForSurrender(hand, count, actionToken);
         if (action != Action.NONE) { return action; }
 
@@ -23,8 +27,6 @@ public abstract class PlayerStrategy implements PlayStrategy {
 
         return evaluateForHard(hand, count, actionToken);
     }
-
-    public abstract double evaluateForInsurance(Hand hand, int count, ActionToken actionToken);
 
     public abstract Action evaluateForSurrender(Hand hand, int count, ActionToken actionToken);
 

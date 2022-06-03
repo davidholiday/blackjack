@@ -31,7 +31,14 @@ public class Player extends Agent {
             case TAKE_CARD:
                 addCardsToHand(actionToken.getOfferedCards());
                 return ActionToken.getDealerNextActionToken(actionToken);
+
             case OFFER_INSURANCE:
+                return new ActionToken.Builder(actionToken)
+                                      .withActionTarget(actionToken.getActionSource())
+                                      .withActionSource(actionToken.getActionTarget())
+                                      .withAction(Action.TAKE_INSURANCE)
+                                      .withOfferedMoney(getInsuranceBet(actionToken))
+                                      .build();
 
             case REQUEST_PLAY:
                 return  getNextPlay(actionToken);

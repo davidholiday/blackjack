@@ -104,6 +104,12 @@ public abstract class Agent {
         return wager;
     }
 
+    double getInsuranceBet(ActionToken actionToken) {
+        double insurance = playStrategy.evaluateHandForInsurance(getHand(), count, actionToken);
+        updateBankroll(-insurance);
+        return insurance;
+    }
+
     public void updateBankroll(double updateBy) {
 
         if (bankroll + updateBy < 0 ) {

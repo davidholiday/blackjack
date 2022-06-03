@@ -17,7 +17,7 @@ public class NoOpPlayerStrategy extends PlayerStrategy {
     public double wager(int count, ActionToken actionToken) { return 5.0; }
 
     @Override
-    public double evaluateForInsurance(Hand hand, int count, ActionToken actionToken) { return 0.0; }
+    public double evaluateHandForInsurance(Hand hand, int count, ActionToken actionToken) { return 0; }
 
     @Override
     public Action evaluateForSurrender(Hand hand, int count, ActionToken actionToken) {

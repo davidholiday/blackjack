@@ -12,4 +12,6 @@ public interface PlayStrategy {
 
     double wager(int count, ActionToken actionToken);
 
+    double evaluateHandForInsurance(Hand hand, int count, ActionToken actionToken);
+
 }

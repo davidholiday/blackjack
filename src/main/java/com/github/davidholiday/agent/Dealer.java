@@ -33,6 +33,8 @@ public class Dealer extends Agent {
 
     private final Map<AgentPosition, Double> playerWagerMap = new HashMap<>();
 
+    private final Map<AgentPosition, Double> playerInsuranceMap = new HashMap<>();
+
     private boolean reshuffleFlag = true;
 
     private boolean hideHoleCard = true;
@@ -61,6 +63,7 @@ public class Dealer extends Agent {
         switch (actionToken.getAction()) {
             case GAME_START:
                 playerWagerMap.clear();
+                playerInsuranceMap.clear();
                 hideHoleCard = true;
 
                 if (reshuffleFlag) {
@@ -85,12 +88,12 @@ public class Dealer extends Agent {
                 if (takeCardActionToken.isPresent()) {
                     return takeCardActionToken.get();
                 }
-                return ActionToken.getEndGameActionToken();
             case OFFER_INSURANCE:
                 Optional<ActionToken> offerInsuranceActionToken = getOfferInsuranceActionToken(actionToken);
                 if (offerInsuranceActionToken.isPresent()) {
                     return offerInsuranceActionToken.get();
                 }
+                return ActionToken.getEndGameActionToken();
 //            case REQUEST_PLAY:
 //                Optional<ActionToken> requestPlayActionToken = getRequestPlayActionToken(actionToken);
 //                if (requestPlayActionToken.isPresent()) {
@@ -106,6 +109,10 @@ public class Dealer extends Agent {
                 return ActionToken.getDealerNextActionToken(actionToken);
             case TAKE_CARD:
                 addCardsToHand(actionToken.getOfferedCards());
+                return ActionToken.getDealerNextActionToken(actionToken);
+            case TAKE_INSURANCE:
+                playerInsuranceMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
+                LOG.info("playerInsuranceMap is now: " + playerInsuranceMap);
                 return ActionToken.getDealerNextActionToken(actionToken);
 
             default:
@@ -200,6 +207,45 @@ public class Dealer extends Agent {
     }
 
     private Optional<ActionToken> getOfferInsuranceActionToken(ActionToken actionToken) {
+
+        // the insurance bet only happens after all the players have bet, have their cards, and the
+        // dealer is showing an ACE. Because we fall into this method on every DEALER_NEXT_ACTION we need
+        // to check to make sure we offer insurance only once per round and only when it's appropriate to
+        // do so
+
+        // everyone should have two cards
+        for (AgentPosition agentPosition : actionToken.getPlayerHandMap().keySet()) {
+            if (actionToken.getPlayerHandMap().get(agentPosition).getCardListSize() != 2) {
+                return Optional.empty();
+            }
+        }
+
+        // the dealer's hole card should be hidden
+        boolean holeCardRight = getHand().getAllCards(false)
+                                         .get(0)
+                                         .getCardType() == CardType.HIDDEN;
+
+        // dealer should be showing an ACE
+        boolean dealerShowingAce = getHand().getAllCards(false)
+                                            .get(1)
+                                            .getCardType() == CardType.ACE;
+
+        if (holeCardRight && dealerShowingAce) {
+            for (AgentPosition agentPosition : dealOrder) {
+                if (agentPosition == DEALER) { continue; }
+                if (actionToken.getPlayerHandMap().containsKey(agentPosition)) {
+                    if (playerInsuranceMap.containsKey(agentPosition) == false) {
+                        ActionToken offerInsuranceActionToken =  new ActionToken.Builder(actionToken)
+                                                                                .withAction(Action.OFFER_INSURANCE)
+                                                                                .withActionTarget(agentPosition)
+                                                                                .withActionSource(DEALER)
+                                                                                .build();
+
+                        return Optional.of(offerInsuranceActionToken);
+                    }
+                }
+            }
+        }
         return Optional.empty();
     }
 

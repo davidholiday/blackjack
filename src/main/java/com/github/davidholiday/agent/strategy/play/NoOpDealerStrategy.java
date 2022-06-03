@@ -27,4 +27,7 @@ public class NoOpDealerStrategy extends DealerStrategy {
     public double wager(int count, ActionToken actionToken) {
         return 0;
     }
+
+    @Override
+    public double evaluateHandForInsurance(Hand hand, int count, ActionToken actionToken) { return 0; }
 }
