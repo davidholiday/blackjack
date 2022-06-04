@@ -171,7 +171,6 @@ public class Game {
                     LOG.info(
                         "creating new actionToken instance with correct ruleSet, playerHandMap, and discardTrayCount"
                     );
-
                     currentActionToken = new ActionToken.Builder(currentActionToken)
                                                         .withRuleSet(getRuleSet())
                                                         .withPlayerHandMap(getPlayerHandMap())

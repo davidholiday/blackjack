@@ -142,9 +142,18 @@ public class Hand extends CardCollection {
     // ty SO https://stackoverflow.com/a/27609
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        return getAllCards(false) == ((Hand) o).getAllCards(false);
+        List<Card> localCardList = getAllCards(false);
+        List<Card> otherCardList = ((Hand) o).getAllCards(false);
+
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
+        if (localCardList.size() != otherCardList.size()) { return false; }
+
+        for (Card card : localCardList) {
+            if (otherCardList.contains(card) == false) { return false; }
+        }
+
+        return true;
     }
 
     @Override
