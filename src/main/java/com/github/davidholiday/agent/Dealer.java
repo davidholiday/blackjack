@@ -344,6 +344,12 @@ public class Dealer extends Agent {
 
     private Optional<ActionToken> getDealerPlayActionToken(ActionToken actionToken) {
         if (playerDoneList.contains(DEALER)) { return Optional.empty(); }
+
+//        // because the switch/case that activates this will have DEALER_NEXT_ACTION
+//        actionToken = new ActionToken.Builder(actionToken)
+//                                     .withAction(Action.REQUEST_DEALER_PLAY)
+//                                     .build();
+
         Action dealerAction = getNextAction(actionToken);
 
         ActionToken requestDealerPlayActionToken = new ActionToken.Builder(actionToken)

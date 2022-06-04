@@ -21,14 +21,14 @@ public abstract class DealerStrategy implements PlayStrategy {
         switch (actionToken.getAction()) {
             case OFFER_CARDS:
                 return Action.TAKE_CARD;
-            case REQUEST_DEALER_PLAY:
+            case DEALER_NEXT_ACTION:
                 Action action = evaluateForSoft(hand, actionToken);
                 if (action != Action.NONE) { return action; }
 
                 action = evaluateForHard(hand, actionToken);
                 if (action != Action.NONE) { return action; }
         }
-
+        LOG.info("asdf");
         return Action.NONE;
     }
 
