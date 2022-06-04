@@ -14,10 +14,7 @@ import com.github.davidholiday.util.GeneralUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,6 +31,8 @@ public class Dealer extends Agent {
     private final Map<AgentPosition, Double> playerWagerMap = new HashMap<>();
 
     private final Map<AgentPosition, Double> playerInsuranceMap = new HashMap<>();
+
+    private final List<AgentPosition> playerDoneList = new ArrayList<>();
 
     private boolean reshuffleFlag = true;
 
@@ -64,6 +63,7 @@ public class Dealer extends Agent {
             case GAME_START:
                 playerWagerMap.clear();
                 playerInsuranceMap.clear();
+                playerDoneList.clear();
                 hideHoleCard = true;
 
                 if (reshuffleFlag) {
@@ -91,16 +91,15 @@ public class Dealer extends Agent {
                 if (offerInsuranceActionToken.isPresent()) {
                     return offerInsuranceActionToken.get();
                 }
-            case SETTLE_INSURANCE_BETS:
+//            case SETTLE_INSURANCE_BETS:
+//                return ActionToken.getEndGameActionToken();
+            case REQUEST_PLAY:
+                Optional<ActionToken> requestPlayActionToken = getRequestPlayActionToken(actionToken);
+                if (requestPlayActionToken.isPresent()) {
+                    return requestPlayActionToken.get();
+                }
                 return ActionToken.getEndGameActionToken();
-//            case REQUEST_PLAY:
-//                Optional<ActionToken> requestPlayActionToken = getRequestPlayActionToken(actionToken);
-//                if (requestPlayActionToken.isPresent()) {
-//                    return requestPlayActionToken.get();
-//                }
             // remaining DEALER initiated actions here
-
-
 
             case SUBMIT_WAGER:
                 playerWagerMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
@@ -112,6 +111,17 @@ public class Dealer extends Agent {
             case TAKE_INSURANCE:
                 playerInsuranceMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
                 LOG.info("playerInsuranceMap is now: " + playerInsuranceMap);
+                return ActionToken.getDealerNextActionToken(actionToken);
+            case SURRENDER:
+                //
+            case SPLIT:
+                //
+            case DOUBLE_DOWN:
+                //
+            case HIT:
+                //
+            case STAND:
+                playerDoneList.add(actionToken.getActionSource());
                 return ActionToken.getDealerNextActionToken(actionToken);
 
             default:
@@ -242,6 +252,24 @@ public class Dealer extends Agent {
 
                         return Optional.of(offerInsuranceActionToken);
                     }
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<ActionToken> getRequestPlayActionToken(ActionToken actionToken) {
+        for (AgentPosition agentPosition : dealOrder) {
+            if (agentPosition == DEALER) { continue; }
+            if (actionToken.getPlayerHandMap().containsKey(agentPosition)) {
+                if (playerDoneList.contains(agentPosition) == false) {
+
+                    ActionToken requestPlayActionToken = new ActionToken.Builder(actionToken)
+                                                                        .withAction(Action.REQUEST_PLAY)
+                                                                        .withActionSource(DEALER)
+                                                                        .withActionTarget(agentPosition)
+                                                                        .build();
+                    return Optional.of(requestPlayActionToken);
                 }
             }
         }
