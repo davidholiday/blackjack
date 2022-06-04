@@ -132,13 +132,15 @@ public class Dealer extends Agent {
                 }
                 // fall into ADJUDICATE_GAME
             case ADJUDICATE_GAME:
+                LOG.info("*!* ADJUDICATING GAME *!*");
                 adjudicationPhase = true;
                 Optional<ActionToken> getAdjudicateActionToken = getAdjudicateActionToken(actionToken);
                 if (getAdjudicateActionToken.isPresent()) {
                     return getAdjudicateActionToken.get();
                 }
             case GAME_END:
-                // collect cards from player
+                // DO SOME INTEGRITY CHECKING HERE *!* *!* *!*
+                collectAllCards(actionToken);
                 return ActionToken.getEndGameActionToken();
 
             //
@@ -238,6 +240,15 @@ public class Dealer extends Agent {
 
     Optional<ActionToken> getOfferMoneyToOptional(AgentPosition recipient, double offeredMoney) {
         return Optional.of(getOfferMoneyToActionToken(recipient, offeredMoney));
+    }
+
+    private void collectAllCards(ActionToken actionToken) {
+        for (AgentPosition agentPosition : actionToken.getPlayerHandMap().keySet()) {
+            List<Card> cardList = actionToken.getPlayerHandMap().get(agentPosition).getAllCards(true);
+            discardTray.addCards(cardList);
+        }
+
+
     }
 
     private Optional<ActionToken> getSolicitWagerActionToken(ActionToken actionToken) {
@@ -415,41 +426,52 @@ public class Dealer extends Agent {
 
         for (AgentPosition agentPosition : dealOrder) {
             if (agentPosition == DEALER) { continue; }
+            if (playerWagerMap.containsKey(agentPosition) == false) { continue; }
             if (actionToken.getPlayerHandMap().containsKey(agentPosition)) {
                 Hand playerHand = actionToken.getPlayerHandMap().get(agentPosition);
 
                 // player bust - gets adjudicated before dealer hand
                 if (playerHand.isBust()) {
+                    LOG.info("player: " + agentPosition + " is bust. DEALER WIN");
                     updateBankroll(playerWagerMap.remove(agentPosition));
+                    continue;
                 }
                 // player blackjack
                 else if (playerHand.isBlackJack()) {
                     if (getHandInternal().isBlackJack()) {
                         // push
+                        LOG.info("player: " + agentPosition + " has blackjack but so does dealer. PUSH");
                         double offerMoneyAmount = playerWagerMap.remove(agentPosition);
                         return getOfferMoneyToOptional(agentPosition, offerMoneyAmount);
                     }
                     else if (ruleSet.contains(Rule.BLACKJACK_PAYS_SIX_TO_FIVE)) {
                         // pay 6:5
+                        LOG.info("player: " + agentPosition + " has BlackJack! PLAYER WIN");
                         double offerMoneyAmount = playerWagerMap.remove(agentPosition) * 1.2;
                         return getOfferMoneyToOptional(agentPosition, offerMoneyAmount);
                     }
                     else {
                         // pay 3:2
+                        LOG.info("player: " + agentPosition + " has BlackJack! PLAYER WIN");
                         double offerMoneyAmount = playerWagerMap.remove(agentPosition) * 1.5;
                         return getOfferMoneyToOptional(agentPosition, offerMoneyAmount);
                     }
                 }
                 else {
                     HandOutcome handOutcome = dealerHand.getHandOutcome(playerHand);
+                    double playerWager = playerWagerMap.remove(agentPosition);
                     switch (handOutcome) {
                         case WIN:
-                            updateBankroll(playerWagerMap.remove(agentPosition));
+                            LOG.info("player: " + agentPosition + " LOSES TO DEALER");
+                            updateBankroll(playerWager);
+                            continue;
                         case LOSE:
-                            double offerMoneyAmount = playerWagerMap.remove(agentPosition);
+                            LOG.info("player: " + agentPosition + " WINS");
+                            double offerMoneyAmount = playerWager;
                             return getOfferMoneyToOptional(agentPosition, offerMoneyAmount);
                         case PUSH:
-                            offerMoneyAmount = playerWagerMap.remove(agentPosition);
+                            LOG.info("player: " + agentPosition + " PUSH");
+                            offerMoneyAmount = playerWager;
                             return getOfferMoneyToOptional(agentPosition, offerMoneyAmount);
                     }
                 }
