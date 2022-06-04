@@ -32,7 +32,7 @@ public class Dealer extends Agent {
 
     private final Map<AgentPosition, Double> playerInsuranceMap = new HashMap<>();
 
-    private final Set<AgentPosition> playerDoneList = new HashSet<>();
+    private final Set<AgentPosition> playerDoneSet = new HashSet<>();
 
     private boolean reshuffleFlag = true;
 
@@ -66,7 +66,7 @@ public class Dealer extends Agent {
             case GAME_START:
                 playerWagerMap.clear();
                 playerInsuranceMap.clear();
-                playerDoneList.clear();
+                playerDoneSet.clear();
                 hideHoleCard = true;
 
                 if (reshuffleFlag) {
@@ -118,8 +118,7 @@ public class Dealer extends Agent {
                 if (requestPlayActionToken.isPresent()) {
                     return requestPlayActionToken.get();
                 }
-                // fall into DEALER_PLAY_HAND
-            case REQUEST_DEALER_PLAY:
+                // we handle the dealer's play only after all the players have gone
                 hideHoleCard = false;
                 Optional<ActionToken> requestDealerPlayActionToken = getDealerPlayActionToken(actionToken);
                 if (requestDealerPlayActionToken.isPresent()) {
@@ -153,7 +152,7 @@ public class Dealer extends Agent {
             case STAND:
                 // fall into NONE
             case NONE:
-                playerDoneList.add(actionToken.getActionSource());
+                playerDoneSet.add(actionToken.getActionSource());
                 return actionToken.getDealerNextActionToken();
             default:
                 return ActionToken.getEndGameActionToken();
@@ -299,7 +298,7 @@ public class Dealer extends Agent {
         for (AgentPosition agentPosition : dealOrder) {
             if (agentPosition == DEALER) { continue; }
             if (actionToken.getPlayerHandMap().containsKey(agentPosition)) {
-                if (playerDoneList.contains(agentPosition) == false) {
+                if (playerDoneSet.contains(agentPosition) == false) {
 
                     ActionToken requestPlayActionToken = new ActionToken.Builder(actionToken)
                                                                         .withAction(Action.REQUEST_PLAY)
@@ -343,13 +342,13 @@ public class Dealer extends Agent {
     }
 
     private Optional<ActionToken> getDealerPlayActionToken(ActionToken actionToken) {
-        if (playerDoneList.contains(DEALER)) { return Optional.empty(); }
-
-//        // because the switch/case that activates this will have DEALER_NEXT_ACTION
-//        actionToken = new ActionToken.Builder(actionToken)
-//                                     .withAction(Action.REQUEST_DEALER_PLAY)
-//                                     .build();
-
+        // the DEALER is in the playerHandMap, so if all the players have gone, playerDoneSet.size() should
+        // either equal playerHandMap.size() or be one less
+        if (playerDoneSet.size() < actionToken.getPlayerHandMap().size() - 1) {
+            String msg = "dealer should not be playing their hand before all the players have gone!";
+            throw new IllegalStateException(msg);
+        }
+        if (playerDoneSet.contains(DEALER)) { return Optional.empty(); }
         Action dealerAction = getNextAction(actionToken);
 
         ActionToken requestDealerPlayActionToken = new ActionToken.Builder(actionToken)
