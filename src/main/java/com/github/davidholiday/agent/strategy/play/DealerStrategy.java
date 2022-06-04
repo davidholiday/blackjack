@@ -4,24 +4,34 @@ import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
 
-import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public abstract class DealerStrategy implements PlayStrategy {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DealerStrategy.class);
 
     @Override
     public Action evaluateHand(Hand hand, int count, ActionToken actionToken) {
         if (actionToken.getRuleSet().isEmpty()) {
             throw new IllegalArgumentException("DealerStrategy requires RuleSet in actionToken to be populated.");
         }
-        Action action = evaluateForSoft(hand, actionToken);
-        if (action != Action.NONE) { return action; }
 
-        return evaluateForHard(hand, actionToken);
+        switch (actionToken.getAction()) {
+            case TAKE_CARD:
+                hand.addCards(actionToken.getOfferedCards());
+                return Action.DEALER_NEXT_ACTION;
+            case REQUEST_PLAY:
+                Action action = evaluateForSoft(hand, actionToken);
+                if (action != Action.NONE) { return action; }
 
+                action = evaluateForHard(hand, actionToken);
+                if (action != Action.NONE) { return action; }
+        }
 
-
-
-
+        LOG.warn("returning NONE action by way of code path we should not be in");
+        return Action.NONE;
     }
 
     /*

@@ -24,7 +24,7 @@ public enum Action {
     RESPOND_TO_STAND,
     REQUEST_WAGER,
     SUBMIT_WAGER,
-    SETTLE_WAGER,
+    ADJUDICATE_GAME,
     TAKE_MONEY,
     NONE
 }

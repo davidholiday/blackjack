@@ -10,12 +10,13 @@ public class NoOpDealerStrategy extends DealerStrategy {
 
     @Override
     public Action evaluateForSoft(Hand hand, ActionToken actionToken) {
-        return Action.NONE;
+        if (hand.isSoft() == false) { return Action.NONE; }
+        else { return Action.STAND; }
     }
 
     @Override
     public Action evaluateForHard(Hand hand, ActionToken actionToken) {
-        return Action.NONE;
+        return Action.STAND;
     }
 
     @Override

@@ -32,7 +32,7 @@ public class Dealer extends Agent {
 
     private final Map<AgentPosition, Double> playerInsuranceMap = new HashMap<>();
 
-    private final List<AgentPosition> playerDoneList = new ArrayList<>();
+    private final Set<AgentPosition> playerDoneList = new HashSet<>();
 
     private boolean reshuffleFlag = true;
 
@@ -98,6 +98,10 @@ public class Dealer extends Agent {
                 if (requestPlayActionToken.isPresent()) {
                     return requestPlayActionToken.get();
                 }
+                // fall into DEALER_PLAY_HAND
+            case DEALER_PLAY_HAND:
+                hideHoleCard = false;
+            case ADJUDICATE_GAME:
                 return ActionToken.getEndGameActionToken();
             // remaining DEALER initiated actions here
 
