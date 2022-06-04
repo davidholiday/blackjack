@@ -15,14 +15,10 @@ public class NoOpDealerStrategy extends DealerStrategy {
     }
 
     @Override
-    public Action evaluateForHard(Hand hand, ActionToken actionToken) {
-        return Action.STAND;
-    }
+    public Action evaluateForHard(Hand hand, ActionToken actionToken) { return Action.STAND; }
 
     @Override
-    public String getName() {
-        return NAME;
-    }
+    public String getName() { return NAME; }
 
     @Override
     public double getWager(int count, ActionToken actionToken) { return 0; }

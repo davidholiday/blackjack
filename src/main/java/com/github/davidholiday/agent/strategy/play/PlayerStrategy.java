@@ -19,9 +19,10 @@ public abstract class PlayerStrategy implements PlayStrategy {
         switch (actionToken.getAction()) {
             case REQUEST_WAGER:
                 return Action.SUBMIT_WAGER;
-            case TAKE_CARD:
-                hand.addCards(actionToken.getOfferedCards());
-                return Action.DEALER_NEXT_ACTION;
+            case OFFER_CARD:
+                return Action.TAKE_CARD;
+            case OFFER_MONEY:
+                return Action.TAKE_MONEY;
             case OFFER_INSURANCE:
                 return evaluateHandForInsurance(hand, count, actionToken);
             case REQUEST_PLAY:
@@ -35,6 +36,7 @@ public abstract class PlayerStrategy implements PlayStrategy {
                 if (action != Action.NONE) { return action; }
 
                 return evaluateForHard(hand, count, actionToken);
+
         }
 
         LOG.warn("returning NONE action by way of code path we should not be in");

@@ -20,24 +20,21 @@ public class Player extends Agent {
         updateCount(actionToken);
 
         Action nextAction = getNextAction(actionToken);
-
         switch (nextAction) {
             case DEALER_NEXT_ACTION:
-                return ActionToken.getDealerNextActionToken(actionToken);
+                return actionToken.getDealerNextActionToken();
             case SUBMIT_WAGER:
                 double wager = getWager(actionToken);
                 return getOfferMoneyActionToken(actionToken, nextAction, wager);
             case TAKE_CARD:
                 addCardsToHand(actionToken.getOfferedCards());
-                ActionToken at = ActionToken.getDealerNextActionToken(actionToken);
-                LOG.info(at + "");
-                return at;
+                return actionToken.getDealerNextActionToken();
             case TAKE_INSURANCE:
                 double insuranceWager = getInsuranceBet(actionToken);
                 return getOfferMoneyActionToken(actionToken, nextAction, insuranceWager);
             case TAKE_MONEY:
                 updateBankroll(actionToken.getOfferedMoney());
-                return ActionToken.getDealerNextActionToken(actionToken);
+                return actionToken.getDealerNextActionToken();
             case SURRENDER:
                 //
             case SPLIT:
