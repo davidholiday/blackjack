@@ -88,9 +88,13 @@ public class Dealer extends Agent {
                     return offerCardActionToken.get();
                 }
                 // fall into OFFER_CARD
-            case OFFER_CARD:
+            case OFFER_CARDS:
                 if (actionToken.getOfferedCards().size() > 0) {
-                    addCardsToHand(actionToken.getOfferedCards());
+                    if (actionToken.getActionSource() == DEALER) {
+                        addCardsToHand(actionToken.getOfferedCards());
+                    } else {
+                        addCardsToDiscardTray(actionToken.getOfferedCards());
+                    }
                     return actionToken.getDealerNextActionToken();
                 }
                 // fall into OFFER_INSURANCE
@@ -114,20 +118,23 @@ public class Dealer extends Agent {
                 // fall into DEALER_PLAY_HAND
             case REQUEST_PLAY_DEALER:
                 hideHoleCard = false;
-                // fall into ADJUDICATE_GAME
+                Action nextAction = getNextAction(actionToken);
+
             case ADJUDICATE_GAME:
                 return ActionToken.getEndGameActionToken();
-
+            //
+            // PLAY RESPONSES
+            //
             case SUBMIT_WAGER:
                 playerWagerMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
                 LOG.info("playerWagerMap is now: " + playerWagerMap);
                 return actionToken.getDealerNextActionToken();
-//            case TAKE_CARD:
-//                //addCardsToHand(actionToken.getOfferedCards());
-//                return ActionToken.getDealerNextActionToken(actionToken);
             case TAKE_INSURANCE:
                 playerInsuranceMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
                 LOG.info("playerInsuranceMap is now: " + playerInsuranceMap);
+                return actionToken.getDealerNextActionToken();
+            case TAKE_CARD: // <-- only the dealer should be receiving this action from itself
+                addCardsToHand(actionToken.getOfferedCards());
                 return actionToken.getDealerNextActionToken();
             case SURRENDER:
                 //
@@ -138,9 +145,10 @@ public class Dealer extends Agent {
             case HIT:
                 //
             case STAND:
+                // fall into NONE
+            case NONE:
                 playerDoneList.add(actionToken.getActionSource());
                 return actionToken.getDealerNextActionToken();
-
             default:
                 return ActionToken.getEndGameActionToken();
 
@@ -200,6 +208,8 @@ public class Dealer extends Agent {
         return cardList;
     }
 
+    private void addCardsToDiscardTray(List<Card> cardList) { discardTray.addCards(cardList); }
+
     private Optional<ActionToken> getSolicitWagerActionToken(ActionToken actionToken) {
         for (AgentPosition agentPosition : dealOrder) {
             if (actionToken.getPlayerHandMap().containsKey(agentPosition)) {
@@ -224,7 +234,7 @@ public class Dealer extends Agent {
                 if (actionToken.getPlayerHandMap().get(agentPosition).getCardListSize() < 2) {
 
                     ActionToken offerCardActionToken = new ActionToken.Builder(actionToken)
-                                                                      .withAction(Action.OFFER_CARD)
+                                                                      .withAction(Action.OFFER_CARDS)
                                                                       .withActionSource(DEALER)
                                                                       .withActionTarget(agentPosition)
                                                                       .withOfferedCards(draw(1))
