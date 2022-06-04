@@ -21,7 +21,7 @@ public abstract class DealerStrategy implements PlayStrategy {
         switch (actionToken.getAction()) {
             case OFFER_CARDS:
                 return Action.TAKE_CARD;
-            case REQUEST_PLAY_DEALER:
+            case REQUEST_DEALER_PLAY:
                 Action action = evaluateForSoft(hand, actionToken);
                 if (action != Action.NONE) { return action; }
 

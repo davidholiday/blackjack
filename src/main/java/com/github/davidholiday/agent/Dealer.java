@@ -60,6 +60,9 @@ public class Dealer extends Agent {
     public ActionToken act(ActionToken actionToken) {
 
         switch (actionToken.getAction()) {
+            //
+            // DEALER ACTIONS
+            //
             case GAME_START:
                 playerWagerMap.clear();
                 playerInsuranceMap.clear();
@@ -116,10 +119,13 @@ public class Dealer extends Agent {
                     return requestPlayActionToken.get();
                 }
                 // fall into DEALER_PLAY_HAND
-            case REQUEST_PLAY_DEALER:
+            case REQUEST_DEALER_PLAY:
                 hideHoleCard = false;
-                Action nextAction = getNextAction(actionToken);
-
+                Optional<ActionToken> requestDealerPlayActionToken = getDealerPlayActionToken(actionToken);
+                if (requestDealerPlayActionToken.isPresent()) {
+                    return requestDealerPlayActionToken.get();
+                }
+                // fall into ADJUDICATE_GAME
             case ADJUDICATE_GAME:
                 return ActionToken.getEndGameActionToken();
             //
@@ -336,4 +342,17 @@ public class Dealer extends Agent {
         return Optional.empty();
     }
 
+    private Optional<ActionToken> getDealerPlayActionToken(ActionToken actionToken) {
+        if (playerDoneList.contains(DEALER)) { return Optional.empty(); }
+        Action dealerAction = getNextAction(actionToken);
+
+        ActionToken requestDealerPlayActionToken = new ActionToken.Builder(actionToken)
+                                                                  .withAction(dealerAction)
+                                                                  .withActionSource(DEALER)
+                                                                  .withActionTarget(DEALER)
+                                                                  .build();
+
+        return Optional.of(requestDealerPlayActionToken);
+
+    }
 }
