@@ -24,11 +24,6 @@ public abstract class CardCollection {
     private final SecureRandom secureRandom = new SecureRandom();
 
     void validateDeck(int numDecks, boolean withJokers, List<Card> deck) {
-//        if (App.RUNTIME_INFO.ASSERTIONS_ENABLED == false) {
-//            LOG.warn("skipping deck validation because Java was invoked without flag to enable assertions");
-//            return;
-//        }
-
         if (numDecks < 1) { throw new IllegalArgumentException("numDecks must be greater than zero"); }
 
         Map<CardType, Integer> typeMap = new HashMap<>();

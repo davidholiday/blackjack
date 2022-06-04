@@ -45,6 +45,34 @@ public class Hand extends CardCollection {
         updateHandValue();
     }
 
+    public HandOutcome getHandOutcome(Hand otherHand) {
+
+        // bust
+        if (isBust() && otherHand.isBust()) { return HandOutcome.BOTH_BUST; }
+        if (isBust() && otherHand.isBust() == false) { return HandOutcome.LOSE;}
+        if (isBust() == false && otherHand.isBust()) { return HandOutcome.WIN; }
+
+        // blackjack
+        if (isBlackJack() && otherHand.isBlackJack()) { return HandOutcome.PUSH; }
+        if (isBlackJack() == false && otherHand.isBlackJack()) { return HandOutcome.LOSE;}
+        if (isBlackJack() && otherHand.isBlackJack() == false) { return HandOutcome.WIN; }
+
+        // hand value
+        if (getHighestValueNotOver21() < otherHand.getHighestValueNotOver21()) { return HandOutcome.LOSE; }
+        if (getHighestValueNotOver21() == otherHand.getHighestValueNotOver21()) { return HandOutcome.PUSH; }
+        if (getHighestValueNotOver21() > otherHand.getHighestValueNotOver21()) { return HandOutcome.WIN; }
+
+        throw new IllegalStateException("logic error -- hand comparison failed -- should not be in this code path");
+    }
+
+    public int getHighestValueNotOver21() {
+        if (isSoft()) {
+            return handValue > aceSpecialHandValue ? handValue : aceSpecialHandValue;
+        }
+
+        return handValue;
+    }
+
     public boolean isBlackJack() { return isBlackJack; }
 
     public boolean isBust() { return isBust; }

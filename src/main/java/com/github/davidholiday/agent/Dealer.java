@@ -5,11 +5,14 @@ import com.github.davidholiday.card.CardSuit;
 import com.github.davidholiday.card.CardType;
 import com.github.davidholiday.cardcollection.DiscardTray;
 import com.github.davidholiday.cardcollection.Hand;
+import com.github.davidholiday.cardcollection.HandOutcome;
 import com.github.davidholiday.cardcollection.Shoe;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.agent.strategy.count.NoCountStrategy;
 import com.github.davidholiday.agent.strategy.play.PlayStrategy;
+import com.github.davidholiday.game.Rule;
+import com.github.davidholiday.game.RuleSet;
 import com.github.davidholiday.util.GeneralUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,7 +129,12 @@ public class Dealer extends Agent {
                 }
                 // fall into ADJUDICATE_GAME
             case ADJUDICATE_GAME:
-                return ActionToken.getEndGameActionToken();
+                Optional<ActionToken> getAdjudicateActionToken = getAdjudicateActionToken(actionToken);
+                if (getAdjudicateActionToken.isPresent()) {
+                    return getAdjudicateActionToken.get();
+                } else {
+                    return ActionToken.getEndGameActionToken();
+                }
             //
             // PLAY RESPONSES
             //
@@ -174,9 +182,7 @@ public class Dealer extends Agent {
         return hand;
     }
 
-    public Hand getHandInternal() {
-        return super.getHand();
-    }
+    public Hand getHandInternal() { return super.getHand(); }
 
     @Override
     public void updateBankroll(double updateBy) {
@@ -359,5 +365,59 @@ public class Dealer extends Agent {
 
         return Optional.of(requestDealerPlayActionToken);
 
+    }
+
+    private void adjudicateGame(ActionToken actionToken) {
+
+        // make sure everyone has played their hand before we do this
+        if (playerDoneSet.size() < actionToken.getPlayerHandMap().size()) {
+            String msg = "can't adjudicate a game before all the players have finished playing!";
+            throw new IllegalStateException(msg);
+        }
+
+        // make sure hole card is revealed. if not something has gone wrong with the logic upstream...
+        Card hiddenHoleCard = new Card(CardType.HIDDEN, CardSuit.NONE);
+        if (getHandInternal().getAllCards(false).contains(hiddenHoleCard)) {
+            String msg = "can't adjudicate a game with dealer hole card still hidden!";
+            throw new IllegalStateException(msg);
+        }
+
+        Hand dealerHand = getHandInternal();
+        RuleSet ruleSet = actionToken.getRuleSet();
+
+        for (AgentPosition agentPosition : dealOrder) {
+            if (agentPosition == DEALER) { continue; }
+            if (actionToken.getPlayerHandMap().containsKey(agentPosition)) {
+                Hand playerHand = actionToken.getPlayerHandMap().get(agentPosition);
+
+                // player bust - gets adjudicated before dealer hand
+                if (playerHand.isBust()) {
+                    updateBankroll(playerWagerMap.remove(agentPosition));
+                }
+                // player blackjack
+                else if (playerHand.isBlackJack()) {
+                    if (getHandInternal().isBlackJack()) {
+                        // push
+                    }
+                    else if (ruleSet.contains(Rule.BLACKJACK_PAYS_SIX_TO_FIVE)) {
+                        // pay 6:5
+                    }
+                    else {
+                        // pay 3:2
+                    }
+                }
+                else {
+                    HandOutcome handOutcome = dealerHand.getHandOutcome(playerHand);
+                    switch (handOutcome) {
+                        case WIN:
+                            // dealer win
+                        case LOSE:
+                            // dealer lose
+                        case PUSH:
+                            // push
+                    }
+                }
+            }
+        }
     }
 }

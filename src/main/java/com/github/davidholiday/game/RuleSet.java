@@ -64,10 +64,11 @@ public class RuleSet {
     }
 
 
+    public boolean contains(Rule rule) { return unmodifiableRuleSet.contains(rule); }
+
     public void validateRuleSet() {
         this.validateRuleSet(this.unmodifiableRuleSet);
     }
-
 
     public void validateRuleSet(Set<Rule> ruleSet) {
         String errorMessage = "";
