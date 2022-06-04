@@ -4,10 +4,12 @@ import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.agent.strategy.count.CountStrategy;
 import com.github.davidholiday.agent.strategy.play.PlayStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Player extends Agent {
 
-    private double current_wager = 0;
+    private static final Logger LOG = LoggerFactory.getLogger(Player.class);
 
     public Player(CountStrategy countStrategy, PlayStrategy playStrategy, int bankroll) {
         super(countStrategy, playStrategy, bankroll);
@@ -17,37 +19,59 @@ public class Player extends Agent {
     public ActionToken act(ActionToken actionToken) {
         updateCount(actionToken);
 
-        switch (actionToken.getAction()) {
+        Action nextAction = getNextAction(actionToken);
 
-            case REQUEST_WAGER:
-                current_wager = wager(actionToken);
-                return new ActionToken.Builder(actionToken)
-                                      .withActionTarget(actionToken.getActionSource())
-                                      .withActionSource(actionToken.getActionTarget())
-                                      .withAction(Action.SUBMIT_WAGER)
-                                      .withOfferedMoney(wager(actionToken))
-                                      .build();
-
+        switch (nextAction) {
+            case DEALER_NEXT_ACTION:
+                return ActionToken.getDealerNextActionToken(actionToken);
+            case SUBMIT_WAGER:
+                double wager = getWager(actionToken);
+                return getOfferMoneyActionToken(actionToken, nextAction, wager);
             case TAKE_CARD:
                 addCardsToHand(actionToken.getOfferedCards());
+                ActionToken at = ActionToken.getDealerNextActionToken(actionToken);
+                LOG.info(at + "");
+                return at;
+            case TAKE_INSURANCE:
+                double insuranceWager = getInsuranceBet(actionToken);
+                return getOfferMoneyActionToken(actionToken, nextAction, insuranceWager);
+            case TAKE_MONEY:
+                updateBankroll(actionToken.getOfferedMoney());
                 return ActionToken.getDealerNextActionToken(actionToken);
-
-            case OFFER_INSURANCE:
-                return new ActionToken.Builder(actionToken)
-                                      .withActionTarget(actionToken.getActionSource())
-                                      .withActionSource(actionToken.getActionTarget())
-                                      .withAction(Action.TAKE_INSURANCE)
-                                      .withOfferedMoney(getInsuranceBet(actionToken))
-                                      .build();
-
-            case REQUEST_PLAY:
-                return  getNextPlay(actionToken);
-
-            // on BUST or end of game reset current_wager
+            case SURRENDER:
+                //
+            case SPLIT:
+                //
+            case DOUBLE_DOWN:
+                //
+            case HIT:
+                //
+            case STAND:
+                //
+            case NONE:
+                return getNextActionToken(actionToken, nextAction);
         }
 
-        return null;
+        LOG.warn("something went wrong - we are in a code path we should not be in. sending end game token... ");
+        return ActionToken.getEndGameActionToken();
     }
 
+
+    private ActionToken getOfferMoneyActionToken(ActionToken actionToken, Action nextAction, double offerMoneyAmount) {
+        return new ActionToken.Builder(actionToken)
+                              .withActionTarget(actionToken.getActionSource())
+                              .withActionSource(actionToken.getActionTarget())
+                              .withAction(nextAction)
+                              .withOfferedMoney(offerMoneyAmount)
+                              .build();
+    }
+
+    private ActionToken getNextActionToken(ActionToken actionToken, Action nextAction) {
+        return new ActionToken.Builder(actionToken)
+                              .withActionTarget(actionToken.getActionSource())
+                              .withActionSource(actionToken.getActionTarget())
+                              .withAction(nextAction)
+                              .build();
+    }
 
 }

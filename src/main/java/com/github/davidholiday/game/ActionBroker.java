@@ -48,7 +48,9 @@ public class ActionBroker {
         ActionToken nextActionToken = agentMap.get(actionTarget)
                                               .act(actionToken);
 
-        LOG.info("received reply actionToken: " + nextActionToken);
+        if (nextActionToken.getAction() == Action.GAME_END) {
+            LOG.info("received actionToken: " + nextActionToken);
+        }
         flightRecorder.add(nextActionToken);
         return nextActionToken;
     }

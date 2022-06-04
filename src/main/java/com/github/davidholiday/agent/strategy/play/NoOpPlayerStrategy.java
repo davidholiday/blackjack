@@ -14,10 +14,16 @@ public class NoOpPlayerStrategy extends PlayerStrategy {
     }
 
     @Override
+    public double getWager(int count, ActionToken actionToken) { return 5; }
+
+    @Override
+    public double getInsuranceBet(Hand hand, int count, ActionToken actionToken) { return 0; }
+
+    @Override
     public double wager(int count, ActionToken actionToken) { return 5.0; }
 
     @Override
-    public double evaluateHandForInsurance(Hand hand, int count, ActionToken actionToken) { return 0; }
+    public Action evaluateHandForInsurance(Hand hand, int count, ActionToken actionToken) { return Action.NONE; }
 
     @Override
     public Action evaluateForSurrender(Hand hand, int count, ActionToken actionToken) {
@@ -26,16 +32,18 @@ public class NoOpPlayerStrategy extends PlayerStrategy {
 
     @Override
     public Action evaluateForSplit(Hand hand, int count, ActionToken actionToken) {
-        return Action.NONE;
+        if (hand.isPair()) { return Action.STAND; }
+        else { return Action.NONE; }
     }
 
     @Override
     public Action evaluateForSoft(Hand hand, int count, ActionToken actionToken) {
-        return Action.NONE;
+        if (hand.isSoft()) { return Action.STAND; }
+        else { return Action.NONE; }
     }
 
     @Override
     public Action evaluateForHard(Hand hand, int count, ActionToken actionToken) {
-        return Action.NONE;
+        return Action.STAND;
     }
 }

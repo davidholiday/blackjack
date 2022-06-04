@@ -27,8 +27,6 @@ public abstract class Agent {
 
     private int count = 0;
 
-    private Queue<ActionToken> actionTokenQueue = new LinkedList<>();
-
     public Agent(CountStrategy countStrategy, PlayStrategy playStrategy, double bankroll) {
         this.hand = new Hand();
         this.countStrategy = countStrategy;
@@ -42,10 +40,6 @@ public abstract class Agent {
     }
 
     public abstract ActionToken act(ActionToken actionToken);
-
-    public void addActionToQueue(ActionToken action) {
-        actionTokenQueue.add(action);
-    }
 
     public Hand getHand() {
         return new Hand(hand);
@@ -71,44 +65,7 @@ public abstract class Agent {
         count = countStrategy.updateCount(hand, actionToken);
     }
 
-    ActionToken getNextPlay(ActionToken actionToken) {
-        Action nextAction = playStrategy.evaluateHand(hand, count, actionToken);
-
-        switch (nextAction){
-            case TAKE_INSURANCE:
-                break;
-            case SURRENDER:
-                break;
-            case SPLIT:
-                break;
-            case DOUBLE_DOWN:
-                break;
-            case HIT:
-                break;
-            case STAND:
-                break;
-        }
-
-        // should never fall into this block
-        LOG.warn("*!* code path should not have reached this point. returning NONE action *!*");
-        return new ActionToken.Builder(actionToken)
-                              .withAction(Action.NONE)
-                              .withActionSource(actionToken.getActionTarget())
-                              .withActionTarget(actionToken.getActionSource())
-                              .build();
-    }
-
-    double wager(ActionToken actionToken) {
-        double wager = playStrategy.wager(count, actionToken);
-        updateBankroll(-wager);
-        return wager;
-    }
-
-    double getInsuranceBet(ActionToken actionToken) {
-        double insurance = playStrategy.evaluateHandForInsurance(getHand(), count, actionToken);
-        updateBankroll(-insurance);
-        return insurance;
-    }
+    Action getNextAction(ActionToken actionToken) { return playStrategy.evaluateHand(hand, count, actionToken); }
 
     public void updateBankroll(double updateBy) {
 
@@ -126,5 +83,17 @@ public abstract class Agent {
     }
 
     public double getBankroll() { return bankroll; }
+
+    public double getWager(ActionToken actionToken) {
+        double wager = playStrategy.getWager(count, actionToken);
+        updateBankroll(-wager);
+        return wager;
+    }
+
+    public double getInsuranceBet(ActionToken actionToken) {
+        double insurance = playStrategy.getInsuranceBet(hand, getCount(), actionToken);
+        updateBankroll(-insurance);
+        return insurance;
+    }
 
 }

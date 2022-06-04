@@ -25,5 +25,6 @@ public enum Action {
     REQUEST_WAGER,
     SUBMIT_WAGER,
     SETTLE_WAGER,
+    TAKE_MONEY,
     NONE
 }

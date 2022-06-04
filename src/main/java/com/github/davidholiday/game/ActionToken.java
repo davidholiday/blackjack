@@ -198,7 +198,7 @@ public class ActionToken {
                               .withAction(Action.DEALER_NEXT_ACTION)
                               .withRuleSet(actionToken.getRuleSet())
                               .withPlayerHandMap(actionToken.getPlayerHandMap())
-                              .withActionSource(actionToken.getActionSource())
+                              .withActionSource(actionToken.getActionTarget())
                               .withActionTarget(AgentPosition.DEALER)
                               .build();
     }

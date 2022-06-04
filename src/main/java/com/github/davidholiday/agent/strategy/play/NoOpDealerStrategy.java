@@ -24,10 +24,10 @@ public class NoOpDealerStrategy extends DealerStrategy {
     }
 
     @Override
-    public double wager(int count, ActionToken actionToken) {
-        return 0;
-    }
+    public double getWager(int count, ActionToken actionToken) { return 0; }
 
     @Override
-    public double evaluateHandForInsurance(Hand hand, int count, ActionToken actionToken) { return 0; }
+    public double getInsuranceBet(Hand hand, int count, ActionToken actionToken) { return 0; }
+
+
 }
