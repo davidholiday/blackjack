@@ -54,20 +54,20 @@ public class Player extends Agent {
     }
 
 
-    private ActionToken getOfferMoneyActionToken(ActionToken actionToken, Action nextAction, double offerMoneyAmount) {
-        return new ActionToken.Builder(actionToken)
-                              .withActionTarget(actionToken.getActionSource())
-                              .withActionSource(actionToken.getActionTarget())
-                              .withAction(nextAction)
-                              .withOfferedMoney(offerMoneyAmount)
-                              .build();
-    }
-
     private ActionToken getNextActionToken(ActionToken actionToken, Action nextAction) {
         return new ActionToken.Builder(actionToken)
                               .withActionTarget(actionToken.getActionSource())
                               .withActionSource(actionToken.getActionTarget())
                               .withAction(nextAction)
+                              .build();
+    }
+
+    ActionToken getOfferMoneyActionToken(ActionToken actionToken, Action nextAction, double offerMoneyAmount) {
+        return new ActionToken.Builder(actionToken)
+                              .withActionTarget(actionToken.getActionSource())
+                              .withActionSource(actionToken.getActionTarget())
+                              .withAction(nextAction)
+                              .withOfferedMoney(offerMoneyAmount)
                               .build();
     }
 

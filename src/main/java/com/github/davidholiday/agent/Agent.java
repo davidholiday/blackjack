@@ -69,7 +69,7 @@ public abstract class Agent {
 
     Action getNextAction(ActionToken actionToken) { return playStrategy.evaluateHand(hand, count, actionToken); }
 
-    public void updateBankroll(double updateBy) {
+    void updateBankroll(double updateBy) {
 
         if (bankroll + updateBy < 0 ) {
             LOG.info("bankroll has been ruined for player " + this.toString());
@@ -86,16 +86,17 @@ public abstract class Agent {
 
     public double getBankroll() { return bankroll; }
 
-    public double getWager(ActionToken actionToken) {
+    double getWager(ActionToken actionToken) {
         double wager = playStrategy.getWager(count, actionToken);
         updateBankroll(-wager);
         return wager;
     }
 
-    public double getInsuranceBet(ActionToken actionToken) {
+    double getInsuranceBet(ActionToken actionToken) {
         double insurance = playStrategy.getInsuranceBet(hand, getCount(), actionToken);
         updateBankroll(-insurance);
         return insurance;
     }
+
 
 }
