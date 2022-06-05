@@ -150,8 +150,8 @@ public class Game {
     public void playRounds(int rounds) {
 
         LOG.info("*!* BEGIN RUN OF " + rounds + " ROUNDS *!* ");
-        for (Agent agent : agentMap.values()) {
-            LOG.info("agent " + agent + " bankroll is: " + agent.getBankroll());
+        for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
+            LOG.info("{} has bankroll of ${}", agentMapEntry.getKey(), agentMapEntry.getValue().getBankroll());
         }
 
         for (int i = 0; i < rounds; i ++) {
