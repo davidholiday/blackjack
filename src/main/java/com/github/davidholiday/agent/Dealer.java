@@ -507,9 +507,10 @@ public class Dealer extends Agent {
             if (playerWagerMap.containsKey(agentPosition) == false) { continue; }
             if (actionToken.getPlayerHandMap().containsKey(agentPosition)) {
                 Hand playerHand = actionToken.getPlayerHandMap().get(agentPosition);
-                LOG.info("adjudicating {} hand: {} vs DEALER hand: {}", playerHand, dealerHand);
+                LOG.info("adjudicating {} hand: {} vs DEALER hand: {}", agentPosition, playerHand, dealerHand);
                 LOG.debug(
                         "adjudicating {} hand: {} vs DEALER hand: {}",
+                        agentPosition,
                         playerHand.toStringFull(),
                         dealerHand.toStringFull()
                 );
