@@ -24,22 +24,11 @@ public class App {
     public static final RuntimeInfo RUNTIME_INFO = new RuntimeInfo();
 
     public static void main( String[] args ) {
-//        Shoe shoe = new Shoe(6);
-//        shoe.shuffle(10);
-//        shoe.cut();
-////        String msg = MessageFormat.format("shoe is: {0}", shoe.getAllCards(false));
-////        LOG.info(msg);
-//
-//        for (int i = 0; i < 5; i ++) {
-//            int randy = GeneralUtils.getRandomIntForRange(2, 6);
-//            Hand hand = new Hand(shoe.draw(randy));
-//            LOG.info("hand is: " + hand.toString());
-//        }
 
         NoCountStrategy noCountStrategy = new NoCountStrategy();
         NoOpPlayerStrategy noOpPlayerStrategy = new NoOpPlayerStrategy();
-        Player playerOne = new Player(noCountStrategy, noOpPlayerStrategy, 99999);
-        Player playerTwo = new Player(noCountStrategy, noOpPlayerStrategy, 66666);
+        Player playerOne = new Player(noCountStrategy, noOpPlayerStrategy, 1000);
+        Player playerTwo = new Player(noCountStrategy, noOpPlayerStrategy, 1000);
         RuleSet ruleSet = new RuleSet.Builder()
                                      .withRule(Rule.BLACKJACK_PAYS_THREE_TO_TWO)
                                      .withRule(Rule.SIX_DECK_SHOE)
@@ -55,13 +44,6 @@ public class App {
 
         game.playRounds(1);
 
-       /*
-
-
-       eventuall this method will have a stream of Game objects it will map a lambda onto to run [n] roudns of blackjack
-
-
-        */
     }
 
 }

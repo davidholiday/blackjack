@@ -149,7 +149,13 @@ public class Game {
 
     public void playRounds(int rounds) {
 
+        LOG.info("*!* BEGIN RUN OF " + rounds + " ROUNDS *!* ");
+        for (Agent agent : agentMap.values()) {
+            LOG.info("agent " + agent + " bankroll is: " + agent.getBankroll());
+        }
+
         for (int i = 0; i < rounds; i ++) {
+            LOG.info("*!* ROUND START *!* ");
             ActionToken actionToken = new ActionToken.Builder()
                                                      .withAction(Action.GAME_START)
                                                      .withActionSource(AgentPosition.GAME)
@@ -182,6 +188,10 @@ public class Game {
                 cycleCount ++;
             }
 
+            LOG.info("*!* ROUND COMPLETE *!* ");
+            for (Agent agent : agentMap.values()) {
+                LOG.info("agent " + agent + " bankroll is: " + agent.getBankroll());
+            }
         }
     }
 

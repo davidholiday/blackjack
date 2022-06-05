@@ -36,6 +36,11 @@ public abstract class PlayerStrategy implements PlayStrategy {
                 if (action != Action.NONE) { return action; }
 
                 return evaluateForHard(hand, count, actionToken);
+            case CLEAR_HAND:
+                if (hand.getCardListSize() == 0) {
+                    throw new IllegalArgumentException("can't clear an already empty hand!");
+                }
+                return Action.OFFER_CARDS_FOR_DISCARD_TRAY;
         }
 
         return Action.NONE;

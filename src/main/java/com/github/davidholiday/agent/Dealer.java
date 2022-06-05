@@ -43,6 +43,8 @@ public class Dealer extends Agent {
 
     private boolean adjudicationPhase = false;
 
+    private boolean insuranceBetSettled = false;
+
     private List<AgentPosition> dealOrder =
             Stream.of(
                 PLAYER_ONE,
@@ -55,11 +57,20 @@ public class Dealer extends Agent {
                 DEALER
         ).collect(Collectors.toList());
 
-
     public Dealer(PlayStrategy playStrategy, Shoe shoe) {
         super(new NoCountStrategy(), playStrategy, Integer.MAX_VALUE);
         this.shoe = shoe;
     }
+
+    /*
+
+    unlike the Player Agents, the Dealer's Strategy object is only invoked inside the REQUEST_PLAY case block. all
+    other dealer self-actions are handled within the act() method.
+
+    in contrast, the Player Agents act method switches on the response from its strategy object's getNextAction()
+    method.
+
+     */
 
     @Override
     public ActionToken act(ActionToken actionToken) {
@@ -74,6 +85,7 @@ public class Dealer extends Agent {
                 playerDoneSet.clear();
                 hideHoleCard = true;
                 adjudicationPhase = false;
+                insuranceBetSettled = false;
 
                 if (reshuffleFlag) {
                     LOG.info("reshuffle flag is set - shuffling and cutting shoe...");
@@ -99,8 +111,13 @@ public class Dealer extends Agent {
                 // fall into OFFER_CARD
             case OFFER_CARDS:
                 if (actionToken.getOfferedCards().size() > 0) {
-                    if (actionToken.getActionSource() == DEALER) {
-                        addCardsToHand(actionToken.getOfferedCards());
+                    if (actionToken.getActionSource() == DEALER && actionToken.getActionTarget() == DEALER) {
+                        //addCardsToHand(actionToken.getOfferedCards());
+
+                        clearHand();
+                        Card deuce = new Card(CardType.TWO, CardSuit.SPADES);
+                        Card ace = new Card(CardType.ACE, CardSuit.HEARTS);
+                        addCardsToHand(List.of(deuce, ace));
                     } else {
                         addCardsToDiscardTray(actionToken.getOfferedCards());
                     }
@@ -117,6 +134,18 @@ public class Dealer extends Agent {
                 Optional<ActionToken> settleInsuranceBetActionToken = getSettleInsuranceBetActionToken(actionToken);
                 if (settleInsuranceBetActionToken.isPresent()) {
                     return settleInsuranceBetActionToken.get();
+                } else {
+                    // check to make sure we've resolved all insurance bets then clear the map
+                    for (double wager : playerInsuranceMap.values()) {
+                        if (wager > 0) {
+                            throw new IllegalStateException("insurance bets did not get resolved correctly!");
+                        }
+                    }
+                    if (playerInsuranceMap.isEmpty() == false) {
+                        LOG.info("all insurance bets settled. clearing playerInsuranceMap");
+                        playerInsuranceMap.clear();
+                    }
+                    insuranceBetSettled = true;
                 }
                 // fall into REQUEST_PLAY
             case REQUEST_PLAY:
@@ -132,16 +161,48 @@ public class Dealer extends Agent {
                 }
                 // fall into ADJUDICATE_GAME
             case ADJUDICATE_GAME:
-                LOG.info("*!* ADJUDICATING GAME *!*");
-                adjudicationPhase = true;
+                if (adjudicationPhase == false) {
+                    LOG.info("*!* ADJUDICATING GAME *!*");
+                    adjudicationPhase = true;
+                }
                 Optional<ActionToken> getAdjudicateActionToken = getAdjudicateActionToken(actionToken);
                 if (getAdjudicateActionToken.isPresent()) {
                     return getAdjudicateActionToken.get();
                 }
+                // fall into GAME_END
             case GAME_END:
-                // DO SOME INTEGRITY CHECKING HERE *!* *!* *!*
-                collectAllCards(actionToken);
-                return ActionToken.getEndGameActionToken();
+                // clear dealer hand first
+                addCardsToDiscardTray(clearHand());
+
+                // now do player hands
+                Optional<ActionToken> getClearHandActionToken = getClearHandActionToken(actionToken);
+                if (getClearHandActionToken.isPresent()) {
+                    return getClearHandActionToken.get();
+                }
+
+                // integrity check
+                if (hideHoleCard) {
+                    throw new IllegalStateException("hole card should not be hidden at endgame!");
+                }
+
+                if (playerDoneSet.size() != actionToken.getPlayerHandMap().size()) {
+                    throw new IllegalStateException("players have not all completed their play at endgame state!");
+                }
+
+                if (playerWagerMap.isEmpty() == false) {
+                    throw new IllegalStateException("playerWagerMap should be empty at endgame state!");
+                }
+
+                if (playerInsuranceMap.isEmpty() == false) {
+                    throw new IllegalStateException("playerInsuranceMap should be empty at endgame state!");
+                }
+
+                if (insuranceBetSettled == false) {
+                    throw new IllegalStateException("insurances bets not settled at endgame state!");
+                }
+
+                // end the round
+                return actionToken.getEndGameActionToken(getHand(), getDiscardTrayCardSize());
 
             //
             // PLAY RESPONSES
@@ -154,8 +215,16 @@ public class Dealer extends Agent {
                 playerInsuranceMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
                 LOG.info("playerInsuranceMap is now: " + playerInsuranceMap);
                 return actionToken.getDealerNextActionToken();
-            case TAKE_CARD: // <-- only the dealer should be receiving this action from itself
-                addCardsToHand(actionToken.getOfferedCards());
+            case OFFER_CARDS_FOR_DISCARD_TRAY:
+                if (adjudicationPhase == false) {
+                    String msg = "we should not be putting cards in the discard tray before adjudication phase!";
+                    throw new IllegalStateException(msg);
+                }
+
+                if (actionToken.getActionSource() == DEALER && actionToken.getActionTarget() == DEALER) {
+                    addCardsToDiscardTray(clearHand());
+                }
+                addCardsToDiscardTray(actionToken.getOfferedCards());
                 return actionToken.getDealerNextActionToken();
             case SURRENDER:
                 //
@@ -171,7 +240,8 @@ public class Dealer extends Agent {
                 playerDoneSet.add(actionToken.getActionSource());
                 return actionToken.getDealerNextActionToken();
             default:
-                return ActionToken.getEndGameActionToken();
+                return actionToken.getEndGameActionToken(getHand(), getDiscardTrayCardSize());
+
 
 
         }
@@ -229,7 +299,7 @@ public class Dealer extends Agent {
 
     private void addCardsToDiscardTray(List<Card> cardList) { discardTray.addCards(cardList); }
 
-    ActionToken getOfferMoneyToActionToken(AgentPosition recipient, double offeredMoney) {
+    private ActionToken getOfferMoneyToActionToken(AgentPosition recipient, double offeredMoney) {
         return new ActionToken.Builder()
                               .withActionTarget(recipient)
                               .withActionSource(DEALER)
@@ -238,17 +308,8 @@ public class Dealer extends Agent {
                               .build();
     }
 
-    Optional<ActionToken> getOfferMoneyToOptional(AgentPosition recipient, double offeredMoney) {
+    private Optional<ActionToken> getOfferMoneyToOptional(AgentPosition recipient, double offeredMoney) {
         return Optional.of(getOfferMoneyToActionToken(recipient, offeredMoney));
-    }
-
-    private void collectAllCards(ActionToken actionToken) {
-        for (AgentPosition agentPosition : actionToken.getPlayerHandMap().keySet()) {
-            List<Card> cardList = actionToken.getPlayerHandMap().get(agentPosition).getAllCards(true);
-            discardTray.addCards(cardList);
-        }
-
-
     }
 
     private Optional<ActionToken> getSolicitWagerActionToken(ActionToken actionToken) {
@@ -290,7 +351,9 @@ public class Dealer extends Agent {
     }
 
     private Optional<ActionToken> getOfferInsuranceActionToken(ActionToken actionToken) {
+        if (insuranceBetSettled) { return Optional.empty(); }
         if (adjudicationPhase) { return Optional.empty(); }
+
 
         // the insurance bet only happens after all the players have bet, have their cards, and the
         // dealer is showing an ACE. Because we fall into this method on every DEALER_NEXT_ACTION we need
@@ -355,7 +418,10 @@ public class Dealer extends Agent {
 
     private Optional<ActionToken> getSettleInsuranceBetActionToken(ActionToken actionToken) {
         if (adjudicationPhase) { return Optional.empty(); }
+        if (playerInsuranceMap.isEmpty()) { return Optional.empty(); }
 
+        // doing it this way because an insurance bet of 0 is a valid return and that state needs to be preserved
+        // for the duration of the insurance resolution phase
         for (AgentPosition agentPosition : playerInsuranceMap.keySet()) {
             double wager = playerInsuranceMap.get(agentPosition);
             if (wager == 0) {
@@ -365,10 +431,11 @@ public class Dealer extends Agent {
             }
 
             if (getHandInternal().isBlackJack()) {
+                LOG.info("dealer has blackjack. paying insurance bet...");
                 double offeredMoney = wager * 2;
                 ActionToken settleInsuranceBetActionToken =
                         new ActionToken.Builder(actionToken)
-                                       .withAction(Action.TAKE_MONEY)
+                                       .withAction(Action.OFFER_MONEY)
                                        .withActionSource(DEALER)
                                        .withActionTarget(agentPosition)
                                        .withOfferedMoney(offeredMoney)
@@ -376,8 +443,8 @@ public class Dealer extends Agent {
 
                 return Optional.of(settleInsuranceBetActionToken);
             } else {
+                LOG.info("dealer does not have blackjack. settling insurance bet...");
                 updateBankroll(wager);
-                LOG.info("collecting insurance bet. playerInsuranceMap now: " + playerInsuranceMap);
                 return Optional.of(actionToken.getDealerNextActionToken());
             }
         }
@@ -447,13 +514,13 @@ public class Dealer extends Agent {
                     else if (ruleSet.contains(Rule.BLACKJACK_PAYS_SIX_TO_FIVE)) {
                         // pay 6:5
                         LOG.info("player: " + agentPosition + " has BlackJack! PLAYER WIN");
-                        double offerMoneyAmount = playerWagerMap.remove(agentPosition) * 1.2;
+                        double offerMoneyAmount = playerWagerMap.remove(agentPosition) * 2.2;
                         return getOfferMoneyToOptional(agentPosition, offerMoneyAmount);
                     }
                     else {
                         // pay 3:2
                         LOG.info("player: " + agentPosition + " has BlackJack! PLAYER WIN");
-                        double offerMoneyAmount = playerWagerMap.remove(agentPosition) * 1.5;
+                        double offerMoneyAmount = playerWagerMap.remove(agentPosition) * 2.5;
                         return getOfferMoneyToOptional(agentPosition, offerMoneyAmount);
                     }
                 }
@@ -464,10 +531,10 @@ public class Dealer extends Agent {
                         case WIN:
                             LOG.info("player: " + agentPosition + " LOSES TO DEALER");
                             updateBankroll(playerWager);
-                            continue;
+                            break;
                         case LOSE:
                             LOG.info("player: " + agentPosition + " WINS");
-                            double offerMoneyAmount = playerWager;
+                            double offerMoneyAmount = playerWager * 2;
                             return getOfferMoneyToOptional(agentPosition, offerMoneyAmount);
                         case PUSH:
                             LOG.info("player: " + agentPosition + " PUSH");
@@ -479,4 +546,22 @@ public class Dealer extends Agent {
         }
         return Optional.empty();
     }
+
+    private Optional<ActionToken> getClearHandActionToken(ActionToken actionToken) {
+        for (AgentPosition agentPosition : dealOrder) {
+            if (actionToken.getPlayerHandMap().containsKey(agentPosition)) {
+                if (actionToken.getPlayerHandMap().get(agentPosition).getCardListSize() == 0) { continue; }
+
+                ActionToken clearHandActionToken = new ActionToken.Builder(actionToken)
+                                                                  .withAction(Action.CLEAR_HAND)
+                                                                  .withActionSource(AgentPosition.DEALER)
+                                                                  .withActionTarget(agentPosition)
+                                                                  .build();
+
+                return Optional.of(clearHandActionToken);
+            }
+        }
+        return Optional.empty();
+    }
+
 }

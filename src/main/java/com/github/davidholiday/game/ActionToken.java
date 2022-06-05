@@ -203,22 +203,25 @@ public class ActionToken {
                               .build();
     }
 
-    public static ActionToken getDealerNextActionToken(ActionToken actionToken) {
-        // specifically not including player offering of cards or money in this token
-        return new ActionToken.Builder()
-                              .withAction(Action.DEALER_NEXT_ACTION)
-                              .withRuleSet(actionToken.getRuleSet())
-                              .withPlayerHandMap(actionToken.getPlayerHandMap())
-                              .withActionSource(actionToken.getActionTarget())
-                              .withActionTarget(AgentPosition.DEALER)
-                              .build();
-    }
+//    public static ActionToken getDealerNextActionToken(ActionToken actionToken) {
+//        // specifically not including player offering of cards or money in this token
+//        return new ActionToken.Builder()
+//                              .withAction(Action.DEALER_NEXT_ACTION)
+//                              .withRuleSet(actionToken.getRuleSet())
+//                              .withPlayerHandMap(actionToken.getPlayerHandMap())
+//                              .withActionSource(actionToken.getActionTarget())
+//                              .withActionTarget(AgentPosition.DEALER)
+//                              .build();
+//    }
 
-    public static ActionToken getEndGameActionToken() {
-        return new ActionToken.Builder()
+    public ActionToken getEndGameActionToken(Hand dealerHand, int discardTrayCardSize) {
+        playerHandMap.put(AgentPosition.DEALER, dealerHand);
+        return new ActionToken.Builder(this)
                               .withActionSource(AgentPosition.DEALER)
                               .withActionTarget(AgentPosition.GAME)
                               .withAction(Action.GAME_END)
+                              .withPlayerHandMap(playerHandMap)
+                              .withDiscardTrayCardSize(discardTrayCardSize)
                               .build();
     }
 

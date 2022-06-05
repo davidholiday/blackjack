@@ -45,12 +45,18 @@ public class Player extends Agent {
                 //
             case STAND:
                 //
+            case OFFER_CARDS_FOR_DISCARD_TRAY:
+                return new ActionToken.Builder()
+                                      .withAction(nextAction)
+                                      .withOfferedCards(clearHand())
+                                      .withActionSource(actionToken.getActionTarget())
+                                      .withActionTarget(AgentPosition.DEALER)
+                                      .build();
             case NONE:
                 return getNextActionToken(actionToken, nextAction);
         }
 
-        LOG.warn("something went wrong - we are in a code path we should not be in. sending end game token... ");
-        return ActionToken.getEndGameActionToken();
+        throw new IllegalStateException("something went wrong - we are in a code path we should not be in. ");
     }
 
 

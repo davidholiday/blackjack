@@ -53,7 +53,7 @@ public abstract class Agent {
         hand.addCards(cardList);
     }
 
-    public void clearHand() { hand.getAllCards(true); }
+    public List<Card> clearHand() { return hand.getAllCards(true); }
 
     public String getCountStrategyName() { return countStrategy.getName(); }
 
