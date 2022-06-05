@@ -174,7 +174,7 @@ public class Game {
                 boolean playerHandMapOk = currentActionToken.getPlayerHandMap().equals(getPlayerHandMap());
                 boolean discardTrayCardCountOk = currentActionToken.getDiscardTrayCardSize() == getDiscardTrayCardSize();
                 if (ruleSetOk == false || playerHandMapOk == false || discardTrayCardCountOk == false) {
-                    LOG.info(
+                    LOG.debug(
                         "creating new actionToken instance with correct ruleSet, playerHandMap, and discardTrayCount"
                     );
                     currentActionToken = new ActionToken.Builder(currentActionToken)
@@ -189,8 +189,8 @@ public class Game {
             }
 
             LOG.info("*!* ROUND COMPLETE *!* ");
-            for (Agent agent : agentMap.values()) {
-                LOG.info("agent " + agent + " bankroll is: " + agent.getBankroll());
+            for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
+                LOG.info("{} has bankroll of ${}", agentMapEntry.getKey(), agentMapEntry.getValue().getBankroll());
             }
         }
     }

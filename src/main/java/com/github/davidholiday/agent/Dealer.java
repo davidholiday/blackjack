@@ -88,11 +88,11 @@ public class Dealer extends Agent {
                 insuranceBetSettled = false;
 
                 if (reshuffleFlag) {
-                    LOG.info("reshuffle flag is set - shuffling and cutting shoe...");
+                    LOG.debug("reshuffle flag is set - shuffling and cutting shoe...");
                     shoe.shuffle(10);
                     shoe.cut();
                     reshuffleFlag = false;
-                    LOG.info("done with reshuffle!");
+                    LOG.debug("done with reshuffle!");
                 }
                 // fall into DEALER_NEXT_ACTION
             case DEALER_NEXT_ACTION:
@@ -112,12 +112,14 @@ public class Dealer extends Agent {
             case OFFER_CARDS:
                 if (actionToken.getOfferedCards().size() > 0) {
                     if (actionToken.getActionSource() == DEALER && actionToken.getActionTarget() == DEALER) {
-                        //addCardsToHand(actionToken.getOfferedCards());
+                        addCardsToHand(actionToken.getOfferedCards());
 
-                        clearHand();
-                        Card deuce = new Card(CardType.TWO, CardSuit.SPADES);
-                        Card ace = new Card(CardType.ACE, CardSuit.HEARTS);
-                        addCardsToHand(List.of(deuce, ace));
+// FOR TESTING INSURANCE BETS
+//                        clearHand();
+//                        Card deuce = new Card(CardType.TWO, CardSuit.SPADES);
+//                        Card ace = new Card(CardType.ACE, CardSuit.HEARTS);
+//                        //Card deuce = new Card(CardType.TWO, CardSuite.HEARTS);
+//                        addCardsToHand(List.of(deuce, ace));
                     } else {
                         addCardsToDiscardTray(actionToken.getOfferedCards());
                     }
@@ -142,13 +144,16 @@ public class Dealer extends Agent {
                         }
                     }
                     if (playerInsuranceMap.isEmpty() == false) {
-                        LOG.info("all insurance bets settled. clearing playerInsuranceMap");
+                        LOG.debug("all insurance bets settled. clearing playerInsuranceMap");
                         playerInsuranceMap.clear();
                     }
                     insuranceBetSettled = true;
                 }
                 // fall into REQUEST_PLAY
             case REQUEST_PLAY:
+                if (adjudicationPhase == false) {
+                    LOG.info("REQUEST_PLAY >> player hands are: {}", actionToken.getPlayerHandMap());
+                }
                 Optional<ActionToken> requestPlayActionToken = getRequestPlayActionToken(actionToken);
                 if (requestPlayActionToken.isPresent()) {
                     return requestPlayActionToken.get();
@@ -162,7 +167,7 @@ public class Dealer extends Agent {
                 // fall into ADJUDICATE_GAME
             case ADJUDICATE_GAME:
                 if (adjudicationPhase == false) {
-                    LOG.info("*!* ADJUDICATING GAME *!*");
+                    LOG.info("*!* ALL PLAYS MADE -- ADJUDICATING GAME *!*");
                     adjudicationPhase = true;
                 }
                 Optional<ActionToken> getAdjudicateActionToken = getAdjudicateActionToken(actionToken);
@@ -208,12 +213,17 @@ public class Dealer extends Agent {
             // PLAY RESPONSES
             //
             case SUBMIT_WAGER:
+                LOG.info("player: {} wagers: ${}", actionToken.getActionSource(), actionToken.getOfferedMoney());
                 playerWagerMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
-                LOG.info("playerWagerMap is now: " + playerWagerMap);
+                LOG.debug("playerWagerMap is now: " + playerWagerMap);
                 return actionToken.getDealerNextActionToken();
             case TAKE_INSURANCE:
+                LOG.info("player: {} takes insurance at: ${}",
+                        actionToken.getActionSource(),
+                        actionToken.getOfferedMoney()
+                );
                 playerInsuranceMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
-                LOG.info("playerInsuranceMap is now: " + playerInsuranceMap);
+                LOG.debug("playerInsuranceMap is now: " + playerInsuranceMap);
                 return actionToken.getDealerNextActionToken();
             case OFFER_CARDS_FOR_DISCARD_TRAY:
                 if (adjudicationPhase == false) {
@@ -235,6 +245,7 @@ public class Dealer extends Agent {
             case HIT:
                 //
             case STAND:
+                LOG.info("player: {} STANDS", actionToken.getActionSource());
                 // fall into NONE
             case NONE:
                 playerDoneSet.add(actionToken.getActionSource());
@@ -265,7 +276,7 @@ public class Dealer extends Agent {
     @Override
     public void updateBankroll(double updateBy) {
         if (getBankroll() + updateBy < 0) {
-            LOG.info("Dealer bankroll ruin. Resetting to: " + Double.MAX_VALUE);
+            LOG.debug("Dealer bankroll ruin. Resetting to: " + Double.MAX_VALUE);
             super.updateBankroll(Double.MAX_VALUE);
         }
     }
@@ -431,8 +442,8 @@ public class Dealer extends Agent {
             }
 
             if (getHandInternal().isBlackJack()) {
-                LOG.info("dealer has blackjack. paying insurance bet...");
                 double offeredMoney = wager * 2;
+                LOG.info("dealer has blackjack. paying ${} to player {}", offeredMoney, agentPosition);
                 ActionToken settleInsuranceBetActionToken =
                         new ActionToken.Builder(actionToken)
                                        .withAction(Action.OFFER_MONEY)
@@ -443,7 +454,7 @@ public class Dealer extends Agent {
 
                 return Optional.of(settleInsuranceBetActionToken);
             } else {
-                LOG.info("dealer does not have blackjack. settling insurance bet...");
+                LOG.info("dealer has blackjack. taking ${} insurance bet from player {}", wager, agentPosition);
                 updateBankroll(wager);
                 return Optional.of(actionToken.getDealerNextActionToken());
             }
@@ -496,6 +507,12 @@ public class Dealer extends Agent {
             if (playerWagerMap.containsKey(agentPosition) == false) { continue; }
             if (actionToken.getPlayerHandMap().containsKey(agentPosition)) {
                 Hand playerHand = actionToken.getPlayerHandMap().get(agentPosition);
+                LOG.info("adjudicating {} hand: {} vs DEALER hand: {}", playerHand, dealerHand);
+                LOG.debug(
+                        "adjudicating {} hand: {} vs DEALER hand: {}",
+                        playerHand.toStringFull(),
+                        dealerHand.toStringFull()
+                );
 
                 // player bust - gets adjudicated before dealer hand
                 if (playerHand.isBust()) {

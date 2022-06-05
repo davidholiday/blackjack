@@ -43,15 +43,15 @@ public class ActionBroker {
             throw new IllegalArgumentException("action target: " + actionTarget + " not found in agentMap");
         }
 
-        LOG.info("received actionToken: " + actionToken);
-        flightRecorder.add(actionToken);
+        LOG.debug("received actionToken: " + actionToken);
+        //flightRecorder.add(actionToken);
         ActionToken nextActionToken = agentMap.get(actionTarget)
                                               .act(actionToken);
 
         if (nextActionToken.getAction() == Action.GAME_END) {
-            LOG.info("received actionToken: " + nextActionToken);
+            LOG.debug("received actionToken: " + nextActionToken);
         }
-        flightRecorder.add(nextActionToken);
+        //flightRecorder.add(nextActionToken);
         return nextActionToken;
     }
 
@@ -62,17 +62,18 @@ public class ActionBroker {
             throw new IllegalArgumentException("action target: " + actionTarget + " not found in agentMap");
         }
 
-        LOG.info("received actionToken: " + actionToken);
-        flightRecorder.add(actionToken);
+        LOG.debug("received actionToken: " + actionToken);
+        //flightRecorder.add(actionToken);
         ActionToken nextActionToken = agentMap.get(actionTarget)
                                               .act(actionToken);
 
-        LOG.info("received reply actionToken: " + nextActionToken);
-        flightRecorder.add(nextActionToken);
+        LOG.debug("received reply actionToken: " + nextActionToken);
+        //flightRecorder.add(nextActionToken);
         return nextActionToken;
     }
 
     //
     // TODO serialize() and flush methods for the flight recorder
+    // TODO flight recorder should get serialized into a json object
     //
 }

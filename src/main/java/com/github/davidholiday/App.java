@@ -3,20 +3,15 @@ package com.github.davidholiday;
 import com.github.davidholiday.agent.AgentPosition;
 import com.github.davidholiday.agent.Player;
 import com.github.davidholiday.agent.strategy.count.NoCountStrategy;
-import com.github.davidholiday.agent.strategy.play.NoOpDealerStrategy;
 import com.github.davidholiday.agent.strategy.play.NoOpPlayerStrategy;
-import com.github.davidholiday.cardcollection.Hand;
-import com.github.davidholiday.cardcollection.Shoe;
-import com.github.davidholiday.game.ActionBroker;
 import com.github.davidholiday.game.Game;
 import com.github.davidholiday.game.Rule;
 import com.github.davidholiday.game.RuleSet;
 import com.github.davidholiday.util.RuntimeInfo;
-import com.github.davidholiday.util.GeneralUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.MessageFormat;
 
 public class App {
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
@@ -42,7 +37,7 @@ public class App {
                             .withRuleSet(ruleSet)
                             .build();
 
-        game.playRounds(1);
+        game.playRounds(2);
 
     }
 
