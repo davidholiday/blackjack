@@ -116,10 +116,11 @@ public class Dealer extends Agent {
 
 // FOR TESTING INSURANCE BETS
 //                        clearHand();
-//                        Card deuce = new Card(CardType.TWO, CardSuit.SPADES);
+//                        Card ten = new Card(CardType.TEN, CardSuit.SPADES);
+//                        Card jack = new Card(CardType.JACK, CardSuit.HEARTS);
 //                        Card ace = new Card(CardType.ACE, CardSuit.HEARTS);
-//                        //Card deuce = new Card(CardType.TWO, CardSuite.HEARTS);
-//                        addCardsToHand(List.of(deuce, ace));
+//                        Card deuce = new Card(CardType.TWO, CardSuit.HEARTS);
+//                        addCardsToHand(List.of(ten, ace));
                     } else {
                         addCardsToDiscardTray(actionToken.getOfferedCards());
                     }
@@ -148,6 +149,16 @@ public class Dealer extends Agent {
                         playerInsuranceMap.clear();
                     }
                     insuranceBetSettled = true;
+                }
+                // fall into CHECK_FOR_DEALER_BLACKJACK
+            case CHECK_FOR_DEALER_BLACKJACK:
+                if (getHandInternal().isBlackJack() && adjudicationPhase == false) {
+                    LOG.info("*!* DEALER HAS BLACKJACK-- ADJUDICATING GAME *!*");
+                    adjudicationPhase = true;
+                    for (AgentPosition agentPosition : actionToken.getPlayerHandMap().keySet()) {
+                        playerDoneSet.add(agentPosition);
+                    }
+                    return actionToken.getDealerNextActionToken();
                 }
                 // fall into REQUEST_PLAY
             case REQUEST_PLAY:
@@ -444,6 +455,7 @@ public class Dealer extends Agent {
             if (getHandInternal().isBlackJack()) {
                 double offeredMoney = wager * 2;
                 LOG.info("dealer has blackjack. paying ${} to player {}", offeredMoney, agentPosition);
+
                 ActionToken settleInsuranceBetActionToken =
                         new ActionToken.Builder(actionToken)
                                        .withAction(Action.OFFER_MONEY)
@@ -454,7 +466,7 @@ public class Dealer extends Agent {
 
                 return Optional.of(settleInsuranceBetActionToken);
             } else {
-                LOG.info("dealer has blackjack. taking ${} insurance bet from player {}", wager, agentPosition);
+                LOG.info("dealer does not blackjack. taking ${} insurance bet from player {}", wager, agentPosition);
                 updateBankroll(wager);
                 return Optional.of(actionToken.getDealerNextActionToken());
             }
