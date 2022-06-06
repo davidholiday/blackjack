@@ -44,7 +44,11 @@ public class Player extends Agent {
             case HIT:
                 //
             case STAND:
-                //
+                return new ActionToken.Builder()
+                                      .withAction(nextAction)
+                                      .withActionSource(actionToken.getActionTarget())
+                                      .withActionTarget(AgentPosition.DEALER)
+                                      .build();
             case OFFER_CARDS_FOR_DISCARD_TRAY:
                 return new ActionToken.Builder()
                                       .withAction(nextAction)
