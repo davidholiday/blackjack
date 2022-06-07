@@ -42,9 +42,10 @@ public class Player extends Agent {
             case SPLIT:
                 //
             case DOUBLE_DOWN:
-                //
+                double doubleDownWager = getLastAnteWager() * 2;
+                return getOfferMoneyActionToken(actionToken, nextAction, doubleDownWager);
             case HIT:
-                //
+                return getNextActionToken(actionToken, nextAction);
             case STAND:
                 return getNextActionToken(actionToken, nextAction);
             case OFFER_CARDS_FOR_DISCARD_TRAY:

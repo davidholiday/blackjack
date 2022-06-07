@@ -256,6 +256,8 @@ public class Dealer extends Agent {
                 return actionToken.getDealerNextActionToken();
             case DECLINE_INSURANCE:
                 LOG.info("{} declines insurance", sourceAgentPosition);
+                // having a zero bet is how the method that handles adjudicating insurance bets determines if
+                // all players have made their insurance election. playerInsuranceMap is cleared after adjudication
                 playerInsuranceMap.put(actionToken.getActionSource(), 0.0);
                 LOG.debug("playerInsuranceMap is now: " + playerInsuranceMap);
                 return actionToken.getDealerNextActionToken();
@@ -296,20 +298,39 @@ public class Dealer extends Agent {
             case SPLIT:
                 //
             case DOUBLE_DOWN:
-                //
+                if (sourceAgentHand.isBust()) {
+                    String msg = sourceAgentPosition + " attempted to DOUBLE but their hand is BUST!";
+                    throw new IllegalStateException();
+                }
+
+                double offeredMoney = actionToken.getOfferedMoney();
+                // playerWager is defined in SURRENDER scope...
+                playerWager = playerWagerMap.get(sourceAgentPosition);
+                if (offeredMoney != playerWager * 2) {
+                    String msg = sourceAgentPosition + " attempted to DOUBLE with incorrect DOUBLE bet value!";
+                    throw new IllegalStateException(msg);
+                }
+
+                LOG.info("{} DOUBLES", sourceAgentPosition);
+
+                // update player wager
+                double newPlayerWager = playerWager + offeredMoney;
+                playerWagerMap.put(sourceAgentPosition, newPlayerWager);
+
+                // player gets this one last card then they are done
+                playerDoneSet.add(sourceAgentPosition);
+
+                // send the card to the player
+                return getOfferCardsActionToken(sourceAgentPosition, List.of(draw()));
+
             case HIT:
-                // make sure the agent isn't busted
                 if (sourceAgentHand.isBust()) {
                     throw new IllegalStateException(sourceAgentPosition + " attempted to HIT but their hand is BUST!");
                 }
 
                 LOG.info("{} HITS", sourceAgentPosition);
-                List<Card> offeredCardList = List.of(draw());
-                return new ActionToken.Builder().withAction(Action.OFFER_CARDS)
-                                                .withActionSource(DEALER)
-                                                .withActionTarget(DEALER)
-                                                .withOfferedCards(offeredCardList)
-                                                .build();
+                return getOfferCardsActionToken(sourceAgentPosition, List.of(draw()));
+
             case STAND:
                 LOG.info("{} STANDS", sourceAgentPosition);
                 // fall into NONE
@@ -367,6 +388,14 @@ public class Dealer extends Agent {
             return cardList;
         }
         return cardList;
+    }
+
+    private ActionToken getOfferCardsActionToken(AgentPosition agentPosition, List<Card> offeredCards) {
+        return new ActionToken.Builder().withAction(Action.OFFER_CARDS)
+                                        .withActionSource(DEALER)
+                                        .withActionTarget(agentPosition)
+                                        .withOfferedCards(offeredCards)
+                                        .build();
     }
 
     private void addCardsToDiscardTray(List<Card> cardList) { discardTray.addCards(cardList); }

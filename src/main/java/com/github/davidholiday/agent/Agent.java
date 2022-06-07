@@ -29,6 +29,9 @@ public abstract class Agent {
 
     private int count = 0;
 
+    // records the last ante wager made so insurance and double down bets can be made
+    private double lastAnteWager = 0;
+
     public Agent(CountStrategy countStrategy, PlayStrategy playStrategy, double bankroll) {
         this.hand = new Hand();
         this.countStrategy = countStrategy;
@@ -93,8 +96,11 @@ public abstract class Agent {
     double getWager(ActionToken actionToken) {
         double wager = playStrategy.getWager(count, actionToken);
         updateBankroll(-wager);
+        lastAnteWager = wager;
         return wager;
     }
+
+    double getLastAnteWager() { return lastAnteWager; }
 
     double getInsuranceBet(ActionToken actionToken) {
         double insurance = playStrategy.getInsuranceBet(hand, getCount(), actionToken);

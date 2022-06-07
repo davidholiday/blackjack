@@ -97,7 +97,64 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
 
     @Override
     public Action evaluateForHard(Hand hand, int count, ActionToken actionToken) {
-        return Action.STAND;
+        if (hand.isBust()) { return Action.NONE; }
+        CardType dealerUpCardType = getDealerUpCard(actionToken).getCardType();
+        switch (hand.getHandValue()) {
+            case 21:
+            case 20:
+            case 19:
+            case 18:
+            case 17:
+                return Action.STAND;
+            case 16:
+            case 15:
+            case 14:
+            case 13:
+                if (dealerUpCardType == CardType.TWO
+                        || dealerUpCardType == CardType.THREE
+                        || dealerUpCardType == CardType.FOUR
+                        || dealerUpCardType == CardType.FIVE
+                        || dealerUpCardType == CardType.SIX) {
+                    return Action.STAND;
+                } else {
+                    return Action.HIT;
+                }
+            case 12:
+                if (dealerUpCardType == CardType.FOUR
+                        || dealerUpCardType == CardType.FIVE
+                        || dealerUpCardType == CardType.SIX) {
+                    return Action.STAND;
+                } else {
+                    return Action.HIT;
+                }
+            case 11:
+                return Action.DOUBLE_DOWN;
+            case 10:
+                if (dealerUpCardType == CardType.TWO
+                        || dealerUpCardType == CardType.THREE
+                        || dealerUpCardType == CardType.FOUR
+                        || dealerUpCardType == CardType.FIVE
+                        || dealerUpCardType == CardType.SIX
+                        || dealerUpCardType == CardType.SEVEN
+                        || dealerUpCardType == CardType.EIGHT
+                        || dealerUpCardType == CardType.NINE) {
+                    return Action.DOUBLE_DOWN;
+                } else {
+                    return Action.HIT;
+                }
+            case 9:
+                if (dealerUpCardType == CardType.THREE
+                        || dealerUpCardType == CardType.FOUR
+                        || dealerUpCardType == CardType.FIVE
+                        || dealerUpCardType == CardType.SIX) {
+                    return Action.DOUBLE_DOWN;
+                } else {
+                    return Action.HIT;
+                }
+            default:
+                return Action.HIT;
+        }
+
     }
 
 
