@@ -32,6 +32,8 @@ public class Player extends Agent {
             case TAKE_INSURANCE:
                 double insuranceWager = getInsuranceBet(actionToken);
                 return getOfferMoneyActionToken(actionToken, nextAction, insuranceWager);
+            case DECLINE_INSURANCE:
+                return getNextActionToken(actionToken, nextAction);
             case TAKE_MONEY:
                 updateBankroll(actionToken.getOfferedMoney());
                 return actionToken.getDealerNextActionToken();

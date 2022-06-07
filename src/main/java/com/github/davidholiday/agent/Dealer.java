@@ -93,11 +93,11 @@ public class Dealer extends Agent {
                 insuranceBetSettled = false;
 
                 if (reshuffleFlag) {
-                    LOG.debug("reshuffle flag is set - shuffling and cutting shoe...");
+                    LOG.info("reshuffle flag is set - shuffling and cutting shoe...");
                     shoe.shuffle(10);
                     shoe.cut();
                     reshuffleFlag = false;
-                    LOG.debug("done with reshuffle!");
+                    LOG.info("done with reshuffle!");
                 }
                 // fall into DEALER_NEXT_ACTION
             case DEALER_NEXT_ACTION:
@@ -222,6 +222,14 @@ public class Dealer extends Agent {
                     throw new IllegalStateException("insurances bets not settled at endgame state!");
                 }
 
+                // clear state variables
+                playerWagerMap.clear();
+                playerInsuranceMap.clear();
+                playerDoneSet.clear();
+                hideHoleCard = true;
+                adjudicationPhase = false;
+                insuranceBetSettled = false;
+
                 // end the round
                 return actionToken.getEndGameActionToken(getHand(), getDiscardTrayCardSize());
 
@@ -229,16 +237,21 @@ public class Dealer extends Agent {
             // PLAY RESPONSES
             //
             case SUBMIT_WAGER:
-                LOG.info("player: {} wagers: ${}", actionToken.getActionSource(), actionToken.getOfferedMoney());
+                LOG.info("{} wagers: ${}", actionToken.getActionSource(), actionToken.getOfferedMoney());
                 playerWagerMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
                 LOG.debug("playerWagerMap is now: " + playerWagerMap);
                 return actionToken.getDealerNextActionToken();
             case TAKE_INSURANCE:
-                LOG.info("player: {} takes insurance at: ${}",
-                        actionToken.getActionSource(),
+                LOG.info("{} takes insurance at: ${}",
+                        sourceAgentPosition,
                         actionToken.getOfferedMoney()
                 );
                 playerInsuranceMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
+                LOG.debug("playerInsuranceMap is now: " + playerInsuranceMap);
+                return actionToken.getDealerNextActionToken();
+            case DECLINE_INSURANCE:
+                LOG.info("{} declines insurance", sourceAgentPosition);
+                playerInsuranceMap.put(actionToken.getActionSource(), 0.0);
                 LOG.debug("playerInsuranceMap is now: " + playerInsuranceMap);
                 return actionToken.getDealerNextActionToken();
             case OFFER_CARDS_FOR_DISCARD_TRAY:

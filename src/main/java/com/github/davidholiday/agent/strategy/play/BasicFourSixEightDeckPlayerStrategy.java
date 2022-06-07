@@ -29,7 +29,9 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
     public double getInsuranceBet(Hand hand, int count, ActionToken actionToken) { return 0; }
 
     @Override
-    public Action evaluateHandForInsurance(Hand hand, int count, ActionToken actionToken) { return Action.NONE; }
+    public Action evaluateHandForInsurance(Hand hand, int count, ActionToken actionToken) {
+        return Action.DECLINE_INSURANCE;
+    }
 
     @Override
     public Action evaluateForSurrender(Hand hand, int count, ActionToken actionToken) {
