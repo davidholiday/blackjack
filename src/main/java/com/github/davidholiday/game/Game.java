@@ -2,7 +2,9 @@ package com.github.davidholiday.game;
 
 
 import com.github.davidholiday.agent.Agent;
+import com.github.davidholiday.agent.strategy.play.DealerStrategy;
 import com.github.davidholiday.agent.strategy.play.NoOpDealerStrategy;
+import com.github.davidholiday.agent.strategy.play.StandardDealerStrategy;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.agent.AgentPosition;
 import com.github.davidholiday.agent.Dealer;
@@ -33,9 +35,9 @@ public class Game {
     public static class Builder {
         private RuleSet ruleSet = new RuleSet();
 
-        private final NoOpDealerStrategy noOpPlayStrategy = new NoOpDealerStrategy();
+        private final DealerStrategy standardDealerStrategy = new StandardDealerStrategy();
         private Shoe shoe = new Shoe(6);
-        private Dealer dealer = new Dealer(noOpPlayStrategy, shoe);
+        private Dealer dealer = new Dealer(standardDealerStrategy, shoe);
         private Map<AgentPosition, Player> playerMap;
 
         public Builder() {

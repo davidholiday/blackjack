@@ -29,10 +29,6 @@ public class App {
         Player playerOne = new Player(noCountStrategy, noOpPlayerStrategy, 10);
         Player playerTwo = new Player(noCountStrategy, noOpPlayerStrategy, 10);
 
-        Shoe shoe = new Shoe(6);
-        DealerStrategy standardDealerStrategy = new StandardDealerStrategy();
-        Dealer dealer = new Dealer(standardDealerStrategy, shoe);
-
         RuleSet ruleSet = new RuleSet.Builder()
                                      .withRule(Rule.BLACKJACK_PAYS_THREE_TO_TWO)
                                      .withRule(Rule.SIX_DECK_SHOE)
@@ -43,7 +39,6 @@ public class App {
         Game game = new Game.Builder()
                             .withPlayerAtPosition(playerOne, AgentPosition.PLAYER_ONE)
                             .withPlayerAtPosition(playerTwo, AgentPosition.PLAYER_TWO)
-                            .withDealer(dealer)
                             .withRuleSet(ruleSet)
                             .build();
 

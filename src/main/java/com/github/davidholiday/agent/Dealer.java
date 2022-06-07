@@ -78,6 +78,7 @@ public class Dealer extends Agent {
         // for convenience in the PLAY RESPONSES section at the bottom
         AgentPosition sourceAgentPosition = actionToken.getActionSource();
         Hand sourceAgentHand = actionToken.getPlayerHandMap().get(sourceAgentPosition);
+        RuleSet ruleset = actionToken.getRuleSet();
 
         switch (actionToken.getAction()) {
             //
@@ -301,16 +302,6 @@ public class Dealer extends Agent {
 
     public Hand getHandInternal() { return super.getHand(); }
 
-//    @Override
-//    public void updateBankroll(double updateBy) {
-//        if (getBankroll() + updateBy < 0) {
-//            LOG.debug("*!* DEALER bankroll ruin. Resetting to: {} *!*", Double.MAX_VALUE);
-//            super.updateBankroll(Double.MAX_VALUE);
-//        }
-//
-//        super.updateBankroll(updateBy);
-//    }
-
     public int getShoeDeckSize() { return shoe.getCardListSize() / GeneralUtils.DECK_SIZE_NO_JOKERS; }
 
     public int getShoeCardSize() { return shoe.getCardListSize(); }
@@ -461,8 +452,8 @@ public class Dealer extends Agent {
         if (adjudicationPhase) { return Optional.empty(); }
         if (playerInsuranceMap.isEmpty()) { return Optional.empty(); }
 
-        // doing it this way because an insurance bet of 0 is a valid return and that state needs to be preserved
-        // for the duration of the insurance resolution phase
+        // doing it this way because an insurance bet of 0 is the flag telling us we've handled that player's
+        // insurance bet. It will be cleared after all insurance bets have been settled
         for (AgentPosition agentPosition : playerInsuranceMap.keySet()) {
             double wager = playerInsuranceMap.get(agentPosition);
             if (wager == 0) {
