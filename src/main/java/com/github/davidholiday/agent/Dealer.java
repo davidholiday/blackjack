@@ -311,6 +311,28 @@ public class Dealer extends Agent {
                     throw new IllegalStateException(msg);
                 }
 
+                if (ruleset.contains(Rule.PLAYER_CAN_DOUBLE_ON_ANY_FIRST_TWO_CARDS) == false) {
+
+                    // using HandValue and not the AceSpecialValue because of the player can only double on
+                    // nine, ten, or eleven the only you can't make that number with an ACE counted as eleven...
+                    int handValue = sourceAgentHand.getHandValue();
+                    if (ruleset.contains(Rule.PLAYER_CAN_DOUBLE_ON_NINE_THROUGH_ELEVEN_ONLY)
+                            && (handValue < 9 || handValue > 11)) {
+                        String msg = sourceAgentPosition +
+                                    " attempted to DOUBLE when rules only permit DOUBLE on player nine->11!";
+                        throw new IllegalStateException(msg);
+                    } else if (ruleset.contains(Rule.PLAYER_CAN_DOUBLE_ON_TEN_ELEVEN_ONLY)
+                            && (handValue < 10 || handValue > 11)) {
+                        String msg = sourceAgentPosition +
+                                " attempted to DOUBLE when rules only permit DOUBLE on player 10->11!";
+                        throw new IllegalStateException(msg);
+                    } else {
+                        String msg = sourceAgentPosition + " attempted to DOUBLE when rules do not permit DOUBLE!";
+                        throw new IllegalStateException(msg);
+                    }
+
+                }
+
                 LOG.info("{} DOUBLES", sourceAgentPosition);
 
                 // update player wager
