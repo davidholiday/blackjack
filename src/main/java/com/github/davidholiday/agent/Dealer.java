@@ -300,7 +300,7 @@ public class Dealer extends Agent {
             case DOUBLE_DOWN:
                 if (sourceAgentHand.isBust()) {
                     String msg = sourceAgentPosition + " attempted to DOUBLE but their hand is BUST!";
-                    throw new IllegalStateException();
+                    throw new IllegalStateException(msg);
                 }
 
                 double offeredMoney = actionToken.getOfferedMoney();
