@@ -94,6 +94,11 @@ public class Dealer extends Agent {
 
                 if (reshuffleFlag) {
                     LOG.info("reshuffle flag is set - shuffling and cutting shoe...");
+
+                    if (discardTray.getCardListSize() > 0) {
+                        shoe.addCards(discardTray.getAllCards(true));
+                    }
+
                     shoe.shuffle(10);
                     shoe.cut();
                     reshuffleFlag = false;

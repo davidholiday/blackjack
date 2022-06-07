@@ -45,7 +45,7 @@ public class App {
                             .withRuleSet(ruleSet)
                             .build();
 
-        game.playRounds(10);
+        game.playRounds(300);
 
     }
 
