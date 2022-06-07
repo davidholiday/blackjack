@@ -288,6 +288,9 @@ public class Dealer extends Agent {
                 double halfWager = playerWager / 2.0;
                 updateBankroll(halfWager);
 
+                LOG.info("returning {} to {}", halfWager, sourceAgentPosition);
+                LOG.info("playerWagerMap is now: {}", playerWagerMap);
+
                 return new ActionToken.Builder(actionToken)
                                       .withAction(Action.OFFER_MONEY)
                                       .withActionSource(DEALER)
@@ -338,6 +341,7 @@ public class Dealer extends Agent {
                 // update player wager
                 double newPlayerWager = playerWager + offeredMoney;
                 playerWagerMap.put(sourceAgentPosition, newPlayerWager);
+                LOG.info("playerWagerMap is now: {}", playerWagerMap);
 
                 // player gets this one last card then they are done
                 playerDoneSet.add(sourceAgentPosition);
