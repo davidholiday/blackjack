@@ -25,6 +25,8 @@ public abstract class Agent {
 
     private double bankroll;
 
+    private double initialBankroll;
+
     private int count = 0;
 
     public Agent(CountStrategy countStrategy, PlayStrategy playStrategy, double bankroll) {
@@ -36,6 +38,7 @@ public abstract class Agent {
             throw new IllegalArgumentException("bankroll argument must be a positive number!");
         }
         this.bankroll = bankroll;
+        this.initialBankroll = bankroll;
 
     }
 
@@ -72,10 +75,11 @@ public abstract class Agent {
     void updateBankroll(double updateBy) {
 
         if (bankroll + updateBy < 0 ) {
-            LOG.info("bankroll has been ruined for player " + this.toString());
-            bankroll = 0;
+            LOG.info("*!* bankroll has been ruined for agent: {} *!*", this.toString() );
+            LOG.info("*!* resetting bankroll to: {} for agent: {} *!*", initialBankroll, this.toString());
+            bankroll = initialBankroll;
         } else if (bankroll + updateBy > Double.MAX_VALUE) {
-            LOG.info("bankroll has been exceeded for player " + this.toString());
+            LOG.info("bankroll has been exceeded for agent {} *!*", this.toString());
             bankroll = Double.MAX_VALUE;
         }
         else {

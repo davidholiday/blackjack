@@ -75,6 +75,10 @@ public class Dealer extends Agent {
     @Override
     public ActionToken act(ActionToken actionToken) {
 
+        // for convenience in the PLAY RESPONSES section at the bottom
+        AgentPosition sourceAgentPosition = actionToken.getActionSource();
+        Hand sourceAgentHand = actionToken.getPlayerHandMap().get(sourceAgentPosition);
+
         switch (actionToken.getAction()) {
             //
             // DEALER ACTIONS
@@ -114,13 +118,13 @@ public class Dealer extends Agent {
                     if (actionToken.getActionSource() == DEALER && actionToken.getActionTarget() == DEALER) {
                         addCardsToHand(actionToken.getOfferedCards());
 
-// FOR TESTING INSURANCE BETS
+// FOR TESTING INSURANCE BETS AND BLACKJACK DETECTION
 //                        clearHand();
 //                        Card ten = new Card(CardType.TEN, CardSuit.SPADES);
 //                        Card jack = new Card(CardType.JACK, CardSuit.HEARTS);
 //                        Card ace = new Card(CardType.ACE, CardSuit.HEARTS);
 //                        Card deuce = new Card(CardType.TWO, CardSuit.HEARTS);
-//                        addCardsToHand(List.of(ten, ace));
+//                        addCardsToHand(List.of(ace, ten));
                     } else {
                         addCardsToDiscardTray(actionToken.getOfferedCards());
                     }
@@ -254,11 +258,24 @@ public class Dealer extends Agent {
             case DOUBLE_DOWN:
                 //
             case HIT:
-                //
+                // make sure the agent isn't busted
+                if (sourceAgentHand.isBust()) {
+                    throw new IllegalStateException(sourceAgentPosition + " attempted to HIT but their hand is BUST!");
+                }
+
+                LOG.info("player: {} HITS", sourceAgentPosition);
+                List<Card> offeredCardList = List.of(draw());
+                return new ActionToken.Builder().withAction(Action.OFFER_CARDS)
+                                                .withActionSource(DEALER)
+                                                .withActionTarget(DEALER).withOfferedCards(offeredCardList)
+                                                .build();
             case STAND:
-                LOG.info("player: {} STANDS", actionToken.getActionSource());
+                LOG.info("player: {} STANDS", sourceAgentPosition);
                 // fall into NONE
             case NONE:
+                if (sourceAgentHand.isBust()) {
+                    LOG.info("player: {} is BUST", sourceAgentPosition);
+                }
                 playerDoneSet.add(actionToken.getActionSource());
                 return actionToken.getDealerNextActionToken();
             default:
@@ -284,13 +301,15 @@ public class Dealer extends Agent {
 
     public Hand getHandInternal() { return super.getHand(); }
 
-    @Override
-    public void updateBankroll(double updateBy) {
-        if (getBankroll() + updateBy < 0) {
-            LOG.debug("Dealer bankroll ruin. Resetting to: " + Double.MAX_VALUE);
-            super.updateBankroll(Double.MAX_VALUE);
-        }
-    }
+//    @Override
+//    public void updateBankroll(double updateBy) {
+//        if (getBankroll() + updateBy < 0) {
+//            LOG.debug("*!* DEALER bankroll ruin. Resetting to: {} *!*", Double.MAX_VALUE);
+//            super.updateBankroll(Double.MAX_VALUE);
+//        }
+//
+//        super.updateBankroll(updateBy);
+//    }
 
     public int getShoeDeckSize() { return shoe.getCardListSize() / GeneralUtils.DECK_SIZE_NO_JOKERS; }
 

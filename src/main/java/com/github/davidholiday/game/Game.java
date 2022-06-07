@@ -33,7 +33,7 @@ public class Game {
     public static class Builder {
         private RuleSet ruleSet = new RuleSet();
 
-        private NoOpDealerStrategy noOpPlayStrategy = new NoOpDealerStrategy();
+        private final NoOpDealerStrategy noOpPlayStrategy = new NoOpDealerStrategy();
         private Shoe shoe = new Shoe(6);
         private Dealer dealer = new Dealer(noOpPlayStrategy, shoe);
         private Map<AgentPosition, Player> playerMap;
@@ -150,6 +150,8 @@ public class Game {
     public void playRounds(int rounds) {
 
         LOG.info("*!* BEGIN RUN OF " + rounds + " ROUNDS *!* ");
+        LOG.info("playerMap is: {}", playerMap);
+
         for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
             LOG.info("{} has bankroll of ${}", agentMapEntry.getKey(), agentMapEntry.getValue().getBankroll());
         }
@@ -189,6 +191,7 @@ public class Game {
             }
 
             LOG.info("*!* ROUND COMPLETE *!* ");
+            LOG.info("playerMap is: {}", playerMap);
             for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
                 LOG.info("{} has bankroll of ${}", agentMapEntry.getKey(), agentMapEntry.getValue().getBankroll());
             }

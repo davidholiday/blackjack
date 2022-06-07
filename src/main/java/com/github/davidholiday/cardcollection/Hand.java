@@ -73,6 +73,10 @@ public class Hand extends CardCollection {
         return handValue;
     }
 
+    public int getHandValue() { return handValue; }
+
+    public int getAceSpecialHandValue() { return aceSpecialHandValue; }
+
     public boolean isBlackJack() { return isBlackJack; }
 
     public boolean isBust() { return isBust; }
