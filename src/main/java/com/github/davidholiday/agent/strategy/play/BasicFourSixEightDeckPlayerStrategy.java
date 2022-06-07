@@ -98,6 +98,8 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
     @Override
     public Action evaluateForHard(Hand hand, int count, ActionToken actionToken) {
         if (hand.isBust()) { return Action.NONE; }
+        RuleSet ruleSet = actionToken.getRuleSet();
+
         CardType dealerUpCardType = getDealerUpCard(actionToken).getCardType();
         switch (hand.getHandValue()) {
             case 21:
@@ -128,7 +130,14 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
                     return Action.HIT;
                 }
             case 11:
-                return Action.DOUBLE_DOWN;
+                if (ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_ANY_FIRST_TWO_CARDS)
+                        || ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_NINE_THROUGH_ELEVEN_ONLY)
+                        || ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_TEN_ELEVEN_ONLY)) {
+
+                    return Action.DOUBLE_DOWN;
+                } else {
+                    return Action.HIT;
+                }
             case 10:
                 if (dealerUpCardType == CardType.TWO
                         || dealerUpCardType == CardType.THREE
@@ -138,7 +147,15 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
                         || dealerUpCardType == CardType.SEVEN
                         || dealerUpCardType == CardType.EIGHT
                         || dealerUpCardType == CardType.NINE) {
-                    return Action.DOUBLE_DOWN;
+
+                    if (ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_ANY_FIRST_TWO_CARDS)
+                            || ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_NINE_THROUGH_ELEVEN_ONLY)
+                            || ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_TEN_ELEVEN_ONLY)) {
+
+                        return Action.DOUBLE_DOWN;
+                    } else {
+                        return Action.HIT;
+                    }
                 } else {
                     return Action.HIT;
                 }
@@ -147,7 +164,14 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
                         || dealerUpCardType == CardType.FOUR
                         || dealerUpCardType == CardType.FIVE
                         || dealerUpCardType == CardType.SIX) {
-                    return Action.DOUBLE_DOWN;
+
+                    if (ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_ANY_FIRST_TWO_CARDS)
+                            || ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_NINE_THROUGH_ELEVEN_ONLY)) {
+
+                        return Action.DOUBLE_DOWN;
+                    } else {
+                        return Action.HIT;
+                    }
                 } else {
                     return Action.HIT;
                 }
