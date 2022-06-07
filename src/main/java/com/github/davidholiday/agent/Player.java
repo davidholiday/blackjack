@@ -36,7 +36,7 @@ public class Player extends Agent {
                 updateBankroll(actionToken.getOfferedMoney());
                 return actionToken.getDealerNextActionToken();
             case SURRENDER:
-                //
+                return getNextActionToken(actionToken, nextAction);
             case SPLIT:
                 //
             case DOUBLE_DOWN:
@@ -44,11 +44,7 @@ public class Player extends Agent {
             case HIT:
                 //
             case STAND:
-                return new ActionToken.Builder()
-                                      .withAction(nextAction)
-                                      .withActionSource(actionToken.getActionTarget())
-                                      .withActionTarget(AgentPosition.DEALER)
-                                      .build();
+                return getNextActionToken(actionToken, nextAction);
             case OFFER_CARDS_FOR_DISCARD_TRAY:
                 return new ActionToken.Builder()
                                       .withAction(nextAction)

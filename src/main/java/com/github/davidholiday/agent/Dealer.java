@@ -125,7 +125,7 @@ public class Dealer extends Agent {
 //                        Card jack = new Card(CardType.JACK, CardSuit.HEARTS);
 //                        Card ace = new Card(CardType.ACE, CardSuit.HEARTS);
 //                        Card deuce = new Card(CardType.TWO, CardSuit.HEARTS);
-//                        addCardsToHand(List.of(ace, ten));
+//                        addCardsToHand(List.of(deuce, ten));
                     } else {
                         addCardsToDiscardTray(actionToken.getOfferedCards());
                     }
@@ -253,7 +253,28 @@ public class Dealer extends Agent {
                 addCardsToDiscardTray(actionToken.getOfferedCards());
                 return actionToken.getDealerNextActionToken();
             case SURRENDER:
-                //
+                if (ruleset.contains(Rule.PLAYER_CAN_EARLY_SURRENDER) == false
+                        && ruleset.contains(Rule.PLAYER_CAN_LATE_SURRENDER) == false) {
+
+                    String msg = sourceAgentPosition + " attempted surrender when rules disallow surrender";
+                    throw new IllegalStateException(msg);
+                }
+
+                LOG.info("{} SURRENDERS", sourceAgentPosition);
+                playerDoneSet.add(sourceAgentPosition);
+                // it's important that we remove the wager from the map so the adjudicate method knows the player
+                // has surrendered
+                double playerWager = playerWagerMap.remove(sourceAgentPosition);
+                double halfWager = playerWager / 2.0;
+                updateBankroll(halfWager);
+
+                return new ActionToken.Builder(actionToken)
+                                      .withAction(Action.OFFER_MONEY)
+                                      .withActionSource(DEALER)
+                                      .withActionTarget(sourceAgentPosition)
+                                      .withOfferedMoney(halfWager)
+                                      .build();
+
             case SPLIT:
                 //
             case DOUBLE_DOWN:
@@ -264,18 +285,19 @@ public class Dealer extends Agent {
                     throw new IllegalStateException(sourceAgentPosition + " attempted to HIT but their hand is BUST!");
                 }
 
-                LOG.info("player: {} HITS", sourceAgentPosition);
+                LOG.info("{} HITS", sourceAgentPosition);
                 List<Card> offeredCardList = List.of(draw());
                 return new ActionToken.Builder().withAction(Action.OFFER_CARDS)
                                                 .withActionSource(DEALER)
-                                                .withActionTarget(DEALER).withOfferedCards(offeredCardList)
+                                                .withActionTarget(DEALER)
+                                                .withOfferedCards(offeredCardList)
                                                 .build();
             case STAND:
-                LOG.info("player: {} STANDS", sourceAgentPosition);
+                LOG.info("{} STANDS", sourceAgentPosition);
                 // fall into NONE
             case NONE:
                 if (sourceAgentHand.isBust()) {
-                    LOG.info("player: {} is BUST", sourceAgentPosition);
+                    LOG.info("{} is BUST", sourceAgentPosition);
                 }
                 playerDoneSet.add(actionToken.getActionSource());
                 return actionToken.getDealerNextActionToken();
@@ -350,6 +372,7 @@ public class Dealer extends Agent {
             if (actionToken.getPlayerHandMap().containsKey(agentPosition)) {
                 if (agentPosition == AgentPosition.DEALER) { continue; }
                 if (playerWagerMap.containsKey(agentPosition)) { continue; }
+                if (playerDoneSet.contains(agentPosition)) { continue; }
 
                 ActionToken requestWagerActionToken = new ActionToken.Builder(actionToken)
                                                                      .withAction(Action.REQUEST_WAGER)

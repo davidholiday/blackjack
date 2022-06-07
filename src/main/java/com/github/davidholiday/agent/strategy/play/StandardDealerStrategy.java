@@ -15,6 +15,7 @@ public class StandardDealerStrategy extends DealerStrategy {
 
     @Override
     public Action evaluateForSoft(Hand hand, ActionToken actionToken) {
+        //LOG.info("dealer hand is: {}", hand.toStringFull());
         if (hand.isSoft() == false) { return Action.NONE; }
 
         boolean hitSoft17 = actionToken.getRuleSet().contains(Rule.DEALER_CAN_HIT_SOFT_17);
@@ -28,6 +29,7 @@ public class StandardDealerStrategy extends DealerStrategy {
 
     @Override
     public Action evaluateForHard(Hand hand, ActionToken actionToken) {
+        //LOG.info("dealer hand is: {}", hand.toStringFull());
         if (hand.getHandValue() < 17) { return Action.HIT; }
         else if (hand.isBust() == false){ return Action.STAND; }
         else { return Action.NONE; }
