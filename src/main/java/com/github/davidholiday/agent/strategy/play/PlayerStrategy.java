@@ -46,8 +46,6 @@ public abstract class PlayerStrategy implements PlayStrategy {
         return Action.NONE;
     }
 
-    public abstract double wager(int count, ActionToken actionToken);
-
     public abstract Action evaluateHandForInsurance(Hand hand, int count, ActionToken actionToken);
 
     public abstract Action evaluateForSurrender(Hand hand, int count, ActionToken actionToken);

@@ -73,6 +73,10 @@ public class RuleSet {
     public void validateRuleSet(Set<Rule> ruleSet) {
         String errorMessage = "";
 
+        if (ruleSet.contains(PLAYER_CAN_EARLY_SURRENDER)) {
+            throw new IllegalStateException("rule PLAYER_CAN_EARLY_SURRENDER is not currently implemented by simulator");
+        }
+
         // ensure ruleset contains one and only one deck definition
         //
         int expectedDeckRules = 1;
