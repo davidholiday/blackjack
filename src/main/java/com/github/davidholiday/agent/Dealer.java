@@ -306,7 +306,7 @@ public class Dealer extends Agent {
                 double offeredMoney = actionToken.getOfferedMoney();
                 // playerWager is defined in SURRENDER scope...
                 playerWager = playerWagerMap.get(sourceAgentPosition);
-                if (offeredMoney != playerWager * 2) {
+                if (offeredMoney != playerWager) {
                     String msg = sourceAgentPosition + " attempted to DOUBLE with incorrect DOUBLE bet value!";
                     throw new IllegalStateException(msg);
                 }
