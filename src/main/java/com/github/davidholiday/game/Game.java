@@ -171,7 +171,9 @@ public class Game {
             ActionToken currentActionToken = actionBroker.send(actionToken);
             int cycleCount = 0;
             while (currentActionToken.getActionTarget() != AgentPosition.GAME) {
-                if (cycleCount > CIRCUIT_BREAKER_FOR_ROUNDS) { break; }
+                if (cycleCount > CIRCUIT_BREAKER_FOR_ROUNDS) {
+                    throw new IllegalStateException("circuit breaker tripped - halting on error");
+                }
 
                 // ensures token that gets passed has correct ruleset and playerhandmap values
                 boolean ruleSetOk = currentActionToken.getRuleSet() == getRuleSet();
