@@ -45,6 +45,9 @@ public class App {
                             .withRuleSet(ruleSet)
                             .build();
 
+        /*
+         TODO make a parallel stream of these and activate them in parallel
+         */
         game.playRounds(300);
 
     }
