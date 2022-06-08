@@ -20,7 +20,7 @@
     </filter>
     <filter class="ch.qos.logback.classic.filter.LevelFilter">
       <level>INFO</level>
-      <onMatch>ACCEPT</onMatch>
+      <onMatch>DENY</onMatch>
       <onMismatch>NEUTRAL</onMismatch>
     </filter>
     <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -34,14 +34,14 @@
   </appender>
 
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file> log-${byDay}-DEBUG.txt </file>
+    <file> logs/log-${byDay}-.txt </file>
     <append>true</append>
     <encoder>
       <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
     </encoder>
   </appender>
 
-  <root level="debug">
+  <root level="info">
     <appender-ref ref="FILE" />
     <appender-ref ref="STDOUT" />
   </root>

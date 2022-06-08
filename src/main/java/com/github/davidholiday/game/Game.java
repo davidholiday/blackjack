@@ -16,8 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 
-public class Game {
+public class Game implements Callable<Integer> {
 
     public static final int CIRCUIT_BREAKER_FOR_ROUNDS = 1000;
 
@@ -32,6 +33,8 @@ public class Game {
 
     private ActionBroker actionBroker;
 
+    private int numRounds = 1;
+
     public static class Builder {
         private RuleSet ruleSet = new RuleSet();
 
@@ -39,6 +42,8 @@ public class Game {
         private Shoe shoe = new Shoe(6);
         private Dealer dealer = new Dealer(standardDealerStrategy, shoe);
         private Map<AgentPosition, Player> playerMap;
+
+        private int numRounds = 1;
 
         public Builder() {
             this.playerMap = new HashMap<>();
@@ -72,6 +77,15 @@ public class Game {
             return this;
         }
 
+        public Builder withNumRounds(int numRounds) {
+            if (numRounds < 1) {
+                throw new IllegalArgumentException("numRounds can't be less than 1");
+            }
+
+            this.numRounds = numRounds;
+            return this;
+        }
+
         public Game build() {
             Game game = new Game();
 
@@ -88,6 +102,7 @@ public class Game {
             }
             game.agentMap = Collections.unmodifiableMap(agentMap);
             game.actionBroker = new ActionBroker(game.agentMap);
+            game.numRounds = numRounds;
             return game;
         }
 
@@ -149,16 +164,16 @@ public class Game {
     }
     private Game() {}
 
-    public void playRounds(int rounds) {
+    public Integer call() {
 
-        LOG.info("*!* BEGIN RUN OF " + rounds + " ROUNDS *!* ");
+        LOG.info("*!* BEGIN RUN OF " + numRounds + " ROUNDS *!* ");
         LOG.info("playerMap is: {}", playerMap);
 
         for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
             LOG.info("{} has bankroll of ${}", agentMapEntry.getKey(), agentMapEntry.getValue().getBankroll());
         }
 
-        for (int i = 0; i < rounds; i ++) {
+        for (int i = 0; i < numRounds; i ++) {
             LOG.info("*!* ROUND START *!* ");
             ActionToken actionToken = new ActionToken.Builder()
                                                      .withAction(Action.GAME_START)
@@ -200,6 +215,8 @@ public class Game {
                 LOG.info("{} has bankroll of ${}", agentMapEntry.getKey(), agentMapEntry.getValue().getBankroll());
             }
         }
+
+        return numRounds;
     }
 
     public RuleSet getRuleSet() { return ruleSet; }

@@ -32,6 +32,12 @@
       <version>1.2.11</version>
     </dependency>
 
+    <dependency>
+      <groupId>me.tongfei</groupId>
+      <artifactId>progressbar</artifactId>
+      <version>0.9.3</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -90,7 +96,7 @@
 
     <!--
      TODO
-     MOVE PLUGIN DATA FROM PLUGINMANAGEMENT INTO PLUGIN SECTION. THAT SEEMS TO DORK THINGS UP IN SOME WAYS...
+     MOVE PLUGIN DATA FROM PLUGIN-MANAGEMENT INTO PLUGIN SECTION. THAT SEEMS TO DORK THINGS UP IN SOME WAYS...
      -->
     <plugins>
       <plugin>
