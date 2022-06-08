@@ -34,56 +34,71 @@ public class App {
 
     public static void main( String[] args ) throws InterruptedException, ExecutionException {
 
-        int numRounds = 1;
+        int totalRounds = 1;
         if (args.length == 1) {
             try {
-                numRounds = Integer.parseInt(args[0]);
-                if (numRounds < 1) { throw new NumberFormatException();}
+                totalRounds = Integer.parseInt(args[0]);
+                if (totalRounds < 1) { throw new NumberFormatException();}
             } catch (NumberFormatException e) {
                 LOG.error("numRounds argument must be a positive number greater than zero!");
                 System.exit(8);
             }
         }
 
+        int numWorkers = RUNTIME_INFO.AVAILABLE_PROCESSORS * 2;
+
+        // each "game" object represents a unit of work for a worker
+        // what we want is to create between (1) and (RUNTIME_INFO.AVAILABLE_PROCESSORS * 2) game objects
+        // for the workers to chew on per evolution
         int gameListSize =
-                numRounds <= SINGLE_WORKER_ROUND_THRESHOLD
-                ? numRounds
-                : Math.min((numRounds / SINGLE_WORKER_ROUND_THRESHOLD), RUNTIME_INFO.AVAILABLE_PROCESSORS * 2);
+                totalRounds <= SINGLE_WORKER_ROUND_THRESHOLD
+                        ? totalRounds
+                        : Math.min((totalRounds / SINGLE_WORKER_ROUND_THRESHOLD), RUNTIME_INFO.AVAILABLE_PROCESSORS * 2);
 
-        List<Game> gameList = getGameList(gameListSize, numRounds);
-        ExecutorService executor = Executors.newFixedThreadPool(RUNTIME_INFO.AVAILABLE_PROCESSORS);
+        // this is how many rounds of blackjack each game obj will perform
+        // also - this is the amount of 'work' each worker will undertake per evolution
+        int roundsPerWorker = Math.min((totalRounds / numWorkers), SINGLE_WORKER_ROUND_THRESHOLD);
 
-        ProgressBar pb = new ProgressBarBuilder().setInitialMax(numRounds)
+        // at every evolution:
+        //      gameListSize * roundsPerWorker = NUMBER OF HANDS OF BLACKJACK SIMULATED
+        int roundsPerBatch = gameListSize * roundsPerWorker;
+        int numBatches = totalRounds / roundsPerBatch;
+        int numRoundsRemainder = totalRounds % roundsPerBatch;
+
+
+        List<Game> gameList = getGameList(gameListSize, roundsPerWorker);
+        ExecutorService executor = Executors.newFixedThreadPool(numWorkers);
+
+        ProgressBar pb = new ProgressBarBuilder().setInitialMax(totalRounds)
                                                  .setTaskName("Simulating Rounds of BlackJack")
-                                                 .setInitialMax(numRounds)
+                                                 .setInitialMax(totalRounds)
                                                  .build();
 
+        for (int i = 0; i < numBatches; i ++) {
+            List<Future<Integer>> resultsList = executor.invokeAll(gameList);
 
-        List<Future<Integer>> resultsList = executor.invokeAll(gameList);
-
-        for (Future<Integer> future : resultsList) {
-            pb.stepBy(Long.valueOf(future.get()));
-            pb.refresh();
+            for (Future<Integer> future : resultsList) {
+                pb.stepBy(Long.valueOf(future.get()));
+                pb.refresh();
+            }
         }
+        // and now for the +1
+        if (numRoundsRemainder > 0) {
+            List<Game> gameListRemainder = getGameList(1, numRoundsRemainder);
+            List<Future<Integer>> resultsList = executor.invokeAll(gameListRemainder);
+
+            for (Future<Integer> future : resultsList) {
+                pb.stepBy(Long.valueOf(future.get()));
+                pb.refresh();
+            }
+        }
+
 
         executor.shutdown();
 
 
 
 
-//
-//        /*
-//
-//        TODO this might create problems as I'm not sure the worker that gets assigned to a given element in the
-//        TODO   parallel stream is guaranteed to be the worker that sees all of the work through for a given
-//        TODO   game object...
-//        TODO     maybe change the Game class to be a Runnable with a baked-in number of rounds?
-//        TODO     this way you can use an ExecutorService and have more control over what's going on ...
-//
-//        also this
-//        https://dzone.com/articles/be-aware-of-forkjoinpoolcommonpool
-//
-//
 //        v------------ these two are the way -----v
 //        https://mkyong.com/logging/logback-different-log-file-for-each-thread/
 //
@@ -98,47 +113,24 @@ public class App {
 //information, such as the client id, client's IP address, request parameters etc. into the MDC. Logback components, if
 //appropriately configured, will automatically include this information in each log entry.
 //"
-//
-//
-//         */
-//        int numWorkers = RUNTIME_INFO.AVAILABLE_PROCESSORS;
-//        if (numRounds < SINGLE_WORKER_ROUND_THRESHOLD) {
-//            LOG.info("running in single thread for: {} rounds", numRounds);
-//            gameList.get(0).playRounds(numRounds);
-//        } else {
-//            LOG.info("will spin up: {} threads for: rounds", numRounds);
-//            int roundsPerWorker = numRounds / numWorkers;
-//            int roundsPerWorkerRemainder = numRounds % numWorkers;
-//            LOG.info("{} rounds will be handled per thread", roundsPerWorker);
-//            if (roundsPerWorkerRemainder > 0) {
-//                LOG.info("handling remainder of {} rounds in single thread first", roundsPerWorkerRemainder);
-//                gameList.get(0).playRounds(roundsPerWorkerRemainder);
-//                LOG.info("done!");
-//            }
-//            LOG.info("starting workers...");
-//            gameList.parallelStream().forEach(g -> g.playRounds(roundsPerWorker));
-//            LOG.info("done!");
-//        }
-//
-//        // again -- this will work once the game object has a proper copy constructor...
-//        //Collections.nCopies(numWorkers, game);
-//
+
     }
 
     /**
      * doing it this way for now because a copy constructor would involve a lot of deep copy work that I
      * don't want to do right now...
+     *
+     * also - this is wonky AF but I want to be able to report intermediate results and the java future/callable
+     * interface doesn't provide that. it wants to frame things in terms of when things are done. given that I
+     * may want to spin up a simulation of millions of hands, waiting that long to update the progress bar is not an
+     * option.
+     *
      * @return
      */
-    private static List<Game> getGameList(int gameListSize, int numRounds) {
+    private static List<Game> getGameList(int gameListSize, int roundsPerWorker) {
+
         List<Game> gameList = new ArrayList<>();
-        int roundsPerWorker = SINGLE_WORKER_ROUND_THRESHOLD;
-        int roundsPerWorkerRemainder = numRounds % gameListSize;
-        int finalWorkerRounds = roundsPerWorker + roundsPerWorkerRemainder;
-
         for (int i = 0; i < gameListSize; i ++)  {
-            int roundsForThisWorker = (i < gameListSize - 1) ? roundsPerWorker : finalWorkerRounds;
-
             NoCountStrategy noCountStrategy = new NoCountStrategy();
             BasicFourSixEightDeckPlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
             Player playerOne = new Player(noCountStrategy, playerStrategy, 10);
@@ -156,7 +148,7 @@ public class App {
                                 .withPlayerAtPosition(playerOne, AgentPosition.PLAYER_ONE)
                                 .withPlayerAtPosition(playerTwo, AgentPosition.PLAYER_TWO)
                                 .withRuleSet(ruleSet)
-                                .withNumRounds(roundsForThisWorker)
+                                .withNumRounds(roundsPerWorker)
                                 .build();
 
             gameList.add(game);
