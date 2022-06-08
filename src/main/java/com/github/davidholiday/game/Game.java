@@ -15,10 +15,15 @@ import com.github.davidholiday.util.MessageTemplates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.transform.Result;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Game implements Callable<Integer> {
+
+    private final LinkedBlockingQueue<Result> results = new LinkedBlockingQueue<Result>();
+
 
     public static final int CIRCUIT_BREAKER_FOR_ROUNDS = 1000;
 
@@ -163,6 +168,10 @@ public class Game implements Callable<Integer> {
 
     }
     private Game() {}
+
+    public Result takeResult() throws InterruptedException {
+        return results.take();
+    }
 
     public Integer call() {
 

@@ -30,7 +30,7 @@ public class App {
 
     public static final RuntimeInfo RUNTIME_INFO = new RuntimeInfo();
 
-    public static final int SINGLE_WORKER_ROUND_THRESHOLD = 1001;
+    public static final int SINGLE_WORKER_ROUND_THRESHOLD = 1000;
 
     public static void main( String[] args ) throws InterruptedException, ExecutionException {
 
@@ -45,51 +45,26 @@ public class App {
             }
         }
 
-//        int gameListSize =
-//                numRounds < SINGLE_WORKER_ROUND_THRESHOLD
-//                ? numRounds
-//                : RUNTIME_INFO.AVAILABLE_PROCESSORS;
+        int gameListSize =
+                numRounds <= SINGLE_WORKER_ROUND_THRESHOLD
+                ? numRounds
+                : Math.min((numRounds / SINGLE_WORKER_ROUND_THRESHOLD), RUNTIME_INFO.AVAILABLE_PROCESSORS * 2);
 
-        int gameListSize = Math.min(numRounds, 100);
         List<Game> gameList = getGameList(gameListSize, numRounds);
         ExecutorService executor = Executors.newFixedThreadPool(RUNTIME_INFO.AVAILABLE_PROCESSORS);
 
-
-
-
         ProgressBar pb = new ProgressBarBuilder().setInitialMax(numRounds)
-                                                      .setTaskName("Simulating Rounds of BlackJack")
-                                                      .setInitialMax(numRounds)
-                                                      .build();
+                                                 .setTaskName("Simulating Rounds of BlackJack")
+                                                 .setInitialMax(numRounds)
+                                                 .build();
 
-        //System.out.println("simulating " + numRounds + " of BlackJack...");
+
         List<Future<Integer>> resultsList = executor.invokeAll(gameList);
 
-//            // me.tongfei.progressbar did not work
-//            // t/y s/o for the dead simple solution...
-//            //   https://stackoverflow.com/a/65929443
-//            StringBuilder sb = new StringBuilder();
-//            double percentComplete = 0;
-//            System.out.print("[" + String.format("%-100s", sb.toString()) + "] " +  percentComplete + "%");
-//            System.out.print("\r");
-            List<Integer> doneIndexes = new ArrayList<>();
-            while (resultsList.size() != doneIndexes.size()) {
-                for (int i=0; i < resultsList.size(); i++) {
-                    if (resultsList.get(i).isDone() && doneIndexes.contains(i) == false) {
-                        int roundsSimulated = resultsList.get(i).get();
-//                        double percentOfTotal = Double.valueOf(roundsSimulated) / numRounds;
-//                        percentComplete += percentOfTotal;
-//                        System.out.print("[" + String.format("%-100s", sb.toString()) + "] " +  percentComplete + "%");
-//                        System.out.print("\r");
-
-                        pb.stepBy(roundsSimulated);
-                        doneIndexes.add(i);
-                    }
-
-                }
-            }
-
-
+        for (Future<Integer> future : resultsList) {
+            pb.stepBy(Long.valueOf(future.get()));
+            pb.refresh();
+        }
 
         executor.shutdown();
 
@@ -157,7 +132,7 @@ public class App {
      */
     private static List<Game> getGameList(int gameListSize, int numRounds) {
         List<Game> gameList = new ArrayList<>();
-        int roundsPerWorker = numRounds / gameListSize;
+        int roundsPerWorker = SINGLE_WORKER_ROUND_THRESHOLD;
         int roundsPerWorkerRemainder = numRounds % gameListSize;
         int finalWorkerRounds = roundsPerWorker + roundsPerWorkerRemainder;
 
