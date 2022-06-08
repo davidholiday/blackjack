@@ -289,7 +289,7 @@ public class Dealer extends Agent {
                 updateBankroll(halfWager);
 
                 LOG.info("returning {} to {}", halfWager, sourceAgentPosition);
-                LOG.info("playerWagerMap is now: {}", playerWagerMap);
+                LOG.debug("playerWagerMap is now: {}", playerWagerMap);
 
                 return new ActionToken.Builder(actionToken)
                                       .withAction(Action.OFFER_MONEY)

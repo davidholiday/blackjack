@@ -22,6 +22,8 @@ public class App {
 
     public static final RuntimeInfo RUNTIME_INFO = new RuntimeInfo();
 
+    public static final int SINGLE_WORKER_ROUND_THRESHOLD = 1001;
+
     public static void main( String[] args ) {
 
         List<Game> gameList = getGameList();
@@ -38,7 +40,7 @@ public class App {
         }
 
         int numWorkers = RUNTIME_INFO.AVAILABLE_PROCESSORS;
-        if (numRounds < 1001) {
+        if (numRounds < SINGLE_WORKER_ROUND_THRESHOLD) {
             LOG.info("running in single thread for: {} rounds", numRounds);
             gameList.get(0).playRounds(numRounds);
         } else {
@@ -56,7 +58,8 @@ public class App {
             LOG.info("done!");
         }
 
-        //game.playRounds(numRounds);
+        // again -- this will work once the game object has a proper copy constructor...
+        //Collections.nCopies(numWorkers, game);
 
     }
 
