@@ -50,6 +50,20 @@ public class App {
         also this
         https://dzone.com/articles/be-aware-of-forkjoinpoolcommonpool
 
+
+        v------------ these two are the way -----v
+        https://mkyong.com/logging/logback-different-log-file-for-each-thread/
+
+        https://logback.qos.ch/manual/mdc.html
+
+"
+The MDC class contains only static methods. It lets the developer place information in a diagnostic context
+that can be subsequently retrieved by certain logback components. The MDC manages contextual information on a per
+thread basis. Typically, while starting to service a new client request, the developer will insert pertinent contextual
+information, such as the client id, client's IP address, request parameters etc. into the MDC. Logback components, if
+appropriately configured, will automatically include this information in each log entry.
+"
+
          */
         int numWorkers = RUNTIME_INFO.AVAILABLE_PROCESSORS;
         if (numRounds < SINGLE_WORKER_ROUND_THRESHOLD) {

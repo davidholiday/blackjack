@@ -12,8 +12,6 @@ import java.util.Objects;
 
 public class Hand extends CardCollection {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Deck.class);
-
     private int handValue;
 
     private int aceSpecialHandValue;
