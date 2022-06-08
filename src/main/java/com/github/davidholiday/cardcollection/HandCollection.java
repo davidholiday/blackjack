@@ -14,8 +14,6 @@ public class HandCollection {
 
     private static final Logger LOG = LoggerFactory.getLogger(HandCollection.class);
 
-    private final List<Integer> playedHands = new ArrayList<>();
-
     private final List<Hand> handList;
 
     private final Optional<Rule> resplitToRuleOptional;
@@ -33,7 +31,7 @@ public class HandCollection {
 
         resplitToRuleOptional = tempOptional.isEmpty() ? tempOptional : Optional.of(tempOptional.get());
 
-        // this will help prevent resplits beyond what the rules say is allowable
+        // this will help prevent resplits beyond what the rules say is allowable by making the handList fixed size
         if (resplitToRuleOptional.isPresent()) {
             switch (resplitToRuleOptional.get()) {
                 case PLAYER_CAN_RESPLIT_TO_FOUR_HANDS:
