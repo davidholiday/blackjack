@@ -19,6 +19,8 @@ public abstract class Agent {
 
     private final Hand hand;
 
+//    private final List<Hand> splitHands = new ArrayList<>();
+
     private final CountStrategy countStrategy;
 
     private final PlayStrategy playStrategy;
@@ -50,6 +52,14 @@ public abstract class Agent {
     public Hand getHand() {
         return new Hand(hand);
     }
+
+//    public List<Hand> getSplitHands() {
+//        return splitHands.stream()
+//                         .map(h -> new Hand(h))
+//                         .collect(Collectors.toList());
+//    }
+
+
 
     public void addCardToHand(Card card) {
         hand.addCards(Stream.of(card).collect(Collectors.toList()));

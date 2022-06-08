@@ -39,6 +39,18 @@ public class App {
             }
         }
 
+        /*
+
+        TODO this might create problems as I'm not sure the worker that gets assigned to a given element in the
+        TODO   parallel stream is guaranteed to be the worker that sees all of the work through for a given
+        TODO   game object...
+        TODO     maybe change the Game class to be a Runnable with a baked-in number of rounds?
+        TODO     this way you can use an ExecutorService and have more control over what's going on ...
+
+        also this
+        https://dzone.com/articles/be-aware-of-forkjoinpoolcommonpool
+
+         */
         int numWorkers = RUNTIME_INFO.AVAILABLE_PROCESSORS;
         if (numRounds < SINGLE_WORKER_ROUND_THRESHOLD) {
             LOG.info("running in single thread for: {} rounds", numRounds);
