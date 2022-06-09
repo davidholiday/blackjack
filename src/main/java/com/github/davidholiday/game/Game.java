@@ -14,6 +14,7 @@ import com.github.davidholiday.util.MessageTemplates;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import javax.xml.transform.Result;
 import java.util.*;
@@ -174,6 +175,11 @@ public class Game implements Callable<Integer> {
     }
 
     public Integer call() {
+
+        // so logback can differentiate where the log streams are coming from and put the streams from
+        // each worker into its own file
+        String threadID = String.valueOf(Thread.currentThread().getId());
+        MDC.put("THREAD_LOG_ID", threadID);
 
         LOG.info("*!* BEGIN RUN OF " + numRounds + " ROUNDS *!* ");
         LOG.info("playerMap is: {}", playerMap);

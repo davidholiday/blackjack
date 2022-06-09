@@ -60,7 +60,7 @@ public class App {
         int roundsPerWorker = Math.min((totalRounds / numWorkers), SINGLE_WORKER_ROUND_THRESHOLD);
 
         // at every evolution:
-        //      gameListSize * roundsPerWorker = NUMBER OF HANDS OF BLACKJACK SIMULATED
+        //      gameListSize * roundsPerWorker = NUMBER OF ROUNDS OF BLACKJACK SIMULATED
         int roundsPerBatch = gameListSize * roundsPerWorker;
         int numBatches = totalRounds / roundsPerBatch;
         int numRoundsRemainder = totalRounds % roundsPerBatch;
@@ -71,7 +71,6 @@ public class App {
 
         ProgressBar pb = new ProgressBarBuilder().setInitialMax(totalRounds)
                                                  .setTaskName("Simulating Rounds of BlackJack")
-                                                 .setInitialMax(totalRounds)
                                                  .build();
 
         for (int i = 0; i < numBatches; i ++) {

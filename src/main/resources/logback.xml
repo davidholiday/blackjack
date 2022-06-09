@@ -3,6 +3,9 @@
   <!--
   TY past self...
   https://examples.javacodegeeks.com/core-java/logback-file-appender-example/
+
+  also so you don't forget later
+  https://logback.qos.ch/manual/layouts.html#conversionWord
   -->
 
   <timestamp key="byDay" datePattern="yyyyMMdd'T'HHmmss"/>
@@ -33,16 +36,32 @@
     </encoder>
   </appender>
 
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file> logs/log-${byDay}-.txt </file>
-    <append>true</append>
-    <encoder>
-      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
-    </encoder>
+<!--  <appender name="FILE" class="ch.qos.logback.core.FileAppender">-->
+<!--    <file> logs/${byDay}/log-${byDay}-.txt </file>-->
+<!--    <append>true</append>-->
+<!--    <encoder>-->
+<!--      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>-->
+<!--    </encoder>-->
+<!--  </appender>-->
+
+  <appender name="FILE-THREAD" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <discriminator>
+      <key>THREAD_LOG_ID</key>
+      <defaultValue>666</defaultValue>
+    </discriminator>
+    <sift>
+      <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file> logs/${byDay}/worker-${THREAD_LOG_ID}-${byDay}.log </file>
+        <append>true</append>
+        <encoder>
+          <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+      </appender>
+    </sift>
   </appender>
 
   <root level="info">
-    <appender-ref ref="FILE" />
+    <appender-ref ref="FILE-THREAD" />
     <appender-ref ref="STDOUT" />
   </root>
 
