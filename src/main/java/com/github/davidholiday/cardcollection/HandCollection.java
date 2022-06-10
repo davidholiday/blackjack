@@ -1,5 +1,6 @@
 package com.github.davidholiday.cardcollection;
 
+import com.github.davidholiday.card.Card;
 import com.github.davidholiday.game.Rule;
 import com.github.davidholiday.game.RuleSet;
 import org.slf4j.Logger;
@@ -57,8 +58,22 @@ public class HandCollection {
         handList.add(hand);
     }
 
-    public void clearHands() {
-        handList.clear();
+    public void addCardsToHand(List<Card> cardList, int handIndex) {
+        handList.get(handIndex)
+                .addCards(cardList);
+    }
+
+    public void addCardToHand(Card card, int handIndex) {
+        handList.get(handIndex)
+                .addCards(List.of(card));
+    }
+
+    public List<Card> clearHands() {
+        List<Card> rv = new ArrayList<>();
+        for (Hand hand : handList) {
+            rv.addAll(hand.getAllCards(true));
+        }
+        return rv;
     }
 
 

@@ -1,6 +1,7 @@
 package com.github.davidholiday.agent.strategy.play;
 
 import com.github.davidholiday.cardcollection.Hand;
+import com.github.davidholiday.cardcollection.HandCollection;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.game.Rule;
@@ -42,6 +43,8 @@ public class StandardDealerStrategy extends DealerStrategy {
     public double getWager(int count, ActionToken actionToken) { return 0; }
 
     @Override
-    public double getInsuranceBet(Hand hand, int count, ActionToken actionToken) { return 0; }
+    public double getInsuranceBet(Hand hand, int count, ActionToken actionToken) {
+        return 0;
+    }
 
 }

@@ -36,14 +36,6 @@
     </encoder>
   </appender>
 
-<!--  <appender name="FILE" class="ch.qos.logback.core.FileAppender">-->
-<!--    <file> logs/${byDay}/log-${byDay}-.txt </file>-->
-<!--    <append>true</append>-->
-<!--    <encoder>-->
-<!--      <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>-->
-<!--    </encoder>-->
-<!--  </appender>-->
-
   <appender name="FILE-THREAD" class="ch.qos.logback.classic.sift.SiftingAppender">
     <discriminator>
       <key>THREAD_LOG_ID</key>
