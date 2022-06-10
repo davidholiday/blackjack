@@ -128,12 +128,10 @@ public class App {
      */
     private static List<Game> getGameList(int gameListSize, int roundsPerWorker) {
 
+        List<AgentPosition> orderedPlayerList = AgentPosition.getPlayerOrderedList();
+
         List<Game> gameList = new ArrayList<>();
         for (int i = 0; i < gameListSize; i ++)  {
-            NoCountStrategy noCountStrategy = new NoCountStrategy();
-            BasicFourSixEightDeckPlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
-            Player playerOne = new Player(noCountStrategy, playerStrategy, 10);
-            Player playerTwo = new Player(noCountStrategy, playerStrategy, 10);
 
             RuleSet ruleSet = new RuleSet.Builder()
                                          .withRule(Rule.BLACKJACK_PAYS_THREE_TO_TWO)
@@ -143,9 +141,26 @@ public class App {
                                          .withRule(Rule.PLAYER_CAN_LATE_SURRENDER)
                                          .build();
 
+            AgentPosition playerPosition = orderedPlayerList.get(i);
+
+            NoCountStrategy noCountStrategy = new NoCountStrategy();
+            BasicFourSixEightDeckPlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
+
+            Player playerOne = new Player(noCountStrategy,
+                                          playerStrategy,
+                                          10,
+                                          ruleSet,
+                                          playerPosition);
+
+            Player playerTwo = new Player(noCountStrategy,
+                                          playerStrategy,
+                                   10,
+                                          ruleSet,
+                                          playerPosition);
+
             Game game = new Game.Builder()
-                                .withPlayerAtPosition(playerOne, AgentPosition.PLAYER_ONE)
-                                .withPlayerAtPosition(playerTwo, AgentPosition.PLAYER_TWO)
+                                .withPlayer(playerOne)
+                                .withPlayer(playerTwo)
                                 .withRuleSet(ruleSet)
                                 .withNumRounds(roundsPerWorker)
                                 .build();

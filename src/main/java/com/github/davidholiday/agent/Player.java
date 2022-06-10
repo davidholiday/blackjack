@@ -1,6 +1,5 @@
 package com.github.davidholiday.agent;
 
-import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.agent.strategy.count.CountStrategy;
@@ -9,22 +8,24 @@ import com.github.davidholiday.game.RuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Player extends Agent {
 
     private static final Logger LOG = LoggerFactory.getLogger(Player.class);
 
-    public Player(CountStrategy countStrategy, PlayStrategy playStrategy, int bankroll, RuleSet ruleSet) {
-        super(countStrategy, playStrategy, bankroll, ruleSet);
+    public Player(CountStrategy countStrategy,
+                  PlayStrategy playStrategy,
+                  int bankroll,
+                  RuleSet ruleSet,
+                  AgentPosition agentPosition) {
+
+        super(countStrategy, playStrategy, bankroll, ruleSet, agentPosition);
     }
 
     @Override
     public ActionToken act(ActionToken actionToken) {
         updateCount(actionToken);
 
-        Action nextAction = getNextAction(actionToken);
+        Action nextAction = getNextAction(actionToken, getCount());
         switch (nextAction) {
             case DEALER_NEXT_ACTION:
                 return actionToken.getDealerNextActionToken();
@@ -32,10 +33,16 @@ public class Player extends Agent {
                 double wager = getWager(actionToken);
                 return getOfferMoneyActionToken(actionToken, nextAction, wager);
             case TAKE_CARD:
-                addCardsToHand(actionToken.getOfferedCards());
+                addCardsToHandCollection(
+                        actionToken.getOfferedCards(),
+                        getHandIndexFromAgentPosition(actionToken.getActionTarget())
+                );
                 return actionToken.getDealerNextActionToken();
             case TAKE_INSURANCE:
-                double insuranceWager = getInsuranceBet(actionToken);
+                double insuranceWager = getInsuranceWager(
+                        actionToken,
+                        getHandIndexFromAgentPosition(actionToken.getActionTarget())
+                );
                 return getOfferMoneyActionToken(actionToken, nextAction, insuranceWager);
             case DECLINE_INSURANCE:
                 return getNextActionToken(actionToken, nextAction);
@@ -56,7 +63,7 @@ public class Player extends Agent {
             case OFFER_CARDS_FOR_DISCARD_TRAY:
                 return new ActionToken.Builder()
                                       .withAction(nextAction)
-                                      .withOfferedCards(clearHand())
+                                      .withOfferedCards(clearHands())
                                       .withActionSource(actionToken.getActionTarget())
                                       .withActionTarget(AgentPosition.DEALER)
                                       .build();

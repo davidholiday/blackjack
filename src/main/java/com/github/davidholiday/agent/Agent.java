@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public abstract class Agent {
 
@@ -31,12 +30,18 @@ public abstract class Agent {
 
     private double initialBankroll;
 
+    private AgentPosition agentPosition;
+
     private int count = 0;
 
     // records the last ante wager made so insurance and double down bets can be made
     private double lastAnteWager = 0;
 
-    public Agent(CountStrategy countStrategy, PlayStrategy playStrategy, double bankroll, RuleSet ruleSet) {
+    public Agent(CountStrategy countStrategy,
+                 PlayStrategy playStrategy,
+                 double bankroll,
+                 RuleSet ruleSet,
+                 AgentPosition agentPosition) {
 //        this.hand = new Hand();
         this.handCollection = new HandCollection(ruleSet);
 
@@ -48,6 +53,7 @@ public abstract class Agent {
         }
         this.bankroll = bankroll;
         this.initialBankroll = bankroll;
+        this.agentPosition = agentPosition;
 
     }
 
@@ -67,12 +73,33 @@ public abstract class Agent {
 //    }
 
 
+    public AgentPosition getAgentPosition() { return agentPosition; }
+
+    public AgentPosition getAgentPositionFromHandIndex(int handIndex) {
+        return AgentPosition.getAgentHandList(agentPosition)
+                            .get(handIndex);
+    }
 
     public int getHandIndexFromAgentPosition(AgentPosition agentPosition) {
-        String indexString = agentPosition.toString()
-                                          .split("$H")[1];
+        try {
+            String indexString = agentPosition.toString()
+                                              .split("$H")[1];
 
-        return Integer.parseInt(indexString);
+            return Integer.parseInt(indexString);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return 0;
+        }
+    }
+
+    public Map<AgentPosition, Hand> getAllHands() {
+        Map<AgentPosition, Hand> agentHandMap = new HashMap<>();
+        List<Hand> handList = getHandCollection();
+        for (int i = 0; i < handList.size(); i ++) {
+            AgentPosition agentPosition = getAgentPositionFromHandIndex(i);
+            agentHandMap.put(agentPosition, handList.get(i));
+        }
+
+        return agentHandMap;
     }
 
     public Hand getHand(int handIndex) {
@@ -90,7 +117,7 @@ public abstract class Agent {
         handCollection.addCardsToHand(cardList, handIndex);
     }
 
-    public void addCardToHand(Card card, int handIndex) {
+    public void addCardToHandCollection(Card card, int handIndex) {
         handCollection.addCardToHand(card, handIndex);
     }
 
@@ -149,7 +176,7 @@ public abstract class Agent {
 
     double getLastAnteWager() { return lastAnteWager; }
 
-    double getInsuranceBet(ActionToken actionToken, int handIndex) {
+    double getInsuranceWager(ActionToken actionToken, int handIndex) {
 //        double insurance = playStrategy.getInsuranceBet(hand, getCount(), actionToken);
         Hand hand = handCollection.getHand(handIndex);
         double insurance = playStrategy.getInsuranceBet(hand, getCount(), actionToken);

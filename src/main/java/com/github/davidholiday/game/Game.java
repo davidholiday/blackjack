@@ -46,7 +46,7 @@ public class Game implements Callable<Integer> {
 
         private final DealerStrategy standardDealerStrategy = new StandardDealerStrategy();
         private Shoe shoe = new Shoe(6);
-        private Dealer dealer = new Dealer(standardDealerStrategy, shoe);
+        private Dealer dealer = new Dealer(standardDealerStrategy, shoe, ruleSet);
         private Map<AgentPosition, Player> playerMap;
 
         private int numRounds = 1;
@@ -55,7 +55,9 @@ public class Game implements Callable<Integer> {
             this.playerMap = new HashMap<>();
         }
 
-        public Builder withPlayerAtPosition(Player player, AgentPosition agentPosition) {
+        public Builder withPlayer(Player player) {
+            AgentPosition agentPosition = player.getAgentPosition();
+
             if (agentPosition == AgentPosition.DEALER
                     || agentPosition == AgentPosition.FIRST_BASE
                     || agentPosition == AgentPosition.SHORT_STOP
@@ -239,7 +241,14 @@ public class Game implements Callable<Integer> {
 
     public Map<AgentPosition, Hand> getPlayerHandMap() {
         Map<AgentPosition, Hand> playerHandMap = new HashMap<>();
-        playerMap.forEach((k, v) -> playerHandMap.put(k, v.h /*v.getHand()*/));
+
+        for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
+            Map<AgentPosition, Hand> agentHandMap = agentMapEntry.getValue().getAllHands();
+            for (Map.Entry<AgentPosition, Hand> agentHandMapEntry : agentHandMap.entrySet()) {
+                playerHandMap.put(agentHandMapEntry.getKey(), agentHandMapEntry.getValue());
+            }
+        }
+
         playerHandMap.put(AgentPosition.DEALER, dealer.getHand());
         return playerHandMap;
     }

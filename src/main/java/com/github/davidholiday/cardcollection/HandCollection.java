@@ -51,7 +51,8 @@ public class HandCollection {
             handList = Arrays.asList(new Hand[1]);
         }
 
-
+        // made sure there's always at least one hand object in the collection
+        handList.add(new Hand());
     }
 
     public void addHand(Hand hand) {
@@ -77,6 +78,9 @@ public class HandCollection {
         for (Hand hand : handList) {
             rv.addAll(hand.getAllCards(true));
         }
+        handList.clear();
+        // made sure there's at least one always one hand object in the collection
+        handList.add(new Hand());
         return rv;
     }
 

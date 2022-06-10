@@ -38,7 +38,14 @@ public class ActionBroker {
 
     public ActionToken send(ActionToken actionToken) {
 
+        // route the message to where it needs to go without removing the hand data the agent might need
         AgentPosition actionTarget = actionToken.getActionTarget();
+        if (actionTarget.toString().contains("$")) {
+            String actionTargetString = actionTarget.toString().split("$")[0];
+            actionTarget = AgentPosition.valueOf(actionTargetString);
+
+        }
+
         if (this.agentMap.containsKey(actionTarget) == false) {
             throw new IllegalArgumentException("action target: " + actionTarget + " not found in agentMap");
         }
@@ -57,7 +64,14 @@ public class ActionBroker {
 
     public ActionToken send(ActionToken actionToken, Map<AgentPosition, Agent> agentMap) {
 
+        // route the message to where it needs to go without removing the hand data the agent might need
         AgentPosition actionTarget = actionToken.getActionTarget();
+        if (actionTarget.toString().contains("$")) {
+            String actionTargetString = actionTarget.toString().split("$")[0];
+            actionTarget = AgentPosition.valueOf(actionTargetString);
+
+        }
+
         if (agentMap.containsKey(actionTarget) == false) {
             throw new IllegalArgumentException("action target: " + actionTarget + " not found in agentMap");
         }
@@ -75,5 +89,7 @@ public class ActionBroker {
     //
     // TODO serialize() and flush methods for the flight recorder
     // TODO flight recorder should get serialized into a json object
+    //
+    // TODO flight recorder should export data in human readable format
     //
 }

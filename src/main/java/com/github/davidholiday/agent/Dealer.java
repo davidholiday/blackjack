@@ -58,7 +58,7 @@ public class Dealer extends Agent {
         ).collect(Collectors.toList());
 
     public Dealer(PlayStrategy playStrategy, Shoe shoe, RuleSet ruleSet) {
-        super(new NoCountStrategy(), playStrategy, Integer.MAX_VALUE, ruleSet);
+        super(new NoCountStrategy(), playStrategy, Integer.MAX_VALUE, ruleSet, DEALER);
         this.shoe = shoe;
     }
 
@@ -122,7 +122,10 @@ public class Dealer extends Agent {
             case OFFER_CARDS:
                 if (actionToken.getOfferedCards().size() > 0) {
                     if (actionToken.getActionSource() == DEALER && actionToken.getActionTarget() == DEALER) {
-                        addCardsToHand(actionToken.getOfferedCards());
+                        addCardsToHandCollection(
+                                actionToken.getOfferedCards(),
+                                getHandIndexFromAgentPosition(DEALER)
+                        );
 
 // FOR TESTING INSURANCE BETS AND BLACKJACK DETECTION
 //                        clearHand();
@@ -198,7 +201,7 @@ public class Dealer extends Agent {
                 // fall into GAME_END
             case GAME_END:
                 // clear dealer hand first
-                addCardsToDiscardTray(clearHand());
+                addCardsToDiscardTray(clearHands());
 
                 // now do player hands
                 Optional<ActionToken> getClearHandActionToken = getClearHandActionToken(actionToken);
@@ -268,7 +271,7 @@ public class Dealer extends Agent {
                 }
 
                 if (actionToken.getActionSource() == DEALER && actionToken.getActionTarget() == DEALER) {
-                    addCardsToDiscardTray(clearHand());
+                    addCardsToDiscardTray(clearHands());
                 }
                 addCardsToDiscardTray(actionToken.getOfferedCards());
                 return actionToken.getDealerNextActionToken();
@@ -375,10 +378,9 @@ public class Dealer extends Agent {
 
     }
 
-    @Override
     public Hand getHand() {
-        if (hideHoleCard == false) { return super.getHand(); }
-        Hand hand = super.getHand();
+        if (hideHoleCard == false) { return super.getHandCollection().get(0); }
+        Hand hand = super.getHandCollection().get(0);
         if (hand.getCardListSize() > 0) {
             Card card = new Card(CardType.HIDDEN, CardSuit.NONE);
             hand.replace(card, 0);
@@ -387,7 +389,7 @@ public class Dealer extends Agent {
         return hand;
     }
 
-    public Hand getHandInternal() { return super.getHand(); }
+    public Hand getHandInternal() { return super.getHandCollection().get(0); }
 
     public int getShoeDeckSize() { return shoe.getCardListSize() / GeneralUtils.DECK_SIZE_NO_JOKERS; }
 
@@ -590,7 +592,7 @@ public class Dealer extends Agent {
             throw new IllegalStateException(msg);
         }
         if (playerDoneSet.contains(DEALER)) { return Optional.empty(); }
-        Action dealerAction = getNextAction(actionToken);
+        Action dealerAction = getNextAction(actionToken, 0);
 
         ActionToken requestDealerPlayActionToken = new ActionToken.Builder(actionToken)
                                                                   .withAction(dealerAction)

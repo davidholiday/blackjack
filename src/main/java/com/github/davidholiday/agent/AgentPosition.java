@@ -48,7 +48,19 @@ public enum AgentPosition {
     PLAYER_SEVEN$H4,
     NONE;
 
-    public List<AgentPosition> getAgentHandList(AgentPosition agentPosition) {
+    public static List<AgentPosition> getPlayerOrderedList() {
+        return List.of(
+                PLAYER_ONE,
+                PLAYER_TWO,
+                PLAYER_THREE,
+                PLAYER_FOUR,
+                PLAYER_FIVE,
+                PLAYER_SIX,
+                PLAYER_SEVEN
+        );
+    }
+
+    public static List<AgentPosition> getAgentHandList(AgentPosition agentPosition) {
 
         switch (agentPosition) {
             case PLAYER_ONE:
@@ -106,7 +118,6 @@ public enum AgentPosition {
 
     }
 
-    public AgentPosition getAgentPositionFromHandIndex(AgentPosition agentPosition, int handIndex) {
-        return getAgentHandList(agentPosition).get(handIndex);
-    }
+
+
 }
