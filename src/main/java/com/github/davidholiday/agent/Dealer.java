@@ -57,8 +57,8 @@ public class Dealer extends Agent {
                 DEALER
         ).collect(Collectors.toList());
 
-    public Dealer(PlayStrategy playStrategy, Shoe shoe) {
-        super(new NoCountStrategy(), playStrategy, Integer.MAX_VALUE);
+    public Dealer(PlayStrategy playStrategy, Shoe shoe, RuleSet ruleSet) {
+        super(new NoCountStrategy(), playStrategy, Integer.MAX_VALUE, ruleSet);
         this.shoe = shoe;
     }
 

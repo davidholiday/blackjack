@@ -66,6 +66,26 @@ public abstract class Agent {
 //        hand.addCards(cardList);
 //    }
 
+
+
+    public int getHandIndexFromAgentPosition(AgentPosition agentPosition) {
+        String indexString = agentPosition.toString()
+                                          .split("$H")[1];
+
+        return Integer.parseInt(indexString);
+    }
+
+    public Hand getHand(int handIndex) {
+        return new Hand(handCollection.getHand(handIndex));
+    }
+
+    public List<Hand> getHandCollection() {
+        return handCollection.getHandList()
+                             .stream()
+                             .map(h -> new Hand(h))
+                             .collect(Collectors.toList());
+    }
+
     public void addCardsToHandCollection(List<Card> cardList, int handIndex) {
         handCollection.addCardsToHand(cardList, handIndex);
     }
@@ -97,7 +117,8 @@ public abstract class Agent {
 //    Action getNextAction(ActionToken actionToken) { return playStrategy.evaluateHand(hand, count, actionToken); }
 
     Action getNextAction(ActionToken actionToken, int handIndex) {
-        return playStrategy.evaluateHand(handCollection, handIndex, count, actionToken);
+        Hand hand = handCollection.getHand(handIndex);
+        return playStrategy.evaluateHand(hand, count, actionToken);
     }
 
 
@@ -130,7 +151,8 @@ public abstract class Agent {
 
     double getInsuranceBet(ActionToken actionToken, int handIndex) {
 //        double insurance = playStrategy.getInsuranceBet(hand, getCount(), actionToken);
-        double insurance = playStrategy.getInsuranceBet(handCollection, handIndex, getCount(), actionToken);
+        Hand hand = handCollection.getHand(handIndex);
+        double insurance = playStrategy.getInsuranceBet(hand, getCount(), actionToken);
         updateBankroll(-insurance);
         return insurance;
     }

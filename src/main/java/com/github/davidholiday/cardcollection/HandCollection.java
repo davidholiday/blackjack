@@ -58,6 +58,10 @@ public class HandCollection {
         handList.add(hand);
     }
 
+    public Hand getHand(int handIndex) { return handList.get(handIndex); }
+
+    public List<Hand> getHandList() { return handList; }
+
     public void addCardsToHand(List<Card> cardList, int handIndex) {
         handList.get(handIndex)
                 .addCards(cardList);

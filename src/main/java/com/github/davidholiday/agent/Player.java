@@ -5,6 +5,7 @@ import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.agent.strategy.count.CountStrategy;
 import com.github.davidholiday.agent.strategy.play.PlayStrategy;
+import com.github.davidholiday.game.RuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +16,8 @@ public class Player extends Agent {
 
     private static final Logger LOG = LoggerFactory.getLogger(Player.class);
 
-    public Player(CountStrategy countStrategy, PlayStrategy playStrategy, int bankroll) {
-        super(countStrategy, playStrategy, bankroll);
+    public Player(CountStrategy countStrategy, PlayStrategy playStrategy, int bankroll, RuleSet ruleSet) {
+        super(countStrategy, playStrategy, bankroll, ruleSet);
     }
 
     @Override

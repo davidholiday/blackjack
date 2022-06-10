@@ -239,7 +239,7 @@ public class Game implements Callable<Integer> {
 
     public Map<AgentPosition, Hand> getPlayerHandMap() {
         Map<AgentPosition, Hand> playerHandMap = new HashMap<>();
-        playerMap.forEach((k, v) -> playerHandMap.put(k, v.getHand()));
+        playerMap.forEach((k, v) -> playerHandMap.put(k, v.h /*v.getHand()*/));
         playerHandMap.put(AgentPosition.DEALER, dealer.getHand());
         return playerHandMap;
     }
