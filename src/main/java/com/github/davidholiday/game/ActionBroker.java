@@ -41,9 +41,9 @@ public class ActionBroker {
         // route the message to where it needs to go without removing the hand data the agent might need
         AgentPosition actionTarget = actionToken.getActionTarget();
         if (actionTarget.toString().contains("$")) {
-            String actionTargetString = actionTarget.toString().split("$")[0];
+            // \\$ because regex
+            String actionTargetString = actionTarget.toString().split("\\$")[0];
             actionTarget = AgentPosition.valueOf(actionTargetString);
-
         }
 
         if (this.agentMap.containsKey(actionTarget) == false) {
@@ -67,7 +67,8 @@ public class ActionBroker {
         // route the message to where it needs to go without removing the hand data the agent might need
         AgentPosition actionTarget = actionToken.getActionTarget();
         if (actionTarget.toString().contains("$")) {
-            String actionTargetString = actionTarget.toString().split("$")[0];
+            // \\$ because regex
+            String actionTargetString = actionTarget.toString().split("\\$")[0];
             actionTarget = AgentPosition.valueOf(actionTargetString);
 
         }

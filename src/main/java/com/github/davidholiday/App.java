@@ -35,7 +35,7 @@ public class App {
     public static final int NUMBER_OF_WORKERS = RUNTIME_INFO.AVAILABLE_PROCESSORS * 2;
 
 
-    public static void main( String[] args ) {
+    public static void main(String[] args ) {
 
         int totalRounds = 1;
         if (args.length == 1) {
@@ -72,6 +72,9 @@ public class App {
 
         int numBatches = totalRounds / roundsPerBatch;
         int numRoundsRemainder = totalRounds % roundsPerBatch;
+
+LOG.info("totalRounds: {} gameListSize: {} roundsPerWorker: {} roundsPerBatch: {} numBatches: {} numRoundsRemainder: {}",
+         totalRounds, gameListSize, roundsPerWorker, roundsPerBatch, numBatches, numRoundsRemainder);
 
         Optional<ExecutorService> executorOptional = Optional.empty();
 
