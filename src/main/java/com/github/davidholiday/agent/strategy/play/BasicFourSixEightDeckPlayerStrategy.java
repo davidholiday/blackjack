@@ -85,8 +85,91 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
 
     @Override
     public Action evaluateForSplit(Hand hand, int count, ActionToken actionToken) {
-        if (hand.isPair()) { return Action.STAND; }
-        else { return Action.NONE; }
+        if (hand.isBust() || hand.isPair() == false) { return Action.NONE; }
+        RuleSet ruleSet = actionToken.getRuleSet();
+
+        CardType dealerUpCardType = getDealerUpCard(actionToken).getCardType();
+        switch (hand.peek(0).get(0).getCardType()) {
+            case ACE:
+                return Action.SPLIT;
+            case KING:
+                // fall into QUEEN
+            case QUEEN:
+                // fall into JACK
+            case JACK:
+                // fall into TEN
+            case TEN:
+                return Action.STAND;
+            case NINE:
+                if (dealerUpCardType == CardType.TWO
+                        || dealerUpCardType == CardType.THREE
+                        || dealerUpCardType == CardType.FOUR
+                        || dealerUpCardType == CardType.FIVE
+                        || dealerUpCardType == CardType.SIX
+                        || dealerUpCardType == CardType.EIGHT
+                        || dealerUpCardType == CardType.NINE) {
+
+                    return Action.SPLIT;
+                } else {
+                    return Action.NONE;
+                }
+            case EIGHT:
+                return Action.SPLIT;
+            case SEVEN:
+                if (dealerUpCardType == CardType.TWO
+                        || dealerUpCardType == CardType.THREE
+                        || dealerUpCardType == CardType.FOUR
+                        || dealerUpCardType == CardType.FIVE
+                        || dealerUpCardType == CardType.SIX
+                        || dealerUpCardType == CardType.SEVEN) {
+
+                    return Action.SPLIT;
+                } else {
+                    return Action.NONE;
+                }
+            case SIX:
+                if (ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_AFTER_SPLIT)
+                        && dealerUpCardType == CardType.TWO) {
+
+                    return Action.SPLIT;
+                } else if (dealerUpCardType == CardType.THREE
+                        || dealerUpCardType == CardType.FOUR
+                        || dealerUpCardType == CardType.FIVE
+                        || dealerUpCardType == CardType.SIX) {
+
+                    return Action.SPLIT;
+                } else {
+                    return Action.NONE;
+                }
+            case FIVE:
+                return Action.NONE;
+            case FOUR:
+                if (ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_AFTER_SPLIT)
+                        && (dealerUpCardType == CardType.FIVE || dealerUpCardType == CardType.FIVE)) {
+
+                    return Action.SPLIT;
+                } else {
+                    return Action.NONE;
+                }
+            case THREE:
+                // fall into TWO
+            case TWO:
+                if (ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_AFTER_SPLIT)
+                        && (dealerUpCardType == CardType.TWO || dealerUpCardType == CardType.THREE)) {
+
+                    return Action.SPLIT;
+                } else if (dealerUpCardType == CardType.FOUR
+                        || dealerUpCardType == CardType.FIVE
+                        || dealerUpCardType == CardType.SIX
+                        || dealerUpCardType == CardType.SEVEN) {
+
+                    return Action.SPLIT;
+                } else {
+                    return Action.NONE;
+                }
+            default:
+                throw new IllegalStateException("in code path that should not be possible to be in");
+        }
     }
 
     @Override

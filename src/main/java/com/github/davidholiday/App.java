@@ -73,8 +73,20 @@ public class App {
         int numBatches = totalRounds / roundsPerBatch;
         int numRoundsRemainder = totalRounds % roundsPerBatch;
 
-LOG.info("totalRounds: {} gameListSize: {} roundsPerWorker: {} roundsPerBatch: {} numBatches: {} numRoundsRemainder: {}",
-         totalRounds, gameListSize, roundsPerWorker, roundsPerBatch, numBatches, numRoundsRemainder);
+        LOG.info("*!* starting run *!*");
+        LOG.info("totalRounds: {} " +
+                        "gameListSize: {} " +
+                        "roundsPerWorker: {} " +
+                        "roundsPerBatch: {} " +
+                        "numBatches: {} " +
+                        "numRoundsRemainder: {}",
+                        totalRounds,
+                        gameListSize,
+                        roundsPerWorker,
+                        roundsPerBatch,
+                        numBatches,
+                        numRoundsRemainder
+        );
 
         Optional<ExecutorService> executorOptional = Optional.empty();
 
@@ -110,6 +122,7 @@ LOG.info("totalRounds: {} gameListSize: {} roundsPerWorker: {} roundsPerBatch: {
         }
         finally {
             if (executorOptional.isPresent()) { executorOptional.get().shutdown(); }
+            LOG.info("*!* done *!*");
         }
 
     }
@@ -142,7 +155,6 @@ LOG.info("totalRounds: {} gameListSize: {} roundsPerWorker: {} roundsPerBatch: {
 
             AgentPosition playerOnePosition = orderedPlayerList.get(0);
             AgentPosition playerTwoPosition = orderedPlayerList.get(1);
-
 
             NoCountStrategy noCountStrategy = new NoCountStrategy();
             BasicFourSixEightDeckPlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();

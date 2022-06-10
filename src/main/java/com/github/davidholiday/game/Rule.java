@@ -56,6 +56,13 @@ public enum Rule {
         ).collect(Collectors.toSet());
     }
 
+    public static Set<Rule> getPlayerSplitAcesRuleSet() {
+        return Stream.of(
+                PLAYER_CAN_RESPLIT_ACES,
+                PLAYER_CAN_HIT_SPLIT_ACES
+        ).collect(Collectors.toSet());
+    }
+
     public static Set<Rule> getBlackJackPaysRuleSet() {
         return Stream.of(
                 BLACKJACK_PAYS_THREE_TO_TWO,
