@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,7 +32,10 @@ public class App {
 
     public static final int SINGLE_WORKER_ROUND_THRESHOLD = 1000;
 
-    public static void main( String[] args ) throws InterruptedException, ExecutionException {
+    public static final int NUMBER_OF_WORKERS = RUNTIME_INFO.AVAILABLE_PROCESSORS * 2;
+
+
+    public static void main( String[] args ) {
 
         int totalRounds = 1;
         if (args.length == 1) {
@@ -45,7 +48,6 @@ public class App {
             }
         }
 
-        int numWorkers = RUNTIME_INFO.AVAILABLE_PROCESSORS * 2;
 
         // each "game" object represents a unit of work for a worker
         // what we want is to create between (1) and (RUNTIME_INFO.AVAILABLE_PROCESSORS * 2) game objects
@@ -54,64 +56,58 @@ public class App {
                 totalRounds <= SINGLE_WORKER_ROUND_THRESHOLD
                         ? totalRounds
                         : Math.min((totalRounds / SINGLE_WORKER_ROUND_THRESHOLD), RUNTIME_INFO.AVAILABLE_PROCESSORS * 2);
+        // to deal with very low values of totalRounds...
+        gameListSize = (gameListSize < 1) ? 1 : gameListSize;
+
 
         // this is how many rounds of blackjack each game obj will perform
         // also - this is the amount of 'work' each worker will undertake per evolution
-        int roundsPerWorker = Math.min((totalRounds / numWorkers), SINGLE_WORKER_ROUND_THRESHOLD);
+        int roundsPerWorker = Math.min((totalRounds / NUMBER_OF_WORKERS), SINGLE_WORKER_ROUND_THRESHOLD);
+        // to deal with very low valus of totalRounds...
+        roundsPerWorker = roundsPerWorker == 0 ? 1 : roundsPerWorker;
 
         // at every evolution:
         //      gameListSize * roundsPerWorker = NUMBER OF ROUNDS OF BLACKJACK SIMULATED
         int roundsPerBatch = gameListSize * roundsPerWorker;
+
         int numBatches = totalRounds / roundsPerBatch;
         int numRoundsRemainder = totalRounds % roundsPerBatch;
 
+        Optional<ExecutorService> executorOptional = Optional.empty();
 
-        List<Game> gameList = getGameList(gameListSize, roundsPerWorker);
-        ExecutorService executor = Executors.newFixedThreadPool(numWorkers);
+        try {
+            List<Game> gameList = getGameList(gameListSize, roundsPerWorker);
+            ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_WORKERS);
+            executorOptional = Optional.of(executor);
 
-        ProgressBar pb = new ProgressBarBuilder().setInitialMax(totalRounds)
-                                                 .setTaskName("Simulating Rounds of BlackJack")
-                                                 .build();
+            ProgressBar pb = new ProgressBarBuilder().setInitialMax(totalRounds)
+                                                     .setTaskName("Simulating Rounds of BlackJack")
+                                                     .build();
 
-        for (int i = 0; i < numBatches; i ++) {
-            List<Future<Integer>> resultsList = executor.invokeAll(gameList);
+            for (int i = 0; i < numBatches; i ++) {
+                List<Future<Integer>> resultsList = executor.invokeAll(gameList);
 
-            for (Future<Integer> future : resultsList) {
-                pb.stepBy(Long.valueOf(future.get()));
-                pb.refresh();
+                for (Future<Integer> future : resultsList) {
+                    pb.stepBy(Long.valueOf(future.get()));
+                    pb.refresh();
+                }
             }
-        }
-        // and now for the +1
-        if (numRoundsRemainder > 0) {
-            List<Game> gameListRemainder = getGameList(1, numRoundsRemainder);
-            List<Future<Integer>> resultsList = executor.invokeAll(gameListRemainder);
+            // and now for the +1
+            if (numRoundsRemainder > 0) {
+                List<Game> gameListRemainder = getGameList(1, numRoundsRemainder);
+                List<Future<Integer>> resultsList = executor.invokeAll(gameListRemainder);
 
-            for (Future<Integer> future : resultsList) {
-                pb.stepBy(Long.valueOf(future.get()));
-                pb.refresh();
+                for (Future<Integer> future : resultsList) {
+                    pb.stepBy(Long.valueOf(future.get()));
+                    pb.refresh();
+                }
             }
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.error("something went wrong executing the batch job", e);
         }
-
-
-        executor.shutdown();
-
-
-
-
-//        v------------ these two are the way -----v
-//        https://mkyong.com/logging/logback-different-log-file-for-each-thread/
-//
-//        https://logback.qos.ch/manual/mdc.html
-//
-//        https://github.com/ctongfei/progressbar
-//
-//"
-//The MDC class contains only static methods. It lets the developer place information in a diagnostic context
-//that can be subsequently retrieved by certain logback components. The MDC manages contextual information on a per
-//thread basis. Typically, while starting to service a new client request, the developer will insert pertinent contextual
-//information, such as the client id, client's IP address, request parameters etc. into the MDC. Logback components, if
-//appropriately configured, will automatically include this information in each log entry.
-//"
+        finally {
+            if (executorOptional.isPresent()) { executorOptional.get().shutdown(); }
+        }
 
     }
 
@@ -141,7 +137,9 @@ public class App {
                                          .withRule(Rule.PLAYER_CAN_LATE_SURRENDER)
                                          .build();
 
-            AgentPosition playerPosition = orderedPlayerList.get(i);
+            AgentPosition playerOnePosition = orderedPlayerList.get(0);
+            AgentPosition playerTwoPosition = orderedPlayerList.get(1);
+
 
             NoCountStrategy noCountStrategy = new NoCountStrategy();
             BasicFourSixEightDeckPlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
@@ -150,13 +148,13 @@ public class App {
                                           playerStrategy,
                                           10,
                                           ruleSet,
-                                          playerPosition);
+                                          playerOnePosition);
 
             Player playerTwo = new Player(noCountStrategy,
                                           playerStrategy,
                                    10,
                                           ruleSet,
-                                          playerPosition);
+                                          playerTwoPosition);
 
             Game game = new Game.Builder()
                                 .withPlayer(playerOne)
