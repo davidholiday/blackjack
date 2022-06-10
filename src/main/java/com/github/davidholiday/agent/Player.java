@@ -1,9 +1,12 @@
 package com.github.davidholiday.agent;
 
+import com.github.davidholiday.card.Card;
+import com.github.davidholiday.card.CardType;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.agent.strategy.count.CountStrategy;
 import com.github.davidholiday.agent.strategy.play.PlayStrategy;
+import com.github.davidholiday.game.Rule;
 import com.github.davidholiday.game.RuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +56,30 @@ public class Player extends Agent {
                 return getNextActionToken(actionToken, nextAction);
             case SPLIT:
                 //
+
+                // TODO HERE IS WHERE YOU LEFT OFF
+
+                //
+
+
+
             case DOUBLE_DOWN:
                 double doubleDownWager = getLastAnteWager();
                 return getOfferMoneyActionToken(actionToken, nextAction, doubleDownWager);
             case HIT:
-                return getNextActionToken(actionToken, nextAction);
+                int handIndex = getHandIndexFromAgentPosition(actionToken.getActionTarget());
+                Card firstCardInHand = getHand(handIndex).peek(0).get(0);
+                boolean playerCanHitSplitAces = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_HIT_SPLIT_ACES);
+
+                // the strategy object has no way of knowing whether or not it is looking at a split hand...
+                if (handIndex == 1) {
+                    return getNextActionToken(actionToken, nextAction);
+                } else if (firstCardInHand.getCardType() == CardType.ACE && playerCanHitSplitAces) {
+                    return getNextActionToken(actionToken, nextAction);
+                } else if (firstCardInHand.getCardType() != CardType.ACE) {
+                    return getNextActionToken(actionToken, nextAction);
+                }
+                // fall into STAND
             case STAND:
                 return getNextActionToken(actionToken, nextAction);
             case OFFER_CARDS_FOR_DISCARD_TRAY:

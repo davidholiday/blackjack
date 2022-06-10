@@ -37,6 +37,8 @@ public class Hand extends CardCollection {
         addCards(cardList);
     }
 
+
+
     @Override
     public void addCards(List<Card> cards) {
         super.addCards(cards);

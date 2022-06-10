@@ -145,7 +145,7 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
                 return Action.NONE;
             case FOUR:
                 if (ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_AFTER_SPLIT)
-                        && (dealerUpCardType == CardType.FIVE || dealerUpCardType == CardType.FIVE)) {
+                        && (dealerUpCardType == CardType.FIVE || dealerUpCardType == CardType.SIX)) {
 
                     return Action.SPLIT;
                 } else {
