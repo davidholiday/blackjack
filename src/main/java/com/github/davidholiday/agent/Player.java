@@ -105,6 +105,11 @@ public class Player extends Agent {
                         }
                     default:
                         // re-evaluate with pair evaluation turned off
+                        /*
+
+                        TODO this causes a stack overflow
+
+                         */
                         actionToken.getPlayerHandMap().get(actionToken.getActionTarget()).disablePairEvaluation();
                         return act(actionToken);
                 }
@@ -115,7 +120,8 @@ public class Player extends Agent {
                 return getOfferMoneyActionToken(actionToken, nextAction, doubleDownWager);
             case HIT:
                 Card firstCardInHand = getHand(handIndex).peek(1).get(0);
-                boolean playerCanHitSplitAces = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_HIT_SPLIT_ACES);
+                boolean playerCanHitSplitAces = actionToken.getRuleSet()
+                                                           .contains(Rule.PLAYER_CAN_HIT_SPLIT_ACES);
 
                 // the strategy object has no way of knowing whether or not it is looking at a split hand...
                 if (handIndex == 1) {
@@ -153,11 +159,11 @@ public class Player extends Agent {
 
     ActionToken getOfferMoneyActionToken(ActionToken actionToken, Action nextAction, double offerMoneyAmount) {
         return new ActionToken.Builder(actionToken)
-                .withActionTarget(actionToken.getActionSource())
-                .withActionSource(actionToken.getActionTarget())
-                .withAction(nextAction)
-                .withOfferedMoney(offerMoneyAmount)
-                .build();
+                              .withActionTarget(actionToken.getActionSource())
+                              .withActionSource(actionToken.getActionTarget())
+                              .withAction(nextAction)
+                              .withOfferedMoney(offerMoneyAmount)
+                              .build();
     }
 
     ActionToken getOfferMoneyActionTokenForSplit(ActionToken actionToken, Action nextAction, double offerMoneyAmount) {
@@ -165,11 +171,11 @@ public class Player extends Agent {
         int newHandIndex = handIndex + 1;
 
         return new ActionToken.Builder(actionToken)
-                .withActionTarget(actionToken.getActionSource())
-                .withActionSource(getAgentPositionFromHandIndex(newHandIndex))
-                .withAction(nextAction)
-                .withOfferedMoney(offerMoneyAmount)
-                .build();
+                              .withActionTarget(actionToken.getActionSource())
+                              .withActionSource(getAgentPositionFromHandIndex(newHandIndex))
+                              .withAction(nextAction)
+                              .withOfferedMoney(offerMoneyAmount)
+                              .build();
     }
 
 }

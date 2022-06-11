@@ -135,9 +135,17 @@ public abstract class Agent {
 
         Hand newHandTwo = new Hand();
         newHandTwo.addCards(newHandCardListTwo);
+
+        handCollection.addHand(newHandOne);
+        handCollection.addHand(newHandTwo);
     }
 
 //    public List<Card> clearHand() { return hand.getAllCards(true); }
+
+    public List<Card> clearHand(int handIndex) {
+        return handCollection.getHand(handIndex)
+                             .getAllCards(true);
+    }
 
     public List<Card> clearHands() { return handCollection.clearHands(); };
 

@@ -244,6 +244,7 @@ public class Game implements Callable<Integer> {
 
         for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
             if (agentMapEntry.getKey() == AgentPosition.DEALER) { continue; }
+
             Map<AgentPosition, Hand> agentHandMap = agentMapEntry.getValue().getAllHands();
             for (Map.Entry<AgentPosition, Hand> agentHandMapEntry : agentHandMap.entrySet()) {
                 playerHandMap.put(agentHandMapEntry.getKey(), agentHandMapEntry.getValue());

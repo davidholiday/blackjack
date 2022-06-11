@@ -236,7 +236,24 @@ public class Dealer extends Agent {
                 }
 
                 if (playerDoneSet.size() != actionToken.getPlayerHandMap().size()) {
-                    throw new IllegalStateException("players have not all completed their play at endgame state!");
+
+                    // make sure it's not because a player split their hand and the playerHandMap has been reset
+                    Set<AgentPosition> onlyH0DoneSet = new HashSet<>();
+                    for (AgentPosition agentPosition : playerDoneSet) {
+                        if (agentPosition == DEALER) { continue; }
+
+                        // \\$ because regex
+                        if (agentPosition.toString().split("\\$")[1].equals("H0")) {
+                            onlyH0DoneSet.add(agentPosition);
+                        }
+                    }
+                    onlyH0DoneSet.add(DEALER);
+
+                    if (onlyH0DoneSet.size() != actionToken.getPlayerHandMap().size()) {
+                        System.out.println(onlyH0DoneSet);
+                        System.out.println(actionToken.getPlayerHandMap());
+                        throw new IllegalStateException("players have not all completed their play at endgame state!");
+                    }
                 }
 
                 if (playerWagerMap.isEmpty() == false) {
