@@ -69,7 +69,6 @@ public class Player extends Agent {
                 boolean playerCanResplitAcesOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_ACES);
 
                 double offeredMoney = getLastAnteWager();
-
                 switch(numActiveHands) {
                     case 1:
                         if (toTwoHandsOk || toThreeHandsOk || toFourHandsOk) {
@@ -104,6 +103,7 @@ public class Player extends Agent {
                             }
                         }
                     default:
+                        LOG.debug("turning off split pair evaluation for player hand: {}", actionToken.getActionTarget());
                         // re-evaluate with pair evaluation turned off
                         ActionToken actionTokenNoSplit = new ActionToken.Builder(actionToken)
                                                                         .withEvaluatePairForSplit(false)

@@ -22,7 +22,7 @@ public class ActionToken {
 
     private int discardTrayDeckSize;
 
-    private boolean evaluatePairForSplit;
+    private boolean evaluatePairForSplit = true;
 
     public static class Builder {
 
@@ -40,7 +40,7 @@ public class ActionToken {
 
         //private int discardTrayDeckSize = 0;
 
-        private boolean evaluatePairForSplit;
+        private boolean evaluatePairForSplit = true;
 
 
         public Builder(ActionToken actionToken) {

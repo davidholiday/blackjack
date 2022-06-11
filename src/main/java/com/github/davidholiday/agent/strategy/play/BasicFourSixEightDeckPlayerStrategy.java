@@ -96,6 +96,7 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
         CardType dealerUpCardType = getDealerUpCard(actionToken).getCardType();
         switch (hand.peek(1).get(0).getCardType()) {
             case ACE:
+                LOG.warn("returning action SPLIT");
                 return Action.SPLIT;
             case KING:
                 // fall into QUEEN
@@ -179,8 +180,107 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
 
     @Override
     public Action evaluateForSoft(Hand hand, int count, ActionToken actionToken) {
-        if (hand.isSoft()) { return Action.STAND; }
-        else { return Action.NONE; }
+        // no need to evaluate if this isn't a soft hand or the action token is telling us not to
+        //   evaluate this hand for a split. the latter happens when the Player object knows the rules don't
+        //   allow things like resplit of ACEs. This method has no awareness of how many hands the player
+        //   currently has - so the flag is there to tell this method whether or not it's cool to proceed.
+        if (hand.isSoft() == false || actionToken.getEvaluatePairForSplit() == false) { return Action.NONE; }
+
+        // no need to evaluate if the hand is 21 - we're definitely going to STAND.
+        if (hand.isBlackJack() || hand.isTwentyOne()) { return Action.STAND; }
+
+        // if we're here it's because the player can't re-split ACES. the SPLIT evaluation happens before the SOFT
+        //   evaluation, which this is. Therefore, we're going to HIT regardless of dealer up card as this hand is
+        //   valued at 2/12
+        if (hand.isPair() && hand.getAceSpecialHandValue() == 12) { return Action.HIT; }
+
+        CardType dealerUpCardType = getDealerUpCard(actionToken).getCardType();
+        // ACE values are [1, 11]
+        // we need the soft value minus the ACE to make a play determination
+        int softValueNoAce = hand.getAceSpecialHandValue() - CardType.ACE.getValues()[1].getValue();
+
+        // we need the number of cards in the hand because in some cases that impacts the correct next play
+        int numCardsInHand = hand.getCardListSize();
+
+        switch (softValueNoAce) {
+            case 9:
+                return Action.STAND;
+            case 8:
+                if (dealerUpCardType == CardType.SIX && numCardsInHand == 2) {
+                    return Action.DOUBLE_DOWN;
+                } else {
+                    return Action.STAND;
+                }
+            case 7:
+                if (dealerUpCardType == CardType.TWO
+                        || dealerUpCardType == CardType.THREE
+                        || dealerUpCardType == CardType.FOUR
+                        || dealerUpCardType == CardType.FIVE
+                        || dealerUpCardType == CardType.SIX) {
+
+                    if (numCardsInHand == 2) {
+                        return Action.DOUBLE_DOWN;
+                    } else {
+                        return Action.STAND;
+                    }
+                } else if (dealerUpCardType == CardType.SEVEN
+                        || dealerUpCardType == CardType.EIGHT) {
+
+                    return Action.STAND;
+                } else {
+                    return Action.HIT;
+                }
+            case 6:
+                if (dealerUpCardType == CardType.TWO) {
+                    return Action.HIT;
+                } else if (dealerUpCardType == CardType.THREE
+                        || dealerUpCardType == CardType.FOUR
+                        || dealerUpCardType == CardType.FIVE
+                        || dealerUpCardType == CardType.SIX) {
+
+                    if (numCardsInHand == 2) {
+                        return Action.DOUBLE_DOWN;
+                    } else {
+                        return Action.HIT;
+                    }
+                } else {
+                    return Action.HIT;
+                }
+            case 5:
+                // fall into FOUR
+            case 4:
+                if (dealerUpCardType == CardType.FOUR
+                        || dealerUpCardType == CardType.FIVE
+                        || dealerUpCardType == CardType.SIX) {
+
+                    if (numCardsInHand == 2) {
+                        return Action.DOUBLE_DOWN;
+                    } else {
+                        return Action.HIT;
+                    }
+                } else {
+                    return Action.HIT;
+                }
+            case 3:
+                // fall into TWO
+            case 2:
+                if (dealerUpCardType == CardType.FIVE
+                        || dealerUpCardType == CardType.SIX) {
+
+                    if (numCardsInHand == 2) {
+                        return Action.DOUBLE_DOWN;
+                    } else {
+                        return Action.HIT;
+                    }
+                } else {
+                    return Action.HIT;
+                }
+            default:
+                LOG.warn("in code path we should not be able to access - might be a bug in the code...");
+                LOG.warn("dealer up-card type: {}  playerHand: {}", dealerUpCardType, hand);
+                return Action.NONE;
+        }
+
     }
 
     @Override
