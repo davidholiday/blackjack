@@ -96,7 +96,6 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
         CardType dealerUpCardType = getDealerUpCard(actionToken).getCardType();
         switch (hand.peek(1).get(0).getCardType()) {
             case ACE:
-                LOG.warn("returning action SPLIT");
                 return Action.SPLIT;
             case KING:
                 // fall into QUEEN
@@ -276,9 +275,7 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
                     return Action.HIT;
                 }
             default:
-                LOG.warn("in code path we should not be able to access - might be a bug in the code...");
-                LOG.warn("dealer up-card type: {}  playerHand: {}", dealerUpCardType, hand);
-                return Action.NONE;
+                throw new IllegalStateException("in code path that should not be possible to be in");
         }
 
     }
