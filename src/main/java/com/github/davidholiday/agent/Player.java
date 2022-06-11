@@ -45,6 +45,7 @@ public class Player extends Agent {
                 return actionToken.getDealerNextActionToken();
             case TAKE_CARDS_FOR_SPLIT:
                 splitHandInHandCollection(actionToken.getOfferedCards(), handIndex);
+                return actionToken.getDealerNextActionToken();
             case TAKE_INSURANCE:
                 double insuranceWager = getInsuranceWager(
                         actionToken,
@@ -67,10 +68,13 @@ public class Player extends Agent {
                 boolean toFourHandsOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_TO_FOUR_HANDS);
                 boolean playerCanResplitAcesOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_ACES);
 
+                double offeredMoney = getLastAnteWager();
+
                 switch(numActiveHands) {
                     case 1:
                         if (toTwoHandsOk || toThreeHandsOk || toFourHandsOk) {
-                            return getNextActionToken(actionToken, nextAction);
+                            updateBankroll(-offeredMoney);
+                            return getOfferMoneyActionTokenForSplit(actionToken, nextAction, offeredMoney);
                         }
                     case 2:
                         if (toThreeHandsOk || toFourHandsOk) {
@@ -81,7 +85,8 @@ public class Player extends Agent {
                                                                   .getCardType();
 
                             if (handTwoCardType == CardType.ACE && playerCanResplitAcesOk) {
-                                return getNextActionToken(actionToken, nextAction);
+                                updateBankroll(-offeredMoney);
+                                return getOfferMoneyActionTokenForSplit(actionToken, nextAction, offeredMoney);
                             }
 
                         }
@@ -94,7 +99,8 @@ public class Player extends Agent {
                                                                     .getCardType();
 
                             if (handThreeCardType == CardType.ACE && playerCanResplitAcesOk) {
-                                return getNextActionToken(actionToken, nextAction);
+                                updateBankroll(-offeredMoney);
+                                return getOfferMoneyActionTokenForSplit(actionToken, nextAction, offeredMoney);
                             }
                         }
                     default:
@@ -108,7 +114,7 @@ public class Player extends Agent {
                 double doubleDownWager = getLastAnteWager();
                 return getOfferMoneyActionToken(actionToken, nextAction, doubleDownWager);
             case HIT:
-                Card firstCardInHand = getHand(handIndex).peek(0).get(0);
+                Card firstCardInHand = getHand(handIndex).peek(1).get(0);
                 boolean playerCanHitSplitAces = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_HIT_SPLIT_ACES);
 
                 // the strategy object has no way of knowing whether or not it is looking at a split hand...
@@ -147,11 +153,23 @@ public class Player extends Agent {
 
     ActionToken getOfferMoneyActionToken(ActionToken actionToken, Action nextAction, double offerMoneyAmount) {
         return new ActionToken.Builder(actionToken)
-                              .withActionTarget(actionToken.getActionSource())
-                              .withActionSource(actionToken.getActionTarget())
-                              .withAction(nextAction)
-                              .withOfferedMoney(offerMoneyAmount)
-                              .build();
+                .withActionTarget(actionToken.getActionSource())
+                .withActionSource(actionToken.getActionTarget())
+                .withAction(nextAction)
+                .withOfferedMoney(offerMoneyAmount)
+                .build();
+    }
+
+    ActionToken getOfferMoneyActionTokenForSplit(ActionToken actionToken, Action nextAction, double offerMoneyAmount) {
+        int handIndex = getHandIndexFromAgentPosition(actionToken.getActionTarget());
+        int newHandIndex = handIndex + 1;
+
+        return new ActionToken.Builder(actionToken)
+                .withActionTarget(actionToken.getActionSource())
+                .withActionSource(getAgentPositionFromHandIndex(newHandIndex))
+                .withAction(nextAction)
+                .withOfferedMoney(offerMoneyAmount)
+                .build();
     }
 
 }

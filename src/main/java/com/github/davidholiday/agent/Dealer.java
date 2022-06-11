@@ -47,34 +47,34 @@ public class Dealer extends Agent {
 
     private List<AgentPosition> dealOrder =
             Stream.of(
+                PLAYER_ONE$H0,
                 PLAYER_ONE$H1,
                 PLAYER_ONE$H2,
                 PLAYER_ONE$H3,
-                PLAYER_ONE$H4,
+                PLAYER_TWO$H0,
                 PLAYER_TWO$H1,
                 PLAYER_TWO$H2,
                 PLAYER_TWO$H3,
-                PLAYER_TWO$H4,
+                PLAYER_THREE$H0,
                 PLAYER_THREE$H1,
                 PLAYER_THREE$H2,
                 PLAYER_THREE$H3,
-                PLAYER_THREE$H4,
+                PLAYER_FOUR$H0,
                 PLAYER_FOUR$H1,
                 PLAYER_FOUR$H2,
                 PLAYER_FOUR$H3,
-                PLAYER_FOUR$H4,
+                PLAYER_FIVE$H0,
                 PLAYER_FIVE$H1,
                 PLAYER_FIVE$H2,
                 PLAYER_FIVE$H3,
-                PLAYER_FIVE$H4,
+                PLAYER_SIX$H0,
                 PLAYER_SIX$H1,
                 PLAYER_SIX$H2,
                 PLAYER_SIX$H3,
-                PLAYER_SIX$H4,
+                PLAYER_SEVEN$H0,
                 PLAYER_SEVEN$H1,
                 PLAYER_SEVEN$H2,
                 PLAYER_SEVEN$H3,
-                PLAYER_SEVEN$H4,
                 DEALER
         ).collect(Collectors.toList());
 
@@ -326,7 +326,11 @@ public class Dealer extends Agent {
                 LOG.info("{} SPLITS", sourceAgentPosition);
                 // TODO this feels a bit dangerous. it's up to the agent to take these cards and split
                 // TODO   their current hand into two
-               return new ActionToken.Builder().withAction(Action.OFFER_CARDS_FOR_SPLIT)
+
+                playerWagerMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
+                LOG.info("playerWagerMap is now: {}", playerWagerMap);
+
+                return new ActionToken.Builder().withAction(Action.OFFER_CARDS_FOR_SPLIT)
                                                 .withActionSource(DEALER)
                                                 .withActionTarget(sourceAgentPosition)
                                                 .withOfferedCards(draw(2))

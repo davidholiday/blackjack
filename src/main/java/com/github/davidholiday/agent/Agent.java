@@ -193,6 +193,7 @@ public abstract class Agent {
 
     double getInsuranceWager(ActionToken actionToken, int handIndex) {
 //        double insurance = playStrategy.getInsuranceBet(hand, getCount(), actionToken);
+
         Hand hand = handCollection.getHand(handIndex);
         double insurance = playStrategy.getInsuranceBet(hand, getCount(), actionToken);
         updateBankroll(-insurance);

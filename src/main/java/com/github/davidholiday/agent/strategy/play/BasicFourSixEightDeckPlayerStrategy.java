@@ -89,7 +89,7 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
         RuleSet ruleSet = actionToken.getRuleSet();
 
         CardType dealerUpCardType = getDealerUpCard(actionToken).getCardType();
-        switch (hand.peek(0).get(0).getCardType()) {
+        switch (hand.peek(1).get(0).getCardType()) {
             case ACE:
                 return Action.SPLIT;
             case KING:

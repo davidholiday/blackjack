@@ -52,7 +52,7 @@
     </sift>
   </appender>
 
-  <root level="info">
+  <root level="DEBUG">
     <appender-ref ref="FILE-THREAD" />
     <appender-ref ref="STDOUT" />
   </root>
