@@ -85,7 +85,7 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
 
     @Override
     public Action evaluateForSplit(Hand hand, int count, ActionToken actionToken) {
-        if (hand.isBust() || hand.isPair() == false) { return Action.NONE; }
+        if (hand.isBust() || hand.isPair() == false || hand.getEvaluatePair() == false) { return Action.NONE; }
         RuleSet ruleSet = actionToken.getRuleSet();
 
         CardType dealerUpCardType = getDealerUpCard(actionToken).getCardType();

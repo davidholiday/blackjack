@@ -121,6 +121,22 @@ public abstract class Agent {
         handCollection.addCardToHand(card, handIndex);
     }
 
+    public void splitHandInHandCollection(List<Card> newCardList, int handIndex) {
+        if (newCardList.size() != 2) {
+            throw new IllegalArgumentException("can only split a hand when provided with exactly two new cards, yo");
+        }
+        List<Card> oldHandCardList = handCollection.popHand(handIndex).getAllCards(true);
+
+        List<Card> newHandCardListOne = List.of(oldHandCardList.get(0), newCardList.get(0));
+        List<Card> newHandCardListTwo = List.of(oldHandCardList.get(1), newCardList.get(1));
+
+        Hand newHandOne = new Hand();
+        newHandOne.addCards(newHandCardListOne);
+
+        Hand newHandTwo = new Hand();
+        newHandTwo.addCards(newHandCardListTwo);
+    }
+
 //    public List<Card> clearHand() { return hand.getAllCards(true); }
 
     public List<Card> clearHands() { return handCollection.clearHands(); };
@@ -147,7 +163,6 @@ public abstract class Agent {
         Hand hand = handCollection.getHand(handIndex);
         return playStrategy.evaluateHand(hand, count, actionToken);
     }
-
 
     void updateBankroll(double updateBy) {
 

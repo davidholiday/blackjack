@@ -69,7 +69,13 @@ public class HandCollection {
         }
     }
 
-    public Hand getHand(int handIndex) { return handList.get(handIndex); }
+    public Hand getHand(int handIndex) {
+        return handList.get(handIndex);
+    }
+
+    public Hand popHand(int handIndex) {
+        return handList.remove(handIndex);
+    }
 
     public List<Hand> getHandList() { return handList; }
 

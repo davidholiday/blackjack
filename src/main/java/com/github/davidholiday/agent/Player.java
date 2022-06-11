@@ -27,6 +27,8 @@ public class Player extends Agent {
     @Override
     public ActionToken act(ActionToken actionToken) {
         updateCount(actionToken);
+        int handIndex = getHandIndexFromAgentPosition(actionToken.getActionTarget());
+        int numActiveHands = getHandCollection().size();
 
         Action nextAction = getNextAction(actionToken, getCount());
         switch (nextAction) {
@@ -41,6 +43,8 @@ public class Player extends Agent {
                         getHandIndexFromAgentPosition(actionToken.getActionTarget())
                 );
                 return actionToken.getDealerNextActionToken();
+            case TAKE_CARDS_FOR_SPLIT:
+                splitHandInHandCollection(actionToken.getOfferedCards(), handIndex);
             case TAKE_INSURANCE:
                 double insuranceWager = getInsuranceWager(
                         actionToken,
@@ -55,19 +59,55 @@ public class Player extends Agent {
             case SURRENDER:
                 return getNextActionToken(actionToken, nextAction);
             case SPLIT:
+                // SPLIT is unique in that it's the only evaluation that relies on context (number of player hands in
+                //   play) that the strategy object has no awareness of
                 //
+                boolean toTwoHandsOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_TO_TWO_HANDS);
+                boolean toThreeHandsOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_TO_THREE_HANDS);
+                boolean toFourHandsOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_TO_FOUR_HANDS);
+                boolean playerCanResplitAcesOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_ACES);
 
-                // TODO HERE IS WHERE YOU LEFT OFF
+                switch(numActiveHands) {
+                    case 1:
+                        if (toTwoHandsOk || toThreeHandsOk || toFourHandsOk) {
+                            return getNextActionToken(actionToken, nextAction);
+                        }
+                    case 2:
+                        if (toThreeHandsOk || toFourHandsOk) {
+                            CardType handTwoCardType = actionToken.getPlayerHandMap()
+                                                                  .get(actionToken.getActionTarget())
+                                                                  .peek(1)
+                                                                  .get(0)
+                                                                  .getCardType();
 
-                //
+                            if (handTwoCardType == CardType.ACE && playerCanResplitAcesOk) {
+                                return getNextActionToken(actionToken, nextAction);
+                            }
 
+                        }
+                    case 3:
+                        if (toFourHandsOk) {
+                            CardType handThreeCardType = actionToken.getPlayerHandMap()
+                                                                    .get(actionToken.getActionTarget())
+                                                                    .peek(2)
+                                                                    .get(0)
+                                                                    .getCardType();
+
+                            if (handThreeCardType == CardType.ACE && playerCanResplitAcesOk) {
+                                return getNextActionToken(actionToken, nextAction);
+                            }
+                        }
+                    default:
+                        // re-evaluate with pair evaluation turned off
+                        actionToken.getPlayerHandMap().get(actionToken.getActionTarget()).disablePairEvaluation();
+                        return act(actionToken);
+                }
 
 
             case DOUBLE_DOWN:
                 double doubleDownWager = getLastAnteWager();
                 return getOfferMoneyActionToken(actionToken, nextAction, doubleDownWager);
             case HIT:
-                int handIndex = getHandIndexFromAgentPosition(actionToken.getActionTarget());
                 Card firstCardInHand = getHand(handIndex).peek(0).get(0);
                 boolean playerCanHitSplitAces = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_HIT_SPLIT_ACES);
 

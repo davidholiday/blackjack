@@ -323,7 +323,15 @@ public class Dealer extends Agent {
                                       .build();
 
             case SPLIT:
-                //
+                LOG.info("{} SPLITS", sourceAgentPosition);
+                // TODO this feels a bit dangerous. it's up to the agent to take these cards and split
+                // TODO   their current hand into two
+               return new ActionToken.Builder().withAction(Action.OFFER_CARDS_FOR_SPLIT)
+                                                .withActionSource(DEALER)
+                                                .withActionTarget(sourceAgentPosition)
+                                                .withOfferedCards(draw(2))
+                                                .build();
+
             case DOUBLE_DOWN:
                 if (sourceAgentHand.isBust()) {
                     String msg = sourceAgentPosition + " attempted to DOUBLE but their hand is BUST!";

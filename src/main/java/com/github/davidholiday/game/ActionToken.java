@@ -3,6 +3,7 @@ package com.github.davidholiday.game;
 import com.github.davidholiday.card.Card;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.agent.AgentPosition;
+import com.github.davidholiday.cardcollection.HandCollection;
 import com.github.davidholiday.util.GeneralUtils;
 
 import java.util.*;
@@ -11,6 +12,7 @@ public class ActionToken {
     private Map<AgentPosition, Hand> playerHandMap;
     private Action action;
     private List<Card> offeredCards;
+
     private double offeredMoney;
     private AgentPosition actionSource;
     private AgentPosition actionTarget;
@@ -25,6 +27,7 @@ public class ActionToken {
         private Map<AgentPosition, Hand> playerHandMap = new HashMap<>();;
         private Action action = Action.NONE;
         private List<Card> offeredCards = new ArrayList<>();
+
         private double offeredMoney = 0;
 
         private AgentPosition actionSource = AgentPosition.NONE;

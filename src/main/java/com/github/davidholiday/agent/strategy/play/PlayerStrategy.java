@@ -25,6 +25,8 @@ public abstract class PlayerStrategy implements PlayStrategy {
                 return Action.TAKE_MONEY;
             case OFFER_INSURANCE:
                 return evaluateHandForInsurance(hand, count, actionToken);
+            case OFFER_CARDS_FOR_SPLIT:
+                return Action.TAKE_CARDS_FOR_SPLIT;
             case REQUEST_PLAY:
                 Action action = evaluateForSurrender(hand, count, actionToken);
                 if (action != Action.NONE) { return action; }
