@@ -105,13 +105,11 @@ public class Player extends Agent {
                         }
                     default:
                         // re-evaluate with pair evaluation turned off
-                        /*
+                        ActionToken actionTokenNoSplit = new ActionToken.Builder(actionToken)
+                                                                        .withEvaluatePairForSplit(false)
+                                                                        .build();
 
-                        TODO this causes a stack overflow
-
-                         */
-                        actionToken.getPlayerHandMap().get(actionToken.getActionTarget()).disablePairEvaluation();
-                        return act(actionToken);
+                        return act(actionTokenNoSplit);
                 }
 
 

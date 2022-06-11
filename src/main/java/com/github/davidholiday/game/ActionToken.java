@@ -22,6 +22,8 @@ public class ActionToken {
 
     private int discardTrayDeckSize;
 
+    private boolean evaluatePairForSplit;
+
     public static class Builder {
 
         private Map<AgentPosition, Hand> playerHandMap = new HashMap<>();;
@@ -38,6 +40,9 @@ public class ActionToken {
 
         //private int discardTrayDeckSize = 0;
 
+        private boolean evaluatePairForSplit;
+
+
         public Builder(ActionToken actionToken) {
             this.playerHandMap = actionToken.playerHandMap;
             this.action = actionToken.action;
@@ -48,6 +53,7 @@ public class ActionToken {
             this.ruleSet = actionToken.ruleSet;
             this.discardTrayCardSize = actionToken.discardTrayCardSize;
             //this.discardTrayDeckSize = actionToken.discardTrayDeckSize;
+            this.evaluatePairForSplit = actionToken.evaluatePairForSplit;
         }
 
         public Builder(Game game, Action action) {
@@ -122,6 +128,11 @@ public class ActionToken {
             return this;
         }
 
+        public Builder withEvaluatePairForSplit(boolean evaluatePairForSplit) {
+            this.evaluatePairForSplit = evaluatePairForSplit;
+            return this;
+        }
+
         public ActionToken build() {
             ActionToken actionToken = new ActionToken();
             actionToken.playerHandMap = this.playerHandMap;
@@ -132,6 +143,7 @@ public class ActionToken {
             actionToken.offeredMoney = this.offeredMoney;
             actionToken.ruleSet = this.ruleSet;
             actionToken.discardTrayCardSize = this.discardTrayCardSize;
+            actionToken.evaluatePairForSplit = this.evaluatePairForSplit;
 //            boolean bothDiscardSizeValuesZero = this.discardTrayCardSize == 0 && this.discardTrayDeckSize == 0;
 //            boolean cardDividedByDeckSizeCorrect =
 //                    bothDiscardSizeValuesZero ?
@@ -194,6 +206,8 @@ public class ActionToken {
     public int getDiscardTrayCardSize() { return discardTrayCardSize; }
 
     public int getDiscardTrayDeckSize() { return discardTrayDeckSize; }
+
+    public boolean getEvaluatePairForSplit() { return evaluatePairForSplit; }
 
     public ActionToken getDealerNextActionToken() {
         // specifically not including player offering of cards or money in this token

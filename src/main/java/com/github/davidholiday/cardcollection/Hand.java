@@ -26,8 +26,6 @@ public class Hand extends CardCollection {
 
     private boolean isTwentyOne;
 
-    private boolean evaluatePair = true;
-
     public Hand() {}
 
     public Hand(List<Card> cards) {
@@ -38,10 +36,6 @@ public class Hand extends CardCollection {
         List<Card> cardList = hand.getAllCards(false);
         addCards(cardList);
     }
-
-    public boolean getEvaluatePair() { return evaluatePair; }
-
-    public void disablePairEvaluation() { evaluatePair = false; }
 
     @Override
     public void addCards(List<Card> cards) {

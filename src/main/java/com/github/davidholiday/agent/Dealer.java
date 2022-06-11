@@ -238,6 +238,8 @@ public class Dealer extends Agent {
                 if (playerDoneSet.size() != actionToken.getPlayerHandMap().size()) {
 
                     // make sure it's not because a player split their hand and the playerHandMap has been reset
+                    //   due to the player agents clearing their HandCollections (which causes them to reset to
+                    //   a state where there's only one hand object in them)
                     Set<AgentPosition> onlyH0DoneSet = new HashSet<>();
                     for (AgentPosition agentPosition : playerDoneSet) {
                         if (agentPosition == DEALER) { continue; }
