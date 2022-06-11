@@ -196,7 +196,7 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
         CardType dealerUpCardType = getDealerUpCard(actionToken).getCardType();
         // ACE values are [1, 11]
         // we need the soft value minus the ACE to make a play determination
-        int softValueNoAce = hand.getAceSpecialHandValue() - CardType.ACE.getValues()[1].getValue();
+        int softValueNoAce = hand.getAceSpecialHandValue() - CardType.ACE.getValues()[1].getValue() + 1;
 
         // we need the number of cards in the hand because in some cases that impacts the correct next play
         int numCardsInHand = hand.getCardListSize();
