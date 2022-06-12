@@ -98,10 +98,37 @@ public class Dealer extends Agent {
 
         // for convenience in the PLAY RESPONSES section at the bottom
         AgentPosition sourceAgentPosition = actionToken.getActionSource();
+        // \\$ because regex
+        String sourceAgentPositionNoHandIndex = sourceAgentPosition.toString().split("\\$")[0];
         Hand sourceAgentHand = actionToken.getPlayerHandMap().get(sourceAgentPosition);
-        int sourceHandIndex = getHandIndexFromAgentPosition(sourceAgentPosition);
+
+        // the only time this will happen is when the PLAYER is endeavoring to SPLIT their hand. They will send a
+        // message to the dealer with an incremented value for hand index but, as the DEALER has not given them
+        // cards yet, sourceAgentHand will end up being null.
+        //
+        // we need sourceAgentHand to be populated with the PLAYER's current hand so the DEALER can check to make sure
+        // that, when the PLAYER wants to split, the ruleSet permits them to do so...
+        if (sourceAgentHand == null && actionToken.getAction() == Action.SPLIT) {
+            int actualSourceAgentHandIndex = getHandIndexFromAgentPosition(sourceAgentPosition) - 1;
+            String actualAgentPositionString = sourceAgentPositionNoHandIndex + "$H" + actualSourceAgentHandIndex;
+            AgentPosition actualAgentPosition = AgentPosition.valueOf(actualAgentPositionString);
+
+            sourceAgentHand = actionToken.getPlayerHandMap()
+                                         .get(actualAgentPosition);
+        }
+
+        // this is so the DEALER can double check the player isn't splitting a hand they shouldn't be splitting
+        // given the ruleset in play
+        int sourceAgentHandCount = 0;
+        for (AgentPosition agentPosition : actionToken.getPlayerHandMap().keySet()) {
+            if (agentPosition.toString().contains(sourceAgentPositionNoHandIndex)) {
+                sourceAgentHandCount += 1;
+            }
+        }
+
         RuleSet ruleset = actionToken.getRuleSet();
 
+        // TODO this is epic in length - at some point it you should break this down into smaller functions
         switch (actionToken.getAction()) {
             //
             // DEALER ACTIONS
@@ -343,23 +370,63 @@ public class Dealer extends Agent {
                                       .build();
 
             case SPLIT:
-                LOG.info("{} SPLITS", sourceAgentPosition);
-                // TODO this feels a bit dangerous. it's up to the agent to take these cards and split
-                // TODO   their current hand into two
+                if (sourceAgentPosition == DEALER) {
+                    throw new IllegalArgumentException("DEALER is trying to SPLIT and is not permitted to do so!");
+                }
 
+                if (sourceAgentHand.isPair() == false) {
+                    throw new IllegalArgumentException(
+                            sourceAgentPosition + " is trying to SPLIT an hand that isn't a pair!");
+                }
 
-                //
-                // TODO
-                //
                 // the dealer needs to cross check to make sure the player isn't splitting when the rules
                 // say they should not be able to split their hand...
-                //
                 boolean toTwoHandsOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_TO_TWO_HANDS);
                 boolean toThreeHandsOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_TO_THREE_HANDS);
                 boolean toFourHandsOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_TO_FOUR_HANDS);
                 boolean playerCanResplitAcesOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_ACES);
 
+                switch (sourceAgentHandCount) {
+                    case 1:
+                        if (toTwoHandsOk || toThreeHandsOk || toFourHandsOk) {
+                            break;
+                        }
+                    case 2:
+                        if (toThreeHandsOk || toFourHandsOk) {
+                            // we already checked to ensure the hand is a pair so now we just need to make sure
+                            // that, if the pair is a pair of ACEs, the player is permitted to split them
+                            CardType handTwoCardType = sourceAgentHand.peek(1)
+                                                                      .get(0)
+                                                                      .getCardType();
 
+                            if (handTwoCardType == CardType.ACE && playerCanResplitAcesOk) {
+                                break;
+                            } else if (handTwoCardType != CardType.ACE) {
+                                break;
+                            }
+                        }
+                    case 3:
+                        if (toFourHandsOk) {
+                            // we already checked to ensure the hand is a pair so now we just need to make sure
+                            // that, if the pair is a pair of ACEs, the player is permitted to split them
+                            CardType handThreeCardType = sourceAgentHand.peek(1)
+                                                                        .get(0)
+                                                                        .getCardType();
+
+                            if (handThreeCardType == CardType.ACE && playerCanResplitAcesOk) {
+                                break;
+                            } else if (handThreeCardType != CardType.ACE) {
+                                break;
+                            }
+                        }
+                    default:
+                        String msg = "player is attempting to SPLIT when the rules do not permit split!";
+                        throw new IllegalArgumentException(msg);
+                }
+
+                LOG.info("{} SPLITS", sourceAgentPosition);
+                // TODO this feels a bit dangerous. it's up to the agent to take these cards and split
+                // TODO   their current hand into two
                 playerWagerMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
                 LOG.info("playerWagerMap is now: {}", playerWagerMap);
 

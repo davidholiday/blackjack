@@ -81,14 +81,12 @@ public abstract class Agent {
     }
 
     public int getHandIndexFromAgentPosition(AgentPosition agentPosition) {
-        try {
-            String indexString = agentPosition.toString()
-                                              .split("$H")[1];
+        if (agentPosition == AgentPosition.DEALER) { return 0; }
 
-            return Integer.parseInt(indexString);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return 0;
-        }
+        String indexString = agentPosition.toString()
+                                          .split("\\$H")[1];
+
+        return Integer.parseInt(indexString);
     }
 
     public Map<AgentPosition, Hand> getAllHands() {
@@ -140,8 +138,6 @@ public abstract class Agent {
         handCollection.addHand(newHandTwo);
     }
 
-//    public List<Card> clearHand() { return hand.getAllCards(true); }
-
     public List<Card> clearHand(int handIndex) {
         return handCollection.getHand(handIndex)
                              .getAllCards(true);
@@ -157,18 +153,23 @@ public abstract class Agent {
         return count;
     }
 
-//    void updateCount(ActionToken actionToken) {
-//        count = countStrategy.updateCount(hand, actionToken);
-//    }
-
     void updateCount(ActionToken actionToken) {
         count = countStrategy.updateCount(handCollection, actionToken);
     }
 
-//    Action getNextAction(ActionToken actionToken) { return playStrategy.evaluateHand(hand, count, actionToken); }
-
     Action getNextAction(ActionToken actionToken, int handIndex) {
+
+        // the reason for this is, during the SPLIT handshake between the dealer and PLAYER, the handIndex is out of
+        // sync between what the dealer is referencing and what exists. The handler for this action needs the current
+        // ACTUAL handIndex, not the incremented one the DEALER needs to track the new hand.
+        if (actionToken.getAction() == Action.OFFER_CARDS_FOR_SPLIT) {
+            handIndex -= 1;
+        }
+
+LOG.info(handCollection.getHandList().toString());
+LOG.info("handIndex: {}", handIndex);
         Hand hand = handCollection.getHand(handIndex);
+LOG.info("hand: {}", hand);
         return playStrategy.evaluateHand(hand, count, actionToken);
     }
 
@@ -200,8 +201,6 @@ public abstract class Agent {
     double getLastAnteWager() { return lastAnteWager; }
 
     double getInsuranceWager(ActionToken actionToken, int handIndex) {
-//        double insurance = playStrategy.getInsuranceBet(hand, getCount(), actionToken);
-
         Hand hand = handCollection.getHand(handIndex);
         double insurance = playStrategy.getInsuranceBet(hand, getCount(), actionToken);
         updateBankroll(-insurance);

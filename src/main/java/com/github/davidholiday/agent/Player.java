@@ -30,7 +30,7 @@ public class Player extends Agent {
         int handIndex = getHandIndexFromAgentPosition(actionToken.getActionTarget());
         int numActiveHands = getHandCollection().size();
 
-        Action nextAction = getNextAction(actionToken, getCount());
+        Action nextAction = getNextAction(actionToken, handIndex);
         switch (nextAction) {
             case DEALER_NEXT_ACTION:
                 return actionToken.getDealerNextActionToken();
@@ -44,7 +44,9 @@ public class Player extends Agent {
                 );
                 return actionToken.getDealerNextActionToken();
             case TAKE_CARDS_FOR_SPLIT:
-                splitHandInHandCollection(actionToken.getOfferedCards(), handIndex);
+                // the -1 on the handIndex is because here that number references the hand that is being MADE, not the
+                // hand that needs to be split to MAKE that new hand.
+                splitHandInHandCollection(actionToken.getOfferedCards(), handIndex - 1);
                 return actionToken.getDealerNextActionToken();
             case TAKE_INSURANCE:
                 double insuranceWager = getInsuranceWager(
@@ -124,9 +126,9 @@ public class Player extends Agent {
                 // the strategy object has no way of knowing whether or not it is looking at a split hand...
                 if (handIndex == 1) {
                     return getNextActionToken(actionToken, nextAction);
-                } else if (firstCardInHand.getCardType() == CardType.ACE && playerCanHitSplitAces) {
+                } else if (handIndex == 1 && firstCardInHand.getCardType() == CardType.ACE && playerCanHitSplitAces) {
                     return getNextActionToken(actionToken, nextAction);
-                } else if (firstCardInHand.getCardType() != CardType.ACE) {
+                } else if (handIndex == 1 && firstCardInHand.getCardType() != CardType.ACE) {
                     return getNextActionToken(actionToken, nextAction);
                 }
                 // fall into STAND
