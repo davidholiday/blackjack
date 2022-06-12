@@ -9,13 +9,9 @@ public interface PlayStrategy {
 
     String getName();
 
-//    Action evaluateHand(Hand hand, int count, ActionToken actionToken);
-
     Action evaluateHand(Hand hand, int count, ActionToken actionToken);
 
     double getWager(int count, ActionToken actionToken);
-
-//    double getInsuranceBet(Hand hand, int count, ActionToken actionToken);
 
     double getInsuranceBet(Hand hand, int count, ActionToken actionToken);
 

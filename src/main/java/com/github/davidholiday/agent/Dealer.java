@@ -99,6 +99,7 @@ public class Dealer extends Agent {
         // for convenience in the PLAY RESPONSES section at the bottom
         AgentPosition sourceAgentPosition = actionToken.getActionSource();
         Hand sourceAgentHand = actionToken.getPlayerHandMap().get(sourceAgentPosition);
+        int sourceHandIndex = getHandIndexFromAgentPosition(sourceAgentPosition);
         RuleSet ruleset = actionToken.getRuleSet();
 
         switch (actionToken.getAction()) {
@@ -353,6 +354,10 @@ public class Dealer extends Agent {
                 // the dealer needs to cross check to make sure the player isn't splitting when the rules
                 // say they should not be able to split their hand...
                 //
+                boolean toTwoHandsOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_TO_TWO_HANDS);
+                boolean toThreeHandsOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_TO_THREE_HANDS);
+                boolean toFourHandsOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_TO_FOUR_HANDS);
+                boolean playerCanResplitAcesOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_ACES);
 
 
                 playerWagerMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
