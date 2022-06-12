@@ -7,12 +7,35 @@ import com.github.davidholiday.game.ActionToken;
 
 import java.util.List;
 
-public interface CountStrategy {
+public abstract class CountStrategy {
 
-    public int getCount();
+    private int shoeDeckSize;
 
-    public String getName();
+    private int initialCount;
 
-    public int updateCount(HandCollection handCollection, ActionToken actionToken);
+    double lastAnteWager = 0;
+
+    public CountStrategy(int shoeDeckSize) {
+        if (shoeDeckSize < 0 || shoeDeckSize > 8) {
+            throw new IllegalArgumentException("shoe size should be between one and eight decks!");
+        }
+
+        this.shoeDeckSize = shoeDeckSize;
+        resetCount();
+    }
+
+    public abstract void resetCount();
+
+    public abstract int getCount();
+
+    public abstract String getName();
+
+    public abstract int updateCount(HandCollection handCollection, ActionToken actionToken);
+
+    public abstract double getWager(int count, ActionToken actionToken);
+
+    public abstract double getInsuranceBet(Hand hand, int count, ActionToken actionToken);
+
+    public abstract double getLastAnteWager();
 
 }

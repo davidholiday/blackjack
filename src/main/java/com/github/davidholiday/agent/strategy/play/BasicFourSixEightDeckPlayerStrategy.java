@@ -11,7 +11,7 @@ import com.github.davidholiday.game.RuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
+public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy {
 
     private static final Logger LOG = LoggerFactory.getLogger(BasicFourSixEightDeckPlayerStrategy.class);
 
@@ -21,12 +21,6 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
     public String getName() {
         return NAME;
     }
-
-    @Override
-    public double getWager(int count, ActionToken actionToken) { return 10; }
-
-    @Override
-    public double getInsuranceBet(Hand hand, int count, ActionToken actionToken) { return 0; }
 
     @Override
     public Action evaluateHandForInsurance(Hand hand, int count, ActionToken actionToken) {
@@ -365,7 +359,6 @@ public class BasicFourSixEightDeckPlayerStrategy extends PlayerStrategy{
         }
 
     }
-
 
     private Card getDealerUpCard(ActionToken actionToken) {
 

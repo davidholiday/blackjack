@@ -14,16 +14,7 @@ public class NoOpPlayerStrategy extends PlayerStrategy {
     }
 
     @Override
-    public double getWager(int count, ActionToken actionToken) { return 5; }
-
-    @Override
-    public double getInsuranceBet(Hand hand, int count, ActionToken actionToken) { return 2.5; }
-
-    @Override
     public Action evaluateHandForInsurance(Hand hand, int count, ActionToken actionToken) {
-        // for testing insurance bet...
-        //return Action.TAKE_INSURANCE;
-
         return Action.DECLINE_INSURANCE;
     }
 

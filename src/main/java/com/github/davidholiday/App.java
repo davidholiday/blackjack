@@ -156,7 +156,7 @@ public class App {
             AgentPosition playerOnePosition = orderedPlayerList.get(0);
             AgentPosition playerTwoPosition = orderedPlayerList.get(1);
 
-            NoCountStrategy noCountStrategy = new NoCountStrategy();
+            NoCountStrategy noCountStrategy = new NoCountStrategy(6);
             BasicFourSixEightDeckPlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
 
             Player playerOne = new Player(noCountStrategy,

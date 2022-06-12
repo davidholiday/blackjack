@@ -18,8 +18,6 @@ public abstract class Agent {
 
     private static final Logger LOG = LoggerFactory.getLogger(Agent.class);
 
-//    private final Hand hand;
-
     private final HandCollection handCollection;
 
     private final CountStrategy countStrategy;
@@ -33,9 +31,6 @@ public abstract class Agent {
     private AgentPosition agentPosition;
 
     private int count = 0;
-
-    // records the last ante wager made so insurance and double down bets can be made
-    private double lastAnteWager = 0;
 
     public Agent(CountStrategy countStrategy,
                  PlayStrategy playStrategy,
@@ -58,20 +53,6 @@ public abstract class Agent {
     }
 
     public abstract ActionToken act(ActionToken actionToken);
-
-//    public Hand getHand() {
-//        return new Hand(hand);
-//    }
-
-
-//    public void addCardToHand(Card card) {
-//        hand.addCards(Stream.of(card).collect(Collectors.toList()));
-//    }
-
-//    public void addCardsToHand(List<Card> cardList) {
-//        hand.addCards(cardList);
-//    }
-
 
     public AgentPosition getAgentPosition() { return agentPosition; }
 
@@ -159,28 +140,24 @@ public abstract class Agent {
 
     Action getNextAction(ActionToken actionToken, int handIndex) {
 
-        // the reason for this is, during the SPLIT handshake between the dealer and PLAYER, the handIndex is out of
+        // the reason for this is, during the SPLIT handshake between the DEALER and PLAYER, the handIndex is out of
         // sync between what the dealer is referencing and what exists. The handler for this action needs the current
         // ACTUAL handIndex, not the incremented one the DEALER needs to track the new hand.
         if (actionToken.getAction() == Action.OFFER_CARDS_FOR_SPLIT) {
             handIndex -= 1;
         }
-
-LOG.info(handCollection.getHandList().toString());
-LOG.info("handIndex: {}", handIndex);
         Hand hand = handCollection.getHand(handIndex);
-LOG.info("hand: {}", hand);
         return playStrategy.evaluateHand(hand, count, actionToken);
     }
 
     void updateBankroll(double updateBy) {
 
         if (bankroll + updateBy < 0 ) {
-            LOG.info("*!* bankroll has been ruined for agent: {} *!*", this.toString() );
-            LOG.info("*!* resetting bankroll to: {} for agent: {} *!*", initialBankroll, this.toString());
+            LOG.info("*!* bankroll has been ruined for agent: {} *!*", this);
+            LOG.info("*!* resetting bankroll to: {} for agent: {} *!*", initialBankroll, this);
             bankroll = initialBankroll;
         } else if (bankroll + updateBy > Double.MAX_VALUE) {
-            LOG.info("bankroll has been exceeded for agent {} *!*", this.toString());
+            LOG.info("bankroll has been exceeded for agent {} *!*", this);
             bankroll = Double.MAX_VALUE;
         }
         else {
@@ -192,17 +169,16 @@ LOG.info("hand: {}", hand);
     public double getBankroll() { return bankroll; }
 
     double getWager(ActionToken actionToken) {
-        double wager = playStrategy.getWager(count, actionToken);
+        double wager = countStrategy.getWager(count, actionToken);
         updateBankroll(-wager);
-        lastAnteWager = wager;
         return wager;
     }
 
-    double getLastAnteWager() { return lastAnteWager; }
+    double getLastAnteWager() { return countStrategy.getLastAnteWager(); }
 
     double getInsuranceWager(ActionToken actionToken, int handIndex) {
         Hand hand = handCollection.getHand(handIndex);
-        double insurance = playStrategy.getInsuranceBet(hand, getCount(), actionToken);
+        double insurance = countStrategy.getInsuranceBet(hand, getCount(), actionToken);
         updateBankroll(-insurance);
         return insurance;
     }

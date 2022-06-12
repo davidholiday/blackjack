@@ -39,12 +39,4 @@ public class StandardDealerStrategy extends DealerStrategy {
     @Override
     public String getName() { return NAME; }
 
-    @Override
-    public double getWager(int count, ActionToken actionToken) { return 0; }
-
-    @Override
-    public double getInsuranceBet(Hand hand, int count, ActionToken actionToken) {
-        return 0;
-    }
-
 }
