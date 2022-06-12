@@ -346,6 +346,15 @@ public class Dealer extends Agent {
                 // TODO this feels a bit dangerous. it's up to the agent to take these cards and split
                 // TODO   their current hand into two
 
+
+                //
+                // TODO
+                //
+                // the dealer needs to cross check to make sure the player isn't splitting when the rules
+                // say they should not be able to split their hand...
+                //
+
+
                 playerWagerMap.put(actionToken.getActionSource(), actionToken.getOfferedMoney());
                 LOG.info("playerWagerMap is now: {}", playerWagerMap);
 
