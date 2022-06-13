@@ -19,7 +19,7 @@ public abstract class CountStrategy {
 
     double baseWager = 10;
 
-    Map<Integer, CardType> seenCardTypesMap = new HashMap<>();
+    Map<String, CardType> seenCardTypesMap = new HashMap<>();
 
     public CountStrategy(int shoeDeckSize) {
         if (shoeDeckSize < 0 || shoeDeckSize > 8) {
@@ -46,6 +46,7 @@ public abstract class CountStrategy {
 
         if (actionToken.getDiscardTrayCardSize() == 0) {
             resetCount();
+            seenCardTypesMap.clear();
         }
 
         return count;

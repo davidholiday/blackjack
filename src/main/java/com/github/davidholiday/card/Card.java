@@ -24,6 +24,8 @@ public class Card {
                      .collect(Collectors.toList());
     }
 
+    public String toStringSuper() { return super.toString(); }
+
     public String toString() { return cardType.toString() + ":" + cardSuit.toString(); }
 
     // ty SO https://stackoverflow.com/a/27609

@@ -3,7 +3,7 @@ package com.github.davidholiday;
 import com.github.davidholiday.agent.AgentPosition;
 import com.github.davidholiday.agent.Player;
 import com.github.davidholiday.agent.strategy.count.NoCountStrategy;
-import com.github.davidholiday.agent.strategy.count.SpeedCountStrategy;
+import com.github.davidholiday.agent.strategy.count.SpeedCountCountStrategy;
 import com.github.davidholiday.agent.strategy.play.BasicFourSixEightDeckPlayerStrategy;
 import com.github.davidholiday.game.Game;
 import com.github.davidholiday.game.Rule;
@@ -158,7 +158,7 @@ public class App {
             AgentPosition playerTwoPosition = orderedPlayerList.get(1);
 
             NoCountStrategy noCountStrategy = new NoCountStrategy(6);
-            SpeedCountStrategy speedCountStrategy = new SpeedCountStrategy(6);
+            SpeedCountCountStrategy speedCountStrategy = new SpeedCountCountStrategy(6);
             BasicFourSixEightDeckPlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
 
             Player playerOne = new Player(noCountStrategy,
