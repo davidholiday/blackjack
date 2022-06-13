@@ -44,12 +44,14 @@ public class Shoe extends CardCollection {
     public void shuffle() {
         this.remove(cutCard);
         super.shuffle();
+        validateDeck(expectedFullShoeSize / 52, false, getAllCards(false));
     }
 
     @Override
     public void shuffle(int count) {
         this.remove(cutCard);
         super.shuffle(count);
+        validateDeck(expectedFullShoeSize / 52, false, getAllCards(false));
     }
 
     public void cut() {
