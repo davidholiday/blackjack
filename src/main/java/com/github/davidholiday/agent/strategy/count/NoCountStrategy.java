@@ -14,7 +14,6 @@ public class NoCountStrategy extends CountStrategy {
 
     @Override
     public void resetCount() {
-        super.seenCardTypesMap.clear();
         super.count = 0;
     }
 

@@ -1,6 +1,5 @@
 package com.github.davidholiday.agent.strategy.count;
 
-import com.github.davidholiday.agent.AgentPosition;
 import com.github.davidholiday.card.Card;
 import com.github.davidholiday.card.CardType;
 import com.github.davidholiday.cardcollection.Hand;
@@ -10,14 +9,13 @@ import com.github.davidholiday.game.ActionToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class SpeedCountCountStrategy extends CountStrategy {
 
     private static final Logger LOG = LoggerFactory.getLogger(SpeedCountCountStrategy.class);
 
     public static final String NAME = "SPEED_COUNT_STRATEGY";
+
+    private int numHands = 0;
 
     public SpeedCountCountStrategy(int shoeDeckSize) {
         super(shoeDeckSize);
@@ -26,35 +24,12 @@ public class SpeedCountCountStrategy extends CountStrategy {
 
     @Override
     public void resetCount() {
-        switch (super.shoeDeckSize) {
-            case 1:
-                // fall into TWO - though we're ignoring a special case for initial count for now...
-            case 2:
-                count = 30;
-                break;
-            case 3:
-                // these don't exist I think but whatevs...
-                // fall into FOUR
-            case 4:
-                count = 29;
-                break;
-            case 5:
-                // these don't exist I think but whatevs...
-                // fall into SIX
-            case 6:
-                count = 27;
-                break;
-            case 7:
-                // these don't exist I think but whatevs...
-                // fall into EIGHT
-            case 8:
-                count = 26;
-                break;
-            default:
-                throw new IllegalStateException("shoe deck size should be between one and eight decks!");
-        }
-
+        playerHandMaps.clear();
+        numHands = 0;
+        count = getInitialCount();
     }
+
+
 
     @Override
     public String getName() { return NAME; }
@@ -62,7 +37,7 @@ public class SpeedCountCountStrategy extends CountStrategy {
     @Override
     public double getWager(ActionToken actionToken) {
 
-        LOG.info("{} has count of: {}", actionToken.getActionTarget(), count);
+LOG.warn("{} has count of: {}", actionToken.getActionTarget(), count);
 
         // pg 24 of the book - conservative/simple bet ramp
         switch (shoeDeckSize) {
@@ -168,60 +143,55 @@ public class SpeedCountCountStrategy extends CountStrategy {
 
     @Override
     public int updateCount(HandCollection handCollection, ActionToken actionToken) {
+        // we should only fall into this at the top of a round when a reshuffle has just happened
+        if (actionToken.getDiscardTrayCardSize() == 0 && actionToken.getAction() == Action.REQUEST_WAGER) {
+LOG.warn("clearing maps and resetting count");
+            resetCount();
+        // here we need to push a new playerHandMap onto the list as we're starting a new round
+        } else if (actionToken.getAction() == Action.REQUEST_WAGER) {
+            playerHandMaps.add(actionToken.getPlayerHandMap());
+        }
 
+//LOG.warn(actionToken.toString());
         // on CLEAR_HAND is when we do our subtraction and set ourselves up to compute the next wager...
         if (actionToken.getAction() == Action.CLEAR_HAND) {
-            Set<AgentPosition> agentsNoHandIds = new HashSet<>();
-
-            for (AgentPosition agentPosition : actionToken.getPlayerHandMap().keySet()) {
-                if (agentPosition == AgentPosition.DEALER) { continue; }
-                String sourceAgentPositionNoHandIndex = agentPosition.toString().split("\\$")[0];
-                agentsNoHandIds.add(AgentPosition.valueOf(sourceAgentPositionNoHandIndex));
-            }
-
-            count -= agentsNoHandIds.size();
-
-            // otherwise we recompute the current count w/o the end of round modifier
-            //
-            // TODO there's probably a better way to keep a 'running count' but for now we'll just
-            // TODO   recompute the 'running count' ever time as it's pretty easy to do...
+            numHands += actionToken.getPlayerHandMap().size();
+            count = (getInitialCount() + seenCardsSet.size()) - numHands;
+LOG.warn("initialCount: {}  seenCardsSet size: {}  numHands: {}", getInitialCount(), seenCardsSet.size(), numHands);
+LOG.warn("end of round! count is now: {}", count);
+System.out.println("ASDFASD");
         } else {
-            for (Hand hand : handCollection.getHandList()) {
-                for (Card card : hand.getAllCards(false)) {
-
-                    // if we haven't seen this card before, update the count and put it in the seen cards map
-                    if (seenCardTypesMap.containsKey(card.toStringSuper()) == false) {
-                        super.seenCardTypesMap.put(card.toStringSuper(), card.getCardType());
-                        updateCountLocal(card);
-                    }
-                }
-            }
-
-            for (Hand hand : actionToken.getPlayerHandMap().values()) {
-                for (Card card : hand.getAllCards(false)) {
-
-                    // if we haven't seen this card before, update the count and put it in the seen cards map
-                    if (seenCardTypesMap.containsKey(card.toStringSuper()) == false) {
-                        super.seenCardTypesMap.put(card.toStringSuper(), card.getCardType());
-                        updateCountLocal(card);
-                    }
-                }
-            }
-
+            updateCurrentPlayerHandMap(actionToken);
         }
+
 
         return count;
     }
 
-    private void updateCountLocal(Card newCard) {
-        CardType cardType = newCard.getCardType();
-        if (cardType == CardType.TWO
-                || cardType == CardType.THREE
-                || cardType == CardType.FOUR
-                || cardType == CardType.FIVE
-                || cardType == CardType.SIX) {
 
-            count += 1;
+    private int getInitialCount() {
+        switch (super.shoeDeckSize) {
+            case 1:
+                // fall into TWO - though we're ignoring a special case for initial count for now...
+            case 2:
+                return 30;
+            case 3:
+                // these don't exist I think but whatevs...
+                // fall into FOUR
+            case 4:
+                return 29;
+            case 5:
+                // these don't exist I think but whatevs...
+                // fall into SIX
+            case 6:
+                return 27;
+            case 7:
+                // these don't exist I think but whatevs...
+                // fall into EIGHT
+            case 8:
+                return  26;
+            default:
+                throw new IllegalStateException("shoe deck size should be between one and eight decks!");
         }
     }
 
