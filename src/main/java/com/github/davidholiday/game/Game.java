@@ -188,6 +188,16 @@ public class Game implements Callable<Integer> {
 
         for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
             LOG.info("{} has bankroll of ${}", agentMapEntry.getKey(), agentMapEntry.getValue().getBankroll());
+
+            LOG.info("{} is using play strategy of {}",
+                    agentMapEntry.getKey(),
+                    agentMapEntry.getValue().getPlayStrategyName()
+            );
+
+            LOG.info("{} is using count strategy of {}",
+                    agentMapEntry.getKey(),
+                    agentMapEntry.getValue().getCountStrategyName()
+            );
         }
 
         for (int i = 0; i < numRounds; i ++) {

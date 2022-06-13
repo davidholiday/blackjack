@@ -169,7 +169,7 @@ public abstract class Agent {
     public double getBankroll() { return bankroll; }
 
     double getWager(ActionToken actionToken) {
-        double wager = countStrategy.getWager(count, actionToken);
+        double wager = countStrategy.getWager(actionToken);
         updateBankroll(-wager);
         return wager;
     }
@@ -178,7 +178,7 @@ public abstract class Agent {
 
     double getInsuranceWager(ActionToken actionToken, int handIndex) {
         Hand hand = handCollection.getHand(handIndex);
-        double insurance = countStrategy.getInsuranceBet(hand, getCount(), actionToken);
+        double insurance = countStrategy.getInsuranceBet(hand, actionToken);
         updateBankroll(-insurance);
         return insurance;
     }

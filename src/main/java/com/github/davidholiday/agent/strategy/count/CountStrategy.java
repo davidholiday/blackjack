@@ -1,19 +1,25 @@
 package com.github.davidholiday.agent.strategy.count;
 
 import com.github.davidholiday.card.Card;
+import com.github.davidholiday.card.CardType;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.cardcollection.HandCollection;
 import com.github.davidholiday.game.ActionToken;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class CountStrategy {
 
-    private int shoeDeckSize;
+    int shoeDeckSize;
 
-    private int initialCount;
+    int count = 0;
 
     double lastAnteWager = 0;
+
+    double baseWager = 10;
+
+    Map<Integer, CardType> seenCardTypesMap = new HashMap<>();
 
     public CountStrategy(int shoeDeckSize) {
         if (shoeDeckSize < 0 || shoeDeckSize > 8) {
@@ -26,16 +32,23 @@ public abstract class CountStrategy {
 
     public abstract void resetCount();
 
-    public abstract int getCount();
-
     public abstract String getName();
 
-    public abstract int updateCount(HandCollection handCollection, ActionToken actionToken);
+    public abstract double getWager(ActionToken actionToken);
 
-    public abstract double getWager(int count, ActionToken actionToken);
-
-    public abstract double getInsuranceBet(Hand hand, int count, ActionToken actionToken);
+    public abstract double getInsuranceBet(Hand hand, ActionToken actionToken);
 
     public abstract double getLastAnteWager();
+
+    public int getCount() { return count; }
+
+    public int updateCount(HandCollection handCollection, ActionToken actionToken) {
+
+        if (actionToken.getDiscardTrayCardSize() == 0) {
+            resetCount();
+        }
+
+        return count;
+    }
 
 }

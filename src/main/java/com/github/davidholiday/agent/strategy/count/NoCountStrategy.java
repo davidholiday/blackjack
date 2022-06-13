@@ -13,10 +13,13 @@ public class NoCountStrategy extends CountStrategy {
     }
 
     @Override
-    public void resetCount() { /* noop */ }
+    public void resetCount() {
+        super.seenCardTypesMap.clear();
+        super.count = 0;
+    }
 
     @Override
-    public int getCount() { return 0; }
+    public int getCount() { return super.count; }
 
     @Override
     public String getName() {
@@ -29,13 +32,13 @@ public class NoCountStrategy extends CountStrategy {
     }
 
     @Override
-    public double getWager(int count, ActionToken actionToken) {
+    public double getWager(ActionToken actionToken) {
         lastAnteWager = 10;
         return 10;
     }
 
     @Override
-    public double getInsuranceBet(Hand hand, int count, ActionToken actionToken) { return 0; }
+    public double getInsuranceBet(Hand hand, ActionToken actionToken) { return 0; }
 
     @Override
     public double getLastAnteWager() { return lastAnteWager; }
