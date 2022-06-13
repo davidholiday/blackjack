@@ -3,13 +3,14 @@ package com.github.davidholiday.agent.strategy.count;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.cardcollection.HandCollection;
 import com.github.davidholiday.game.ActionToken;
+import com.github.davidholiday.game.RuleSet;
 
 public class NoCountStrategy extends CountStrategy {
 
     public static final String NAME = "NO_COUNT_STRATEGY";
 
-    public NoCountStrategy(int shoeDeckSize) {
-        super(shoeDeckSize);
+    public NoCountStrategy(RuleSet ruleSet) {
+        super(ruleSet);
     }
 
     @Override
@@ -26,9 +27,7 @@ public class NoCountStrategy extends CountStrategy {
     }
 
     @Override
-    public int updateCount(ActionToken actionToken) {
-        return 0;
-    }
+    public void updateCount(ActionToken actionToken) { /* noop */ }
 
     @Override
     public double getWager(ActionToken actionToken) {

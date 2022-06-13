@@ -4,10 +4,13 @@ import com.github.davidholiday.agent.AgentPosition;
 import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.cardcollection.HandCollection;
 import com.github.davidholiday.game.ActionToken;
+import com.github.davidholiday.game.Rule;
+import com.github.davidholiday.game.RuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class CountStrategy {
 
@@ -23,12 +26,40 @@ public abstract class CountStrategy {
 
     List<Map<AgentPosition, Hand>> playerHandMaps = new ArrayList<>();
 
-    public CountStrategy(int shoeDeckSize) {
-        if (shoeDeckSize < 0 || shoeDeckSize > 8) {
-            throw new IllegalArgumentException("shoe size should be between one and eight decks!");
+    public CountStrategy(RuleSet ruleSet) {
+        Optional<Rule> deckSizeRuleOptional = Optional.empty();
+
+        for (Rule rule : ruleSet.getRuleSetStream().collect(Collectors.toList())) {
+            if (Rule.getDeckRuleSet().contains(rule)) {
+                deckSizeRuleOptional = Optional.of(rule);
+            }
         }
 
-        this.shoeDeckSize = shoeDeckSize;
+        if (deckSizeRuleOptional.isEmpty()) {
+            throw new IllegalStateException("ruleSet does not contain deck size rule!");
+        }
+
+        Rule deckSizeRule = deckSizeRuleOptional.get();
+        switch (deckSizeRule) {
+            case ONE_DECK_SHOE:
+                this.shoeDeckSize = 1;
+                break;
+            case TWO_DECK_SHOE:
+                this.shoeDeckSize = 2;
+                break;
+            case FOUR_DECK_SHOE:
+                this.shoeDeckSize = 4;
+                break;
+            case SIX_DECK_SHOE:
+                this.shoeDeckSize = 6;
+                break;
+            case EIGHT_DECK_SHOE:
+                this.shoeDeckSize = 8;
+                break;
+            default:
+                throw new IllegalStateException("unexpected deck rule found");
+        }
+
         resetCount();
     }
 
@@ -42,7 +73,7 @@ public abstract class CountStrategy {
 
     public abstract double getLastAnteWager();
 
-    public abstract int updateCount(ActionToken actionToken);
+    public abstract void updateCount(ActionToken actionToken);
 
     public int getCount() { return count; }
 

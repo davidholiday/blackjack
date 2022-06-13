@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -161,6 +162,8 @@ public class RuleSet {
     public Stream<Rule> getRuleSetStream() {
         return unmodifiableRuleSet.stream();
     }
+
+    public List<Rule> getRuleSetList() { return unmodifiableRuleSet.stream().collect(Collectors.toList()); }
 
     public boolean isEmpty() { return unmodifiableRuleSet.isEmpty(); }
 

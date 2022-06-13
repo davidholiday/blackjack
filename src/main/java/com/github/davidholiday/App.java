@@ -157,19 +157,19 @@ public class App {
             AgentPosition playerOnePosition = orderedPlayerList.get(0);
             AgentPosition playerTwoPosition = orderedPlayerList.get(1);
 
-            NoCountStrategy noCountStrategy = new NoCountStrategy(6);
-            SpeedCountCountStrategy speedCountStrategy = new SpeedCountCountStrategy(6);
+            NoCountStrategy noCountStrategy = new NoCountStrategy(ruleSet);
+            SpeedCountCountStrategy speedCountStrategy = new SpeedCountCountStrategy(ruleSet);
             BasicFourSixEightDeckPlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
 
             Player playerOne = new Player(noCountStrategy,
                                           playerStrategy,
-                                          10,
+                                          500,
                                           ruleSet,
                                           playerOnePosition);
 
             Player playerTwo = new Player(speedCountStrategy,
                                           playerStrategy,
-                                   10,
+                                   500,
                                           ruleSet,
                                           playerTwoPosition);
 

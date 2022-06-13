@@ -26,6 +26,23 @@ public class Player extends Agent {
 
     @Override
     public ActionToken act(ActionToken actionToken) {
+
+        // if we're here it's because we're at the top of a round, just after a reshuffle has occurred.
+        if (actionToken.getAction() == Action.REQUEST_WAGER && actionToken.getDiscardTrayCardSize() == 0) {
+            resetCount();
+            LOG.info("{} reset count to: {}", actionToken.getActionTarget(), getCount());
+        }
+
+        // if we're here it's because we're at the end of the round, prior to adjudication, and the DEALER is giving us
+        // an opportunity to update our count before cards get cleared.
+        if (actionToken.getAction() == Action.UPDATE_COUNT) {
+            updateCount(actionToken);
+            LOG.info("{} updated count to: {}", actionToken.getActionTarget(), getCount());
+            return actionToken.getDealerNextActionToken();
+        }
+
+        // if we're still in here it means we're dealing with regular play. As such we can count on all the
+        // action targets to be in the form of {AGENT_POSITION}$H{HAND_INDEX}
         int handIndex = getHandIndexFromAgentPosition(actionToken.getActionTarget());
         int numActiveHands = getHandCollection().size();
 

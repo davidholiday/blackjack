@@ -35,17 +35,30 @@ public class Dealer extends Agent {
 
     private final Map<AgentPosition, Double> playerInsuranceMap = new HashMap<>();
 
+    // which players are done playing their hand
     private final Set<AgentPosition> playerDoneSet = new HashSet<>();
 
+    // which players have updated their counts at the end of the round - prior to adjudication?
     private final Set<AgentPosition> playerUpdateCountDoneSet = new HashSet<>();
 
+    // flag that assists with integrity checking. when this is FALSE, we know that the playerHandMap
+    // is still fully populated - meaning we can cross check the playerDoneSet against the playerHandMap to
+    // ensure we're not having the players update their counts before all plays have been made.
+    private boolean allPlayersUpdatedCount = false;
+
+    // flag gets set when cut card is reached. Indicates to the dealer to shuffle the shoe. checked at GAME_START
     private boolean reshuffleFlag = true;
 
+    // flag telling the dealer whether or not to present their hole card. Is set to FALSE once all players have
+    // make their playes.
     private boolean hideHoleCard = true;
 
+    // indicator that we're in the adjudication phase. Most of the handlers for various dealer actions will use this
+    // flag to determine whether or not to eject immediately.
     private boolean adjudicationPhase = false;
 
-    private boolean insuranceBetSettled = false;
+    // indicator to handlers that OFFER_INSURANCE that we've already done so
+    private boolean insuranceBetsSettled = false;
 
     private List<AgentPosition> dealOrder =
             Stream.of(
@@ -81,7 +94,7 @@ public class Dealer extends Agent {
         ).collect(Collectors.toList());
 
     public Dealer(PlayStrategy playStrategy, Shoe shoe, RuleSet ruleSet) {
-        super(new NoCountStrategy((shoe.getCardListSize()) / 52), playStrategy, Integer.MAX_VALUE, ruleSet, DEALER);
+        super(new NoCountStrategy(ruleSet), playStrategy, Integer.MAX_VALUE, ruleSet, DEALER);
         this.shoe = shoe;
     }
 
@@ -141,8 +154,9 @@ public class Dealer extends Agent {
                 playerDoneSet.clear();
                 playerUpdateCountDoneSet.clear();
                 hideHoleCard = true;
+                allPlayersUpdatedCount = false;
                 adjudicationPhase = false;
-                insuranceBetSettled = false;
+                insuranceBetsSettled = false;
 
                 if (reshuffleFlag) {
                     LOG.info("reshuffle flag is set - shuffling and cutting shoe...");
@@ -213,7 +227,7 @@ public class Dealer extends Agent {
                         LOG.debug("all insurance bets settled. clearing playerInsuranceMap");
                         playerInsuranceMap.clear();
                     }
-                    insuranceBetSettled = true;
+                    insuranceBetsSettled = true;
                 }
                 // fall into CHECK_FOR_DEALER_BLACKJACK
             case CHECK_FOR_DEALER_BLACKJACK:
@@ -242,15 +256,14 @@ public class Dealer extends Agent {
                 }
                 // fall into UPDATE_COUNT
             case UPDATE_COUNT:
-                if (playerDoneSet.size() != actionToken.getPlayerHandMap().size()) {
-                    String msg = "can't send UPDATE_COUNT signal before all players have finished playing their hands!";
-                    throw new IllegalStateException(msg);
-                }
-                LOG.info("*!* ALL PLAYS MADE -- SENDING SIGNAL TO PLAYERS TO UPDATE THEIR COUNTS *!*");
                 Optional<ActionToken> getUpdateCountActionToken = getUpdateCountActionToken(actionToken);
                 if (getUpdateCountActionToken.isPresent()) {
+                    LOG.info("*!* ALL PLAYS MADE -- SENDING SIGNAL TO {} TO UPDATE THEIR COUNT *!*",
+                            getUpdateCountActionToken.get().getActionTarget());
+
                     return getUpdateCountActionToken.get();
                 }
+                allPlayersUpdatedCount = true;
                 // fall into ADJUDICATE_GAME
             case ADJUDICATE_GAME:
                 if (adjudicationPhase == false) {
@@ -308,7 +321,7 @@ public class Dealer extends Agent {
                     throw new IllegalStateException("playerInsuranceMap should be empty at endgame state!");
                 }
 
-                if (insuranceBetSettled == false) {
+                if (insuranceBetsSettled == false) {
                     throw new IllegalStateException("insurances bets not settled at endgame state!");
                 }
 
@@ -318,8 +331,9 @@ public class Dealer extends Agent {
                 playerDoneSet.clear();
                 playerUpdateCountDoneSet.clear();
                 hideHoleCard = true;
+                allPlayersUpdatedCount = false;
                 adjudicationPhase = false;
-                insuranceBetSettled = false;
+                insuranceBetsSettled = false;
 
                 // end the round
                 return actionToken.getEndGameActionToken(getHand(), getDiscardTrayCardSize());
@@ -629,7 +643,7 @@ public class Dealer extends Agent {
     }
 
     private Optional<ActionToken> getOfferInsuranceActionToken(ActionToken actionToken) {
-        if (insuranceBetSettled) { return Optional.empty(); }
+        if (insuranceBetsSettled) { return Optional.empty(); }
         if (adjudicationPhase) { return Optional.empty(); }
 
 
@@ -754,7 +768,8 @@ public class Dealer extends Agent {
 
     private Optional<ActionToken> getUpdateCountActionToken(ActionToken actionToken) {
         // double check we're not doing this prematurely
-        if (playerDoneSet.size() != actionToken.getPlayerHandMap().size()) {
+        if (allPlayersUpdatedCount == false
+                && (playerDoneSet.size() != actionToken.getPlayerHandMap().size())) {
             String msg = "can't send UPDATE_COUNT signal before all players have finished playing their hands!";
             throw new IllegalStateException(msg);
         }

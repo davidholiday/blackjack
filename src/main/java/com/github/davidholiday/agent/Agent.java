@@ -30,8 +30,6 @@ public abstract class Agent {
 
     private AgentPosition agentPosition;
 
-    private int count = 0;
-
     public Agent(CountStrategy countStrategy,
                  PlayStrategy playStrategy,
                  double bankroll,
@@ -131,11 +129,13 @@ public abstract class Agent {
     public String getPlayStrategyName() { return playStrategy.getName(); }
 
     public int getCount() {
-        return count;
+        return countStrategy.getCount();
     }
 
-    void updateCount(ActionToken actionToken) {
-        count = countStrategy.updateCount(actionToken);
+    void updateCount(ActionToken actionToken) { countStrategy.updateCount(actionToken); }
+
+    void resetCount() {
+        countStrategy.resetCount();
     }
 
     Action getNextAction(ActionToken actionToken, int handIndex) {
@@ -147,7 +147,7 @@ public abstract class Agent {
             handIndex -= 1;
         }
         Hand hand = handCollection.getHand(handIndex);
-        return playStrategy.evaluateHand(hand, count, actionToken);
+        return playStrategy.evaluateHand(hand, getCount(), actionToken);
     }
 
     void updateBankroll(double updateBy) {

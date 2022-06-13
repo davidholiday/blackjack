@@ -6,6 +6,7 @@ import com.github.davidholiday.cardcollection.Hand;
 import com.github.davidholiday.cardcollection.HandCollection;
 import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
+import com.github.davidholiday.game.RuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,9 +18,8 @@ public class SpeedCountCountStrategy extends CountStrategy {
 
     private int numHands = 0;
 
-    public SpeedCountCountStrategy(int shoeDeckSize) {
-        super(shoeDeckSize);
-        resetCount();
+    public SpeedCountCountStrategy(RuleSet ruleSet) {
+        super(ruleSet);
     }
 
     @Override
@@ -36,8 +36,6 @@ public class SpeedCountCountStrategy extends CountStrategy {
 
     @Override
     public double getWager(ActionToken actionToken) {
-
-LOG.warn("{} has count of: {}", actionToken.getActionTarget(), count);
 
         // pg 24 of the book - conservative/simple bet ramp
         switch (shoeDeckSize) {
@@ -142,11 +140,22 @@ LOG.warn("{} has count of: {}", actionToken.getActionTarget(), count);
     public double getLastAnteWager() { return lastAnteWager; }
 
     @Override
-    public int updateCount(ActionToken actionToken) {
+    public void updateCount(ActionToken actionToken) {
+        int numHands = actionToken.getPlayerHandMap().size();
+        for (Hand hand : actionToken.getPlayerHandMap().values()) {
+            for (Card card : hand.getAllCards(false)) {
+                if (card.getCardType() == CardType.TWO
+                        || card.getCardType() == CardType.THREE
+                        || card.getCardType() == CardType.FOUR
+                        || card.getCardType() == CardType.FIVE
+                        || card.getCardType() == CardType.SIX) {
 
+                    count += 1;
+                }
+            }
+        }
 
-
-        return count;
+        count -= numHands;
     }
 
 
