@@ -26,8 +26,6 @@ public class Player extends Agent {
 
     @Override
     public ActionToken act(ActionToken actionToken) {
-//LOG.warn("** " + actionToken);
-        updateCount(actionToken);
         int handIndex = getHandIndexFromAgentPosition(actionToken.getActionTarget());
         int numActiveHands = getHandCollection().size();
 

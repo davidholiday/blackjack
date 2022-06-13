@@ -142,27 +142,8 @@ LOG.warn("{} has count of: {}", actionToken.getActionTarget(), count);
     public double getLastAnteWager() { return lastAnteWager; }
 
     @Override
-    public int updateCount(HandCollection handCollection, ActionToken actionToken) {
-        // we should only fall into this at the top of a round when a reshuffle has just happened
-        if (actionToken.getDiscardTrayCardSize() == 0 && actionToken.getAction() == Action.REQUEST_WAGER) {
-LOG.warn("clearing maps and resetting count");
-            resetCount();
-        // here we need to push a new playerHandMap onto the list as we're starting a new round
-        } else if (actionToken.getAction() == Action.REQUEST_WAGER) {
-            playerHandMaps.add(actionToken.getPlayerHandMap());
-        }
+    public int updateCount(ActionToken actionToken) {
 
-//LOG.warn(actionToken.toString());
-        // on CLEAR_HAND is when we do our subtraction and set ourselves up to compute the next wager...
-        if (actionToken.getAction() == Action.CLEAR_HAND) {
-            numHands += actionToken.getPlayerHandMap().size();
-            count = (getInitialCount() + seenCardsSet.size()) - numHands;
-LOG.warn("initialCount: {}  seenCardsSet size: {}  numHands: {}", getInitialCount(), seenCardsSet.size(), numHands);
-LOG.warn("end of round! count is now: {}", count);
-System.out.println("ASDFASD");
-        } else {
-            updateCurrentPlayerHandMap(actionToken);
-        }
 
 
         return count;

@@ -37,6 +37,8 @@ public class Dealer extends Agent {
 
     private final Set<AgentPosition> playerDoneSet = new HashSet<>();
 
+    private final Set<AgentPosition> playerUpdateCountDoneSet = new HashSet<>();
+
     private boolean reshuffleFlag = true;
 
     private boolean hideHoleCard = true;
@@ -137,6 +139,7 @@ public class Dealer extends Agent {
                 playerWagerMap.clear();
                 playerInsuranceMap.clear();
                 playerDoneSet.clear();
+                playerUpdateCountDoneSet.clear();
                 hideHoleCard = true;
                 adjudicationPhase = false;
                 insuranceBetSettled = false;
@@ -237,6 +240,17 @@ public class Dealer extends Agent {
                 if (requestDealerPlayActionToken.isPresent()) {
                     return requestDealerPlayActionToken.get();
                 }
+                // fall into UPDATE_COUNT
+            case UPDATE_COUNT:
+                if (playerDoneSet.size() != actionToken.getPlayerHandMap().size()) {
+                    String msg = "can't send UPDATE_COUNT signal before all players have finished playing their hands!";
+                    throw new IllegalStateException(msg);
+                }
+                LOG.info("*!* ALL PLAYS MADE -- SENDING SIGNAL TO PLAYERS TO UPDATE THEIR COUNTS *!*");
+                Optional<ActionToken> getUpdateCountActionToken = getUpdateCountActionToken(actionToken);
+                if (getUpdateCountActionToken.isPresent()) {
+                    return getUpdateCountActionToken.get();
+                }
                 // fall into ADJUDICATE_GAME
             case ADJUDICATE_GAME:
                 if (adjudicationPhase == false) {
@@ -302,6 +316,7 @@ public class Dealer extends Agent {
                 playerWagerMap.clear();
                 playerInsuranceMap.clear();
                 playerDoneSet.clear();
+                playerUpdateCountDoneSet.clear();
                 hideHoleCard = true;
                 adjudicationPhase = false;
                 insuranceBetSettled = false;
@@ -737,6 +752,32 @@ public class Dealer extends Agent {
 
     }
 
+    private Optional<ActionToken> getUpdateCountActionToken(ActionToken actionToken) {
+        // double check we're not doing this prematurely
+        if (playerDoneSet.size() != actionToken.getPlayerHandMap().size()) {
+            String msg = "can't send UPDATE_COUNT signal before all players have finished playing their hands!";
+            throw new IllegalStateException(msg);
+        }
+
+        Set<AgentPosition> agentSetNoHandIndex = getAgentSetNoHandIndex(actionToken);
+        playerUpdateCountDoneSet.add(DEALER);
+
+        for (AgentPosition agentPosition : agentSetNoHandIndex) {
+            if (playerUpdateCountDoneSet.contains(agentPosition)) { continue; }
+
+            playerUpdateCountDoneSet.add(agentPosition);
+            ActionToken updateCountActionToken = new ActionToken.Builder(actionToken)
+                                                                .withAction(Action.UPDATE_COUNT)
+                                                                .withActionSource(DEALER)
+                                                                .withActionTarget(agentPosition)
+                                                                .build();
+
+            return Optional.of(updateCountActionToken);
+        }
+
+        return Optional.empty();
+    }
+
     private Optional<ActionToken> getAdjudicateActionToken(ActionToken actionToken) {
 
         // make sure everyone has played their hand before we do this
@@ -833,6 +874,16 @@ public class Dealer extends Agent {
             }
         }
         return Optional.empty();
+    }
+
+    private Set<AgentPosition> getAgentSetNoHandIndex(ActionToken actionToken) {
+        Set<AgentPosition> agentSetNoHandIndex = new HashSet<>();
+        for (AgentPosition agentPosition : actionToken.getPlayerHandMap().keySet()) {
+            if (agentPosition == DEALER) { agentSetNoHandIndex.add(agentPosition); }
+            String agentPositionNoHandIndex = agentPosition.toString().split("\\$")[0];
+            agentSetNoHandIndex.add(AgentPosition.valueOf(agentPositionNoHandIndex));
+        }
+        return agentSetNoHandIndex;
     }
 
 }

@@ -42,7 +42,7 @@ public abstract class CountStrategy {
 
     public abstract double getLastAnteWager();
 
-    public abstract int updateCount(HandCollection handCollection, ActionToken actionToken);
+    public abstract int updateCount(ActionToken actionToken);
 
     public int getCount() { return count; }
 

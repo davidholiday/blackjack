@@ -28,5 +28,6 @@ public enum Action {
     OFFER_MONEY,
     TAKE_MONEY,
     CLEAR_HAND,
+    UPDATE_COUNT,
     NONE
 }

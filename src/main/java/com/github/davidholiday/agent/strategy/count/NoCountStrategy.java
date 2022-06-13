@@ -26,7 +26,7 @@ public class NoCountStrategy extends CountStrategy {
     }
 
     @Override
-    public int updateCount(HandCollection handCollection, ActionToken actionToken) {
+    public int updateCount(ActionToken actionToken) {
         return 0;
     }
 

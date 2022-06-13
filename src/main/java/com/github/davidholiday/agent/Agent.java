@@ -135,7 +135,7 @@ public abstract class Agent {
     }
 
     void updateCount(ActionToken actionToken) {
-        count = countStrategy.updateCount(handCollection, actionToken);
+        count = countStrategy.updateCount(actionToken);
     }
 
     Action getNextAction(ActionToken actionToken, int handIndex) {
