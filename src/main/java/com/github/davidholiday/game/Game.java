@@ -180,8 +180,13 @@ public class Game implements Callable<Integer> {
 
         // so logback can differentiate where the log streams are coming from and put the streams from
         // each worker into its own file
-        String threadID = String.valueOf(Thread.currentThread().getId());
-        MDC.put("THREAD_LOG_ID", threadID);
+//        String threadID = String.valueOf(Thread.currentThread().getId());
+//        MDC.put("THREAD_LOG_ID", threadID);
+
+        // threads are (rightly) picking up on whatever callable they can get their hands on when they are ready
+        // for work - meaning delimiting the logs by worker is causing the worker logs to contain multiple game
+        // runs - and thus - is confusing AF. delimiting by game object instead for my sanity
+        MDC.put("GAME_ID", Integer.toHexString(hashCode()));
 
         LOG.info("*!* BEGIN RUN OF " + numRounds + " ROUNDS *!* ");
         LOG.info("playerMap is: {}", playerMap);

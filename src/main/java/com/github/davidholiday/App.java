@@ -163,13 +163,13 @@ public class App {
 
             Player playerOne = new Player(noCountStrategy,
                                           playerStrategy,
-                                          1000,
+                                          2500,
                                           ruleSet,
                                           playerOnePosition);
 
             Player playerTwo = new Player(speedCountStrategy,
                                           playerStrategy,
-                                   1000,
+                                   2500,
                                           ruleSet,
                                           playerTwoPosition);
 

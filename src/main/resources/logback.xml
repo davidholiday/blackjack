@@ -38,12 +38,12 @@
 
   <appender name="FILE-THREAD" class="ch.qos.logback.classic.sift.SiftingAppender">
     <discriminator>
-      <key>THREAD_LOG_ID</key>
+      <key>GAME_ID</key>
       <defaultValue>666</defaultValue>
     </discriminator>
     <sift>
       <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file> logs/${byDay}/worker-${THREAD_LOG_ID}-${byDay}.log </file>
+        <file> logs/${byDay}/gameId-${GAME_ID}-${byDay}.log </file>
         <append>true</append>
         <encoder>
           <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>

@@ -24,9 +24,9 @@ public abstract class Agent {
 
     private final PlayStrategy playStrategy;
 
-    private double bankroll;
+    private Double bankroll;
 
-    private double initialBankroll;
+    private Double initialBankroll;
 
     private AgentPosition agentPosition;
 
@@ -166,7 +166,7 @@ public abstract class Agent {
 
     }
 
-    public double getBankroll() { return bankroll; }
+    public double getBankroll() { return Double.valueOf(bankroll); }
 
     double getWager(ActionToken actionToken) {
         double wager = countStrategy.getWager(actionToken);
