@@ -22,11 +22,13 @@ public abstract class CountStrategy {
 
     double lastAnteWager = 0;
 
-    double baseWager = 10;
+    double baseWager;
 
     List<Map<AgentPosition, Hand>> playerHandMaps = new ArrayList<>();
 
-    public CountStrategy(RuleSet ruleSet) {
+    public CountStrategy(RuleSet ruleSet, double baseWager) {
+        this.baseWager = baseWager;
+
         Optional<Rule> deckSizeRuleOptional = Optional.empty();
 
         for (Rule rule : ruleSet.getRuleSetStream().collect(Collectors.toList())) {

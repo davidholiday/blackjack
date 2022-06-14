@@ -174,6 +174,12 @@ public abstract class Agent {
         return wager;
     }
 
+    double getLastAnteWagerDeductBankroll() {
+        double lastAnteWager = getLastAnteWager();
+        updateBankroll(-lastAnteWager);
+        return lastAnteWager;
+    }
+
     double getLastAnteWager() { return countStrategy.getLastAnteWager(); }
 
     double getInsuranceWager(ActionToken actionToken, int handIndex) {

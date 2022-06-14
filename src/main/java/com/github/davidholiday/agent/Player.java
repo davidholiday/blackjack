@@ -86,12 +86,11 @@ public class Player extends Agent {
                 boolean toFourHandsOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_TO_FOUR_HANDS);
                 boolean playerCanResplitAcesOk = actionToken.getRuleSet().contains(Rule.PLAYER_CAN_RESPLIT_ACES);
 
-                double offeredMoney = getLastAnteWager();
                 switch(numActiveHands) {
                     case 1:
                         if (toTwoHandsOk || toThreeHandsOk || toFourHandsOk) {
-                            updateBankroll(-offeredMoney);
-                            return getOfferMoneyActionTokenForSplit(actionToken, nextAction, offeredMoney);
+                            return getOfferMoneyActionTokenForSplit(
+                                    actionToken, nextAction, getLastAnteWagerDeductBankroll());
                         }
                     case 2:
                         if (toThreeHandsOk || toFourHandsOk) {
@@ -102,8 +101,8 @@ public class Player extends Agent {
                                                                   .getCardType();
 
                             if (handTwoCardType == CardType.ACE && playerCanResplitAcesOk) {
-                                updateBankroll(-offeredMoney);
-                                return getOfferMoneyActionTokenForSplit(actionToken, nextAction, offeredMoney);
+                                return getOfferMoneyActionTokenForSplit(
+                                        actionToken, nextAction, getLastAnteWagerDeductBankroll());
                             }
 
                         }
@@ -116,12 +115,13 @@ public class Player extends Agent {
                                                                     .getCardType();
 
                             if (handThreeCardType == CardType.ACE && playerCanResplitAcesOk) {
-                                updateBankroll(-offeredMoney);
-                                return getOfferMoneyActionTokenForSplit(actionToken, nextAction, offeredMoney);
+                                return getOfferMoneyActionTokenForSplit(
+                                        actionToken, nextAction, getLastAnteWagerDeductBankroll());
                             }
                         }
                     default:
-                        LOG.debug("turning off split pair evaluation for player hand: {}", actionToken.getActionTarget());
+                        LOG.debug(
+                                "turning off split pair evaluation for player hand: {}", actionToken.getActionTarget());
                         // re-evaluate with pair evaluation turned off
                         ActionToken actionTokenNoSplit = new ActionToken.Builder(actionToken)
                                                                         .withEvaluatePairForSplit(false)
@@ -132,8 +132,7 @@ public class Player extends Agent {
 
 
             case DOUBLE_DOWN:
-                double doubleDownWager = getLastAnteWager();
-                return getOfferMoneyActionToken(actionToken, nextAction, doubleDownWager);
+                return getOfferMoneyActionToken(actionToken, nextAction, getLastAnteWagerDeductBankroll());
             case HIT:
                 Card firstCardInHand = getHand(handIndex).peek(1).get(0);
                 boolean playerCanHitSplitAces = actionToken.getRuleSet()

@@ -9,8 +9,9 @@ public class NoCountStrategy extends CountStrategy {
 
     public static final String NAME = "NO_COUNT_STRATEGY";
 
-    public NoCountStrategy(RuleSet ruleSet) {
-        super(ruleSet);
+    public NoCountStrategy(RuleSet ruleSet, double baseWager) {
+
+        super(ruleSet, baseWager);
     }
 
     @Override
@@ -31,8 +32,8 @@ public class NoCountStrategy extends CountStrategy {
 
     @Override
     public double getWager(ActionToken actionToken) {
-        lastAnteWager = 10;
-        return 10;
+        lastAnteWager = baseWager;
+        return baseWager;
     }
 
     @Override

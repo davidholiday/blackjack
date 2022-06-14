@@ -18,8 +18,8 @@ public class SpeedCountCountStrategy extends CountStrategy {
 
     private int numHands = 0;
 
-    public SpeedCountCountStrategy(RuleSet ruleSet) {
-        super(ruleSet);
+    public SpeedCountCountStrategy(RuleSet ruleSet, double baseWager) {
+        super(ruleSet, baseWager);
     }
 
     @Override
