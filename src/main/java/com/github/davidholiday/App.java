@@ -1,10 +1,11 @@
 package com.github.davidholiday;
 
+import com.github.davidholiday.agent.Agent;
 import com.github.davidholiday.agent.AgentPosition;
 import com.github.davidholiday.agent.Player;
-import com.github.davidholiday.agent.strategy.count.NoCountStrategy;
-import com.github.davidholiday.agent.strategy.count.SpeedCountCountStrategy;
+import com.github.davidholiday.agent.strategy.count.*;
 import com.github.davidholiday.agent.strategy.play.BasicFourSixEightDeckPlayerStrategy;
+import com.github.davidholiday.agent.strategy.play.PlayerStrategy;
 import com.github.davidholiday.game.Game;
 import com.github.davidholiday.game.Rule;
 import com.github.davidholiday.game.RuleSet;
@@ -156,10 +157,17 @@ public class App {
 
             AgentPosition playerOnePosition = orderedPlayerList.get(0);
             AgentPosition playerTwoPosition = orderedPlayerList.get(1);
+            AgentPosition playerThreePosition = orderedPlayerList.get(2);
+            AgentPosition playerFourPosition = orderedPlayerList.get(3);
 
-            NoCountStrategy noCountStrategy = new NoCountStrategy(ruleSet, 10);
-            SpeedCountCountStrategy speedCountStrategy = new SpeedCountCountStrategy(ruleSet, 10);
-            BasicFourSixEightDeckPlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
+            CountStrategy noCountStrategy = new NoCountStrategy(ruleSet, 10);
+            CountStrategy speedCountStrategy = new SpeedCountCountStrategy(ruleSet, 10);
+            CountStrategy reKoConservativeCountStrategy = new reKoStrategyConservativeBetRamp(ruleSet, 10);
+            CountStrategy reKoModerateCountStrategy = new reKoStrategyModerateBetRamp(ruleSet, 10);
+
+
+            PlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
+
 
             Player playerOne = new Player(noCountStrategy,
                                           playerStrategy,
@@ -173,9 +181,23 @@ public class App {
                                           ruleSet,
                                           playerTwoPosition);
 
+            Player playerThree = new Player(reKoConservativeCountStrategy,
+                                            playerStrategy,
+                                            2500,
+                                            ruleSet,
+                                            playerThreePosition);
+
+            Player playerFour = new Player(reKoModerateCountStrategy,
+                                           playerStrategy,
+                                           2500,
+                                           ruleSet,
+                                           playerFourPosition);
+
             Game game = new Game.Builder()
                                 .withPlayer(playerOne)
                                 .withPlayer(playerTwo)
+                                .withPlayer(playerThree)
+                                .withPlayer(playerFour)
                                 .withRuleSet(ruleSet)
                                 .withNumRounds(roundsPerWorker)
                                 .build();
