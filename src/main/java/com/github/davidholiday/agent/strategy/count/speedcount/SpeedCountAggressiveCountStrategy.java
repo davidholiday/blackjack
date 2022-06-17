@@ -1,34 +1,19 @@
-package com.github.davidholiday.agent.strategy.count;
+package com.github.davidholiday.agent.strategy.count.speedcount;
 
-import com.github.davidholiday.card.Card;
-import com.github.davidholiday.card.CardType;
-import com.github.davidholiday.cardcollection.Hand;
-import com.github.davidholiday.cardcollection.HandCollection;
-import com.github.davidholiday.game.Action;
 import com.github.davidholiday.game.ActionToken;
 import com.github.davidholiday.game.RuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SpeedCountCountStrategy extends CountStrategy {
+public class SpeedCountAggressiveCountStrategy extends SpeedCountStrategy {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SpeedCountCountStrategy.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SpeedCountAggressiveCountStrategy.class);
 
-    public static final String NAME = "SPEED_COUNT_STRATEGY";
+    public static final String NAME = "SPEED_COUNT_AGGRESSIVE_STRATEGY";
 
-    private int numHands = 0;
-
-    public SpeedCountCountStrategy(RuleSet ruleSet, double baseWager) {
+    public SpeedCountAggressiveCountStrategy(RuleSet ruleSet, double baseWager) {
         super(ruleSet, baseWager);
     }
-
-    @Override
-    public void resetCount() {
-        playerHandMaps.clear();
-        numHands = 0;
-        count = getInitialCount();
-    }
-
 
 
     @Override
@@ -48,24 +33,15 @@ public class SpeedCountCountStrategy extends CountStrategy {
                     lastAnteWager = baseWager * 2;
                     return lastAnteWager;
                 }
-                else if (count >= 32) {
+                else if (count == 32) {
                     lastAnteWager = baseWager * 3;
                     return lastAnteWager;
                 }
-            case 2:
-                if (count < 31) {
-                    lastAnteWager = baseWager;
-                    return lastAnteWager;
-                }
-                else if (count == 31) {
-                    lastAnteWager = baseWager * 2;
-                    return lastAnteWager;
-                }
-                else if (count >= 32) {
+                else if (count >= 33) {
                     lastAnteWager = baseWager * 4;
                     return lastAnteWager;
                 }
-            case 4:
+            case 2:
                 if (count < 31) {
                     lastAnteWager = baseWager;
                     return lastAnteWager;
@@ -86,6 +62,27 @@ public class SpeedCountCountStrategy extends CountStrategy {
                     lastAnteWager = baseWager * 5;
                     return lastAnteWager;
                 }
+            case 4:
+                if (count < 31) {
+                    lastAnteWager = baseWager;
+                    return lastAnteWager;
+                }
+                else if (count == 31) {
+                    lastAnteWager = baseWager * 2;
+                    return lastAnteWager;
+                }
+                else if (count == 32) {
+                    lastAnteWager = baseWager * 4;
+                    return lastAnteWager;
+                }
+                else if (count == 33) {
+                    lastAnteWager = baseWager * 6;
+                    return lastAnteWager;
+                }
+                else if (count >= 34) {
+                    lastAnteWager = baseWager * 8;
+                    return lastAnteWager;
+                }
             case 6:
                 if (count < 31) {
                     lastAnteWager = baseWager;
@@ -99,89 +96,45 @@ public class SpeedCountCountStrategy extends CountStrategy {
                     lastAnteWager = baseWager * 4;
                     return lastAnteWager;
                 }
-                else if (count >= 33) {
-                    lastAnteWager = baseWager * 8;
-                    return lastAnteWager;
-                }
-            case 8:
-                if (count < 31) {
-                    lastAnteWager = baseWager;
-                    return lastAnteWager;
-                }
-                else if (count == 31) {
-                    lastAnteWager = baseWager * 2;
-                    return lastAnteWager;
-                }
-                else if (count == 32) {
-                    lastAnteWager = baseWager * 4;
-                    return lastAnteWager;
-                }
-                else if (count >= 33) {
+                else if (count == 33) {
                     lastAnteWager = baseWager * 6;
                     return lastAnteWager;
                 }
                 else if (count == 34) {
-                    lastAnteWager = baseWager * 8;
+                    lastAnteWager = baseWager * 10;
                     return lastAnteWager;
                 }
                 else if (count >= 35) {
+                    lastAnteWager = baseWager * 12;
+                    return lastAnteWager;
+                }
+            case 8:
+                if (count < 31) {
+                    lastAnteWager = baseWager;
+                    return lastAnteWager;
+                }
+                else if (count == 31) {
+                    lastAnteWager = baseWager * 2;
+                    return lastAnteWager;
+                }
+                else if (count == 32) {
+                    lastAnteWager = baseWager * 4;
+                    return lastAnteWager;
+                }
+                else if (count == 33) {
+                    lastAnteWager = baseWager * 6;
+                    return lastAnteWager;
+                }
+                else if (count == 34) {
                     lastAnteWager = baseWager * 10;
+                    return lastAnteWager;
+                }
+                else if (count >= 35) {
+                    lastAnteWager = baseWager * 12;
                     return lastAnteWager;
                 }
             default:
                 throw new IllegalStateException("there should only be shoe sizes of 1, 2, 4, 6, or 8 decks");
-        }
-    }
-
-    @Override
-    public double getInsuranceBet(Hand hand, ActionToken actionToken) { return 0; }
-
-    @Override
-    public double getLastAnteWager() { return lastAnteWager; }
-
-    @Override
-    public void updateCount(ActionToken actionToken) {
-        int numHands = actionToken.getPlayerHandMap().size();
-        for (Hand hand : actionToken.getPlayerHandMap().values()) {
-            for (Card card : hand.getAllCards(false)) {
-                if (card.getCardType() == CardType.TWO
-                        || card.getCardType() == CardType.THREE
-                        || card.getCardType() == CardType.FOUR
-                        || card.getCardType() == CardType.FIVE
-                        || card.getCardType() == CardType.SIX) {
-
-                    count += 1;
-                }
-            }
-        }
-
-        count -= numHands;
-    }
-
-
-    private int getInitialCount() {
-        switch (super.shoeDeckSize) {
-            case 1:
-                // fall into TWO - though we're ignoring a special case for initial count for now...
-            case 2:
-                return 30;
-            case 3:
-                // these don't exist I think but whatevs...
-                // fall into FOUR
-            case 4:
-                return 29;
-            case 5:
-                // these don't exist I think but whatevs...
-                // fall into SIX
-            case 6:
-                return 27;
-            case 7:
-                // these don't exist I think but whatevs...
-                // fall into EIGHT
-            case 8:
-                return  26;
-            default:
-                throw new IllegalStateException("shoe deck size should be between one and eight decks!");
         }
     }
 

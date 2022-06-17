@@ -154,8 +154,7 @@ public abstract class Agent {
 
         if (bankroll + updateBy < 0 ) {
             LOG.info("*!* bankroll has been ruined for agent: {} *!*", this);
-            LOG.info("*!* resetting bankroll to: {} for agent: {} *!*", initialBankroll, this);
-            bankroll = initialBankroll;
+            resetBankroll();
         } else if (bankroll + updateBy > Double.MAX_VALUE) {
             LOG.info("bankroll has been exceeded for agent {} *!*", this);
             bankroll = Double.MAX_VALUE;
@@ -164,6 +163,11 @@ public abstract class Agent {
             bankroll += updateBy;
         }
 
+    }
+
+    public void resetBankroll() {
+        LOG.info("*!* resetting bankroll to: {} for agent: {} to: ${} *!*", initialBankroll, this, initialBankroll);
+        bankroll = initialBankroll;
     }
 
     public double getBankroll() { return Double.valueOf(bankroll); }

@@ -1,9 +1,11 @@
 package com.github.davidholiday;
 
-import com.github.davidholiday.agent.Agent;
 import com.github.davidholiday.agent.AgentPosition;
 import com.github.davidholiday.agent.Player;
 import com.github.davidholiday.agent.strategy.count.*;
+import com.github.davidholiday.agent.strategy.count.reko.reKoConservativeCountStrategy;
+import com.github.davidholiday.agent.strategy.count.reko.reKoModerateCountStrategy;
+import com.github.davidholiday.agent.strategy.count.speedcount.SpeedCountConservativeCountStrategy;
 import com.github.davidholiday.agent.strategy.play.BasicFourSixEightDeckPlayerStrategy;
 import com.github.davidholiday.agent.strategy.play.PlayerStrategy;
 import com.github.davidholiday.game.Game;
@@ -161,9 +163,9 @@ public class App {
             AgentPosition playerFourPosition = orderedPlayerList.get(3);
 
             CountStrategy noCountStrategy = new NoCountStrategy(ruleSet, 10);
-            CountStrategy speedCountStrategy = new SpeedCountCountStrategy(ruleSet, 10);
-            CountStrategy reKoConservativeCountStrategy = new reKoStrategyConservativeBetRamp(ruleSet, 10);
-            CountStrategy reKoModerateCountStrategy = new reKoStrategyModerateBetRamp(ruleSet, 10);
+            CountStrategy speedCountStrategy = new SpeedCountConservativeCountStrategy(ruleSet, 10);
+            CountStrategy reKoConservativeCountStrategy = new reKoConservativeCountStrategy(ruleSet, 10);
+            CountStrategy reKoModerateCountStrategy = new reKoModerateCountStrategy(ruleSet, 10);
 
 
             PlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();

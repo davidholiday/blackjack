@@ -41,6 +41,8 @@ public class Game implements Callable<Integer> {
 
     private int numRounds = 1;
 
+    private boolean resetBankRollAfterRounds = false;
+
     public static class Builder {
         private RuleSet ruleSet = new RuleSet();
 
@@ -50,6 +52,9 @@ public class Game implements Callable<Integer> {
         private Map<AgentPosition, Player> playerMap;
 
         private int numRounds = 1;
+
+        private boolean resetBankRollAfterRounds = false;
+
 
         public Builder() {
             this.playerMap = new HashMap<>();
@@ -94,6 +99,11 @@ public class Game implements Callable<Integer> {
             return this;
         }
 
+        public Builder withResetBankRollAfterRounds (boolean resetBankRollAfterRounds) {
+            this.resetBankRollAfterRounds = resetBankRollAfterRounds;
+            return this;
+        }
+
         public Game build() {
             Game game = new Game();
 
@@ -111,6 +121,7 @@ public class Game implements Callable<Integer> {
             game.agentMap = Collections.unmodifiableMap(agentMap);
             game.actionBroker = new ActionBroker(game.agentMap);
             game.numRounds = numRounds;
+            game.resetBankRollAfterRounds = resetBankRollAfterRounds;
             return game;
         }
 
@@ -245,6 +256,12 @@ public class Game implements Callable<Integer> {
             LOG.info("playerMap is: {}", playerMap);
             for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
                 LOG.info("{} has bankroll of ${}", agentMapEntry.getKey(), agentMapEntry.getValue().getBankroll());
+            }
+        }
+
+        if (resetBankRollAfterRounds) {
+            for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
+                agentMapEntry.getValue().resetBankroll();
             }
         }
 

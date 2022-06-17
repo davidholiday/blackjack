@@ -16,13 +16,13 @@ public abstract class CountStrategy {
 
     private static final Logger LOG = LoggerFactory.getLogger(CountStrategy.class);
 
-    int shoeDeckSize;
+    protected int shoeDeckSize;
 
-    int count = 0;
+    protected double lastAnteWager = 0;
 
-    double lastAnteWager = 0;
+    protected double baseWager;
 
-    double baseWager;
+    protected int count = 0;
 
     List<Map<AgentPosition, Hand>> playerHandMaps = new ArrayList<>();
 
@@ -65,17 +65,20 @@ public abstract class CountStrategy {
         resetCount();
     }
 
-    public abstract void resetCount();
-
     public abstract String getName();
 
     public abstract double getWager(ActionToken actionToken);
 
     public abstract double getInsuranceBet(Hand hand, ActionToken actionToken);
 
-    public abstract double getLastAnteWager();
-
     public abstract void updateCount(ActionToken actionToken);
+
+    public abstract int getInitialCount();
+
+    public void resetCount() {
+        playerHandMaps.clear();
+        count = getInitialCount();
+    }
 
     public int getCount() { return count; }
 
@@ -85,5 +88,6 @@ public abstract class CountStrategy {
         playerHandMaps.set(playerHandMaps.size()-1, actionToken.getPlayerHandMap());
     }
 
+    public double getLastAnteWager() { return lastAnteWager; };
 
 }

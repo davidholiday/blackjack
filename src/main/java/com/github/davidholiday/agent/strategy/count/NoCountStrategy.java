@@ -31,6 +31,11 @@ public class NoCountStrategy extends CountStrategy {
     public void updateCount(ActionToken actionToken) { /* noop */ }
 
     @Override
+    public int getInitialCount() {
+        return 0;
+    }
+
+    @Override
     public double getWager(ActionToken actionToken) {
         lastAnteWager = baseWager;
         return baseWager;
