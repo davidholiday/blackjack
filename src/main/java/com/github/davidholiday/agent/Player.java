@@ -17,7 +17,7 @@ public class Player extends Agent {
 
     public Player(CountStrategy countStrategy,
                   PlayStrategy playStrategy,
-                  int bankroll,
+                  double bankroll,
                   RuleSet ruleSet,
                   AgentPosition agentPosition) {
 
