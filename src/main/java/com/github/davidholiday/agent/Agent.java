@@ -30,6 +30,8 @@ public abstract class Agent {
 
     private AgentPosition agentPosition;
 
+    private boolean wasRuined = false;
+
     public Agent(CountStrategy countStrategy,
                  PlayStrategy playStrategy,
                  double bankroll,
@@ -51,6 +53,12 @@ public abstract class Agent {
     }
 
     public abstract ActionToken act(ActionToken actionToken);
+
+    public void resetWasRuinedFlag() { wasRuined = false; }
+
+    public boolean getWasRuinedFlag() { return wasRuined; }
+
+    public double getBettingUnit() { return countStrategy.getBaseWager(); }
 
     public AgentPosition getAgentPosition() { return agentPosition; }
 
@@ -154,6 +162,7 @@ public abstract class Agent {
 
         if (bankroll + updateBy < 0 ) {
             LOG.info("*!* bankroll has been ruined for agent: {} *!*", this);
+            wasRuined = true;
             resetBankroll();
         } else if (bankroll + updateBy > Double.MAX_VALUE) {
             LOG.info("bankroll has been exceeded for agent {} *!*", this);

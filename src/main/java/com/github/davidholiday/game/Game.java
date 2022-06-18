@@ -21,10 +21,23 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class Game implements Callable<Integer> {
+public class Game implements Callable<Map<String, String>> {
 
-    private final LinkedBlockingQueue<Result> results = new LinkedBlockingQueue<Result>();
+    public static final String ROUND_COUNT_KEY = "ROUND_COUNT";
 
+    public static final String START_BANKROLL_SUFFIX_KEY = "_START_BANKROLL";
+
+    public static final String END_BANKROLL_SUFFIX_KEY = "_END_BANKROLL";
+
+    public static final String PLAY_STRATEGY_SUFFIX_KEY = "_PLAY_STRATEGY";
+
+    public static final String COUNT_STRATEGY_SUFFIX_KEY = "_COUNT_STRATEGY";
+
+    public static final String BETTING_UNIT_SUFFIX_KEY = "_BETTING_UNIT";
+
+    public static final String RESET_BANKROLL_AFTER_ROUNDS_KEY = "RESET_BANKROLL_AFTER_ROUNDS";
+
+    public static final String GAME_ID_KEY = "GAME_ID";
 
     public static final int CIRCUIT_BREAKER_FOR_ROUNDS = 1000;
 
@@ -183,11 +196,7 @@ public class Game implements Callable<Integer> {
     }
     private Game() {}
 
-    public Result takeResult() throws InterruptedException {
-        return results.take();
-    }
-
-    public Integer call() {
+    public Map<String, String> call() {
 
         // so logback can differentiate where the log streams are coming from and put the streams from
         // each worker into its own file
@@ -197,7 +206,13 @@ public class Game implements Callable<Integer> {
         // threads are (rightly) picking up on whatever callable they can get their hands on when they are ready
         // for work - meaning delimiting the logs by worker is causing the worker logs to contain multiple game
         // runs - and thus - is confusing AF. delimiting by game object instead for my sanity
-        MDC.put("GAME_ID", Integer.toHexString(hashCode()));
+        String gameId = Integer.toHexString(hashCode());
+        MDC.put(GAME_ID_KEY, gameId);
+
+        // we return a map with aggregate data for the round...
+        Map<String, String> rv = new HashMap<>();
+        rv.put(RESET_BANKROLL_AFTER_ROUNDS_KEY, Boolean.toString(resetBankRollAfterRounds));
+        rv.put(GAME_ID_KEY, gameId);
 
         LOG.info("*!* BEGIN RUN OF " + numRounds + " ROUNDS *!* ");
         LOG.info("playerMap is: {}", playerMap);
@@ -214,6 +229,25 @@ public class Game implements Callable<Integer> {
                     agentMapEntry.getKey(),
                     agentMapEntry.getValue().getCountStrategyName()
             );
+
+            // make sure each agent's ruined flag is set to false before starting the run
+            //   this is a callable so it's possible the call() method will be called more than once...
+            agentMapEntry.getValue().resetWasRuinedFlag();
+
+            // record start values
+            if (agentMapEntry.getKey() != AgentPosition.DEALER) {
+                String initialBankrollKey = agentMapEntry.getKey() + START_BANKROLL_SUFFIX_KEY;
+                rv.put(initialBankrollKey, Double.toString(agentMapEntry.getValue().getBankroll()));
+
+                String bettingUnitKey = agentMapEntry.getKey() + BETTING_UNIT_SUFFIX_KEY;
+                rv.put(bettingUnitKey, Double.toString(agentMapEntry.getValue().getBettingUnit()));
+
+                String playStrategyKey = agentMapEntry.getKey() + PLAY_STRATEGY_SUFFIX_KEY;
+                rv.put(playStrategyKey, agentMapEntry.getValue().getPlayStrategyName());
+
+                String countStrategyKey = agentMapEntry.getKey() + COUNT_STRATEGY_SUFFIX_KEY;
+                rv.put(countStrategyKey, agentMapEntry.getValue().getCountStrategyName());
+            }
         }
 
         for (int i = 0; i < numRounds; i ++) {
@@ -259,13 +293,31 @@ public class Game implements Callable<Integer> {
             }
         }
 
-        if (resetBankRollAfterRounds) {
-            for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
-                agentMapEntry.getValue().resetBankroll();
+        // record round tallies
+        rv.put(ROUND_COUNT_KEY, Integer.toString(numRounds));
+        for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
+            if (agentMapEntry.getKey() != AgentPosition.DEALER) {
+                String endBankrollKey = agentMapEntry.getKey() + END_BANKROLL_SUFFIX_KEY;
+                boolean playerWasRuined = agentMapEntry.getValue().getWasRuinedFlag();
+                double bankroll = playerWasRuined ? 0 : agentMapEntry.getValue().getBankroll();
+                rv.put(endBankrollKey, Double.toString(bankroll));
             }
         }
 
-        return numRounds;
+        if (resetBankRollAfterRounds) {
+            for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
+                agentMapEntry.getValue().resetBankroll();
+                LOG.info("{} bankroll reset to ${}", agentMapEntry.getKey(), agentMapEntry.getValue().getBankroll());
+            }
+        }
+
+        //
+        // we reset the 'wasRuined' flag at the top of the round cycle.
+        //
+
+        // done
+        LOG.info("*!* JSON RESULTS: {}", rv);
+        return rv;
     }
 
     public RuleSet getRuleSet() { return ruleSet; }

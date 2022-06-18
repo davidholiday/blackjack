@@ -90,4 +90,6 @@ public abstract class CountStrategy {
 
     public double getLastAnteWager() { return lastAnteWager; };
 
+    public double getBaseWager() { return baseWager; }
+
 }

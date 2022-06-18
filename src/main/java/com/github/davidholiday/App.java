@@ -16,11 +16,15 @@ import com.github.davidholiday.game.Rule;
 import com.github.davidholiday.game.RuleSet;
 import com.github.davidholiday.util.RuntimeInfo;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -40,6 +44,9 @@ public class App {
     public static final int SINGLE_WORKER_ROUND_THRESHOLD = 1000;
 
     public static final int NUMBER_OF_WORKERS = RUNTIME_INFO.AVAILABLE_PROCESSORS * 2;
+
+
+    public static final String BATCH_INDEX_KEY = "BATCH_INDEX";
 
 
     public static void main(String[] args ) {
@@ -95,6 +102,8 @@ public class App {
                         numRoundsRemainder
         );
 
+        JSONArray resultsJsonArray = new JSONArray();
+
         Optional<ExecutorService> executorOptional = Optional.empty();
 
         try {
@@ -107,21 +116,32 @@ public class App {
                                                      .build();
 
             for (int i = 0; i < numBatches; i ++) {
-                List<Future<Integer>> resultsList = executor.invokeAll(gameList);
+                List<Future<Map<String, String>>> resultsList = executor.invokeAll(gameList);
 
-                for (Future<Integer> future : resultsList) {
-                    pb.stepBy(Long.valueOf(future.get()));
+                for (Future<Map<String, String>> future : resultsList) {
+                    long numCompletedRounds = Long.valueOf(future.get().get(Game.ROUND_COUNT_KEY));
+                    pb.stepBy(numCompletedRounds);
                     pb.refresh();
+
+                    JSONObject jsonRecord = new JSONObject(future.get());
+                    jsonRecord.put(BATCH_INDEX_KEY, i);
+                    resultsJsonArray.put(jsonRecord);
                 }
+
             }
             // and now for the +1
             if (numRoundsRemainder > 0) {
                 List<Game> gameListRemainder = getGameList(1, numRoundsRemainder);
-                List<Future<Integer>> resultsList = executor.invokeAll(gameListRemainder);
+                List<Future<Map<String, String>>> resultsList = executor.invokeAll(gameListRemainder);
 
-                for (Future<Integer> future : resultsList) {
-                    pb.stepBy(Long.valueOf(future.get()));
+                for (Future<Map<String, String>> future : resultsList) {
+                    long numCompletedRounds = Long.valueOf(future.get().get(Game.ROUND_COUNT_KEY));
+                    pb.stepBy(numCompletedRounds);
                     pb.refresh();
+
+                    JSONObject jsonRecord = new JSONObject(future.get());
+                    jsonRecord.put(BATCH_INDEX_KEY, numBatches);
+                    resultsJsonArray.put(jsonRecord);
                 }
             }
         } catch (InterruptedException | ExecutionException e) {
@@ -129,6 +149,8 @@ public class App {
         }
         finally {
             if (executorOptional.isPresent()) { executorOptional.get().shutdown(); }
+
+            LOG.info("JSON summary records: {}", resultsJsonArray);
             LOG.info("*!* done *!*");
         }
 
@@ -161,7 +183,7 @@ public class App {
                                          .build();
 
             PlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
-            double bettingUnit = 10;
+            double bettingUnit = 25;
             double bankroll = 2500;
 
             Player playerOne = new Player(new NoCountStrategy(ruleSet, bettingUnit),
@@ -222,6 +244,7 @@ public class App {
                                 .withPlayer(playerSix)
                                 .withPlayer(playerSeven)
                                 .withRuleSet(ruleSet)
+                                .withResetBankRollAfterRounds(true)
                                 .withNumRounds(roundsPerWorker)
                                 .build();
 
