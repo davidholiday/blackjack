@@ -21,6 +21,8 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 
+// TODO have this callable return a JSONObject instead of a map?
+// TODO   NBD doing it this way - it just means a bit of munging later...
 public class Game implements Callable<Map<String, String>> {
 
     public static final String ROUND_COUNT_KEY = "ROUND_COUNT";

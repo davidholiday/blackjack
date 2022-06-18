@@ -87,8 +87,8 @@ public class App {
         int numBatches = totalRounds / roundsPerBatch;
         int numRoundsRemainder = totalRounds % roundsPerBatch;
 
-        LOG.info("*!* starting run *!*");
-        LOG.info("totalRounds: {} " +
+        LOG.warn("*!* starting run *!*");
+        LOG.warn("totalRounds: {} " +
                         "gameListSize: {} " +
                         "roundsPerWorker: {} " +
                         "roundsPerBatch: {} " +
@@ -150,8 +150,8 @@ public class App {
         finally {
             if (executorOptional.isPresent()) { executorOptional.get().shutdown(); }
 
-            LOG.info("JSON summary records: {}", resultsJsonArray);
-            LOG.info("*!* done *!*");
+            LOG.warn("JSON summary records: {}", resultsJsonArray);
+            LOG.warn("*!* done *!*");
         }
 
     }
