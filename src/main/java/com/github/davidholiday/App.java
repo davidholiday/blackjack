@@ -150,6 +150,14 @@ public class App {
         finally {
             if (executorOptional.isPresent()) { executorOptional.get().shutdown(); }
 
+            // TODO if this becomes a problem we can refactor this to dump a buffer to the log
+            // TODO   I don't think that will be necessary though as there will be one element in
+            // TODO   this array totalRounds / SINGLE_WORKER_ROUND_THRESHOLD (currently set to 1k)
+            // TODO
+            // TODO for now I'm thinkin the size of this array should be in the order of <500k. that
+            // TODO  should be ok for now for commodity hardware...
+            // TODO
+            // TODO "should"
             LOG.warn("JSON summary records: {}", resultsJsonArray);
             LOG.warn("*!* done *!*");
         }
@@ -183,8 +191,8 @@ public class App {
                                          .build();
 
             PlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
-            double bettingUnit = 25;
-            double bankroll = 2500;
+            double bettingUnit = 15;
+            double bankroll = 1500;
 
             Player playerOne = new Player(new NoCountStrategy(ruleSet, bettingUnit),
                                           playerStrategy,
