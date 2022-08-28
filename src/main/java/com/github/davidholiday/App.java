@@ -4,6 +4,7 @@ import com.github.davidholiday.agent.AgentPosition;
 import com.github.davidholiday.agent.Player;
 import com.github.davidholiday.agent.strategy.count.*;
 import com.github.davidholiday.agent.strategy.count.reko.reKoConservativeCountStrategy;
+import com.github.davidholiday.agent.strategy.count.reko.reKoFlatBetExperimentCountStrategy;
 import com.github.davidholiday.agent.strategy.count.reko.reKoModerateCountStrategy;
 import com.github.davidholiday.agent.strategy.count.reko.reKoStandardCountStrategy;
 import com.github.davidholiday.agent.strategy.count.speedcount.SpeedCountAggressiveCountStrategy;
@@ -11,6 +12,7 @@ import com.github.davidholiday.agent.strategy.count.speedcount.SpeedCountConserv
 import com.github.davidholiday.agent.strategy.play.BasicFourSixEightDeckPlayerStrategy;
 import com.github.davidholiday.agent.strategy.play.NoOpPlayerStrategy;
 import com.github.davidholiday.agent.strategy.play.PlayerStrategy;
+import com.github.davidholiday.agent.strategy.play.reKoFlatBetExperimentPlayStrategy;
 import com.github.davidholiday.game.Game;
 import com.github.davidholiday.game.Rule;
 import com.github.davidholiday.game.RuleSet;
@@ -41,7 +43,7 @@ public class App {
 
     public static final RuntimeInfo RUNTIME_INFO = new RuntimeInfo();
 
-    public static final int SINGLE_WORKER_ROUND_THRESHOLD = 1000;
+    public static final int SINGLE_WORKER_ROUND_THRESHOLD = 100000;
 
     public static final int NUMBER_OF_WORKERS = RUNTIME_INFO.AVAILABLE_PROCESSORS * 2;
 
@@ -192,7 +194,7 @@ public class App {
 
             PlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
             double bettingUnit = 15;
-            double bankroll = 1500;
+            double bankroll = 10000;
 
             Player playerOne = new Player(new NoCountStrategy(ruleSet, bettingUnit),
                                           playerStrategy,
@@ -201,56 +203,63 @@ public class App {
                                           orderedPlayerList.get(0)
             );
 
-            Player playerTwo = new Player(new SpeedCountConservativeCountStrategy(ruleSet, bettingUnit),
-                                          playerStrategy,
+            Player playerTwo = new Player(new reKoFlatBetExperimentCountStrategy(ruleSet, bettingUnit),
+                                          new reKoFlatBetExperimentPlayStrategy(),
                                           bankroll,
                                           ruleSet,
                                           orderedPlayerList.get(1)
             );
 
-            Player playerThree = new Player(new SpeedCountAggressiveCountStrategy(ruleSet, bettingUnit),
-                                            playerStrategy,
-                                            bankroll,
-                                            ruleSet,
-                                            orderedPlayerList.get(2)
-            );
-
-            Player playerFour = new Player(new reKoConservativeCountStrategy(ruleSet, bettingUnit),
-                                           playerStrategy,
-                                           bankroll,
-                                           ruleSet,
-                                           orderedPlayerList.get(3)
-            );
-
-            Player playerFive = new Player(new reKoModerateCountStrategy(ruleSet, bettingUnit),
-                                           playerStrategy,
-                                           bankroll,
-                                           ruleSet,
-                                           orderedPlayerList.get(4)
-            );
-
-            Player playerSix = new Player(new reKoStandardCountStrategy(ruleSet, bettingUnit),
-                                          playerStrategy,
-                                          bankroll,
-                                          ruleSet,
-                                          orderedPlayerList.get(5)
-            );
-
-            Player playerSeven = new Player(new NoCountStrategy(ruleSet, bettingUnit),
-                                            new NoOpPlayerStrategy(),
-                                            bankroll,
-                                            ruleSet,
-                                            orderedPlayerList.get(6)
-            );
+//            Player playerTwo = new Player(new SpeedCountConservativeCountStrategy(ruleSet, bettingUnit),
+//                                          playerStrategy,
+//                                          bankroll,
+//                                          ruleSet,
+//                                          orderedPlayerList.get(1)
+//            );
+//
+//            Player playerThree = new Player(new SpeedCountAggressiveCountStrategy(ruleSet, bettingUnit),
+//                                            playerStrategy,
+//                                            bankroll,
+//                                            ruleSet,
+//                                            orderedPlayerList.get(2)
+//            );
+//
+//            Player playerFour = new Player(new reKoConservativeCountStrategy(ruleSet, bettingUnit),
+//                                           playerStrategy,
+//                                           bankroll,
+//                                           ruleSet,
+//                                           orderedPlayerList.get(3)
+//            );
+//
+//            Player playerFive = new Player(new reKoModerateCountStrategy(ruleSet, bettingUnit),
+//                                           playerStrategy,
+//                                           bankroll,
+//                                           ruleSet,
+//                                           orderedPlayerList.get(4)
+//            );
+//
+//            Player playerSix = new Player(new reKoStandardCountStrategy(ruleSet, bettingUnit),
+//                                          playerStrategy,
+//                                          bankroll,
+//                                          ruleSet,
+//                                          orderedPlayerList.get(5)
+//            );
+//
+//            Player playerSeven = new Player(new NoCountStrategy(ruleSet, bettingUnit),
+//                                            new NoOpPlayerStrategy(),
+//                                            bankroll,
+//                                            ruleSet,
+//                                            orderedPlayerList.get(6)
+//            );
 
             Game game = new Game.Builder()
                                 .withPlayer(playerOne)
                                 .withPlayer(playerTwo)
-                                .withPlayer(playerThree)
-                                .withPlayer(playerFour)
-                                .withPlayer(playerFive)
-                                .withPlayer(playerSix)
-                                .withPlayer(playerSeven)
+//                                .withPlayer(playerThree)
+//                                .withPlayer(playerFour)
+//                                .withPlayer(playerFive)
+//                                .withPlayer(playerSix)
+//                                .withPlayer(playerSeven)
                                 .withRuleSet(ruleSet)
                                 .withResetBankRollAfterRounds(true)
                                 .withNumRounds(roundsPerWorker)
