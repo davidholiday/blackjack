@@ -13,10 +13,12 @@ import org.slf4j.LoggerFactory;
 
 public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
 
+    private static final int COUNT_THRESHOLD = -27;
+    
     private static final Logger LOG = LoggerFactory.getLogger(BasicFourSixEightDeckPlayerStrategy.class);
 
     public static final String NAME = "REKO_FLAT_BET_EXPERIMENT_PLAYER_STRATEGY";
-
+    
     @Override
     public String getName() {
         return NAME;
@@ -82,7 +84,7 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
         if (hand.isBust()
                 || hand.isPair() == false
                 || actionToken.getEvaluatePairForSplit() == false
-                || count <= -4) {
+                /* || count < COUNT_THRESHOLD */) {
             return Action.NONE;
         }
 
@@ -108,7 +110,7 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
                         || dealerUpCardType == CardType.SIX
                         || dealerUpCardType == CardType.EIGHT
                         || dealerUpCardType == CardType.NINE
-                        && count > -4) {
+                        /* && count > COUNT_THRESHOLD */ ) {
 
                     return Action.SPLIT;
                 } else {
@@ -123,7 +125,7 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
                         || dealerUpCardType == CardType.FIVE
                         || dealerUpCardType == CardType.SIX
                         || dealerUpCardType == CardType.SEVEN
-                        && count > -4) {
+                        /* && count > COUNT_THRESHOLD */) {
 
                     return Action.SPLIT;
                 } else {
@@ -132,14 +134,14 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
             case SIX:
                 if (ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_AFTER_SPLIT)
                         && dealerUpCardType == CardType.TWO
-                        && count > -4) {
+                        /* && count > COUNT_THRESHOLD */) {
 
                     return Action.SPLIT;
                 } else if (dealerUpCardType == CardType.THREE
                         || dealerUpCardType == CardType.FOUR
                         || dealerUpCardType == CardType.FIVE
                         || dealerUpCardType == CardType.SIX
-                        && count > -4) {
+                        /* && count > COUNT_THRESHOLD */) {
 
                     return Action.SPLIT;
                 } else {
@@ -150,7 +152,7 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
             case FOUR:
                 if (ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_AFTER_SPLIT)
                         && (dealerUpCardType == CardType.FIVE || dealerUpCardType == CardType.SIX)
-                        && count > -4) {
+                        /* && count > COUNT_THRESHOLD */ ) {
 
                     return Action.SPLIT;
                 } else {
@@ -161,14 +163,14 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
             case TWO:
                 if (ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_AFTER_SPLIT)
                         && (dealerUpCardType == CardType.TWO || dealerUpCardType == CardType.THREE)
-                        && count > -4) {
+                        /* && count > COUNT_THRESHOLD */) {
 
                     return Action.SPLIT;
                 } else if (dealerUpCardType == CardType.FOUR
                         || dealerUpCardType == CardType.FIVE
                         || dealerUpCardType == CardType.SIX
                         || dealerUpCardType == CardType.SEVEN
-                        && count > -4) {
+                        /* && count > COUNT_THRESHOLD */) {
 
                     return Action.SPLIT;
                 } else {
@@ -207,8 +209,12 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
             case 9:
                 return Action.STAND;
             case 8:
-                if (dealerUpCardType == CardType.SIX && numCardsInHand == 2 && count > -4) {
-                    return Action.DOUBLE_DOWN;
+                if (dealerUpCardType == CardType.SIX && numCardsInHand == 2) {
+                    if (count > COUNT_THRESHOLD) {
+                        return Action.DOUBLE_DOWN;
+                    } else {
+                        return Action.HIT;
+                    }
                 } else {
                     return Action.STAND;
                 }
@@ -219,8 +225,12 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
                         || dealerUpCardType == CardType.FIVE
                         || dealerUpCardType == CardType.SIX) {
 
-                    if (numCardsInHand == 2 && count > -4) {
-                        return Action.DOUBLE_DOWN;
+                    if (numCardsInHand == 2) {
+                        if (count > COUNT_THRESHOLD) {
+                            return Action.DOUBLE_DOWN;
+                        } else {
+                            return Action.HIT;
+                        }
                     } else {
                         return Action.STAND;
                     }
@@ -239,7 +249,7 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
                         || dealerUpCardType == CardType.FIVE
                         || dealerUpCardType == CardType.SIX) {
 
-                    if (numCardsInHand == 2 && count > -4) {
+                    if (numCardsInHand == 2 && count > COUNT_THRESHOLD) {
                         return Action.DOUBLE_DOWN;
                     } else {
                         return Action.HIT;
@@ -254,7 +264,7 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
                         || dealerUpCardType == CardType.FIVE
                         || dealerUpCardType == CardType.SIX) {
 
-                    if (numCardsInHand == 2 && count > -4) {
+                    if (numCardsInHand == 2 && count > COUNT_THRESHOLD) {
                         return Action.DOUBLE_DOWN;
                     } else {
                         return Action.HIT;
@@ -268,7 +278,7 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
                 if (dealerUpCardType == CardType.FIVE
                         || dealerUpCardType == CardType.SIX) {
 
-                    if (numCardsInHand == 2 && count > -4) {
+                    if (numCardsInHand == 2 && count > COUNT_THRESHOLD) {
                         return Action.DOUBLE_DOWN;
                     } else {
                         return Action.HIT;
@@ -320,7 +330,7 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
                 if (ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_ANY_FIRST_TWO_CARDS)
                         || ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_NINE_THROUGH_ELEVEN_ONLY)
                         || ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_TEN_ELEVEN_ONLY)
-                        && count > -4) {
+                        && count > COUNT_THRESHOLD) {
 
                     return Action.DOUBLE_DOWN;
                 } else {
@@ -339,7 +349,7 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
                     if (ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_ANY_FIRST_TWO_CARDS)
                             || ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_NINE_THROUGH_ELEVEN_ONLY)
                             || ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_TEN_ELEVEN_ONLY)
-                            && count > -4) {
+                            && count > COUNT_THRESHOLD) {
 
                         return Action.DOUBLE_DOWN;
                     } else {
@@ -356,7 +366,7 @@ public class reKoFlatBetExperimentPlayStrategy extends PlayerStrategy {
 
                     if (ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_ANY_FIRST_TWO_CARDS)
                             || ruleSet.contains(Rule.PLAYER_CAN_DOUBLE_ON_NINE_THROUGH_ELEVEN_ONLY)
-                            && count > -4) {
+                            && count > COUNT_THRESHOLD) {
 
                         return Action.DOUBLE_DOWN;
                     } else {

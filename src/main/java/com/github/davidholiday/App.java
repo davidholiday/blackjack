@@ -43,7 +43,7 @@ public class App {
 
     public static final RuntimeInfo RUNTIME_INFO = new RuntimeInfo();
 
-    public static final int SINGLE_WORKER_ROUND_THRESHOLD = 100000;
+    public static final int SINGLE_WORKER_ROUND_THRESHOLD = 20000;
 
     public static final int NUMBER_OF_WORKERS = RUNTIME_INFO.AVAILABLE_PROCESSORS * 2;
 
@@ -79,7 +79,7 @@ public class App {
         // this is how many rounds of blackjack each game obj will perform
         // also - this is the amount of 'work' each worker will undertake per evolution
         int roundsPerWorker = Math.min((totalRounds / NUMBER_OF_WORKERS), SINGLE_WORKER_ROUND_THRESHOLD);
-        // to deal with very low valus of totalRounds...
+        // to deal with very low values of totalRounds...
         roundsPerWorker = roundsPerWorker == 0 ? 1 : roundsPerWorker;
 
         // at every evolution:
@@ -188,8 +188,27 @@ public class App {
                                          .withRule(Rule.BLACKJACK_PAYS_THREE_TO_TWO)
                                          .withRule(Rule.SIX_DECK_SHOE)
                                          .withRule(Rule.PLAYER_CAN_DOUBLE_ON_ANY_FIRST_TWO_CARDS)
+                                         .withRule(Rule.PLAYER_CAN_DOUBLE_AFTER_SPLIT)
+                                         .withRule(Rule.DEALER_CAN_HIT_SOFT_17)
+                    /*
+                    15:17:54.532 [main] ERROR com.github.davidholiday.App - something went wrong executing the batch job
+                    java.util.concurrent.ExecutionException: java.lang.IllegalArgumentException: PLAYER_FOUR$H1 is trying to SPLIT an hand that isn't a pair!
+                            at java.base/java.util.concurrent.FutureTask.report(FutureTask.java:122)
+                            at java.base/java.util.concurrent.FutureTask.get(FutureTask.java:191)
+                            at com.github.davidholiday.App.main(App.java:124)
+                    Caused by: java.lang.IllegalArgumentException: PLAYER_FOUR$H1 is trying to SPLIT an hand that isn't a pair!
+                            at com.github.davidholiday.agent.Dealer.act(Dealer.java:407)
+                            at com.github.davidholiday.game.ActionBroker.send(ActionBroker.java:56)
+                            at com.github.davidholiday.game.Game.call(Game.java:287)
+                            at com.github.davidholiday.game.Game.call(Game.java:26)
+                            at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+                            at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1128)
+                            at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:628)
+                            at java.base/java.lang.Thread.run(Thread.java:834)
+
+                     */
+                    //.withRule(Rule.PLAYER_CAN_RESPLIT_ACES)
                                          .withRule(Rule.PLAYER_CAN_RESPLIT_TO_FOUR_HANDS)
-                                         .withRule(Rule.PLAYER_CAN_LATE_SURRENDER)
                                          .build();
 
             PlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
@@ -203,47 +222,47 @@ public class App {
                                           orderedPlayerList.get(0)
             );
 
-            Player playerTwo = new Player(new reKoFlatBetExperimentCountStrategy(ruleSet, bettingUnit),
-                                          new reKoFlatBetExperimentPlayStrategy(),
+//            Player playerTwo = new Player(new reKoFlatBetExperimentCountStrategy(ruleSet, bettingUnit),
+//                                          new reKoFlatBetExperimentPlayStrategy(),
+//                                          bankroll,
+//                                          ruleSet,
+//                                          orderedPlayerList.get(1)
+//            );
+
+            Player playerTwo = new Player(new SpeedCountConservativeCountStrategy(ruleSet, bettingUnit),
+                                          playerStrategy,
                                           bankroll,
                                           ruleSet,
                                           orderedPlayerList.get(1)
             );
 
-//            Player playerTwo = new Player(new SpeedCountConservativeCountStrategy(ruleSet, bettingUnit),
-//                                          playerStrategy,
-//                                          bankroll,
-//                                          ruleSet,
-//                                          orderedPlayerList.get(1)
-//            );
-//
-//            Player playerThree = new Player(new SpeedCountAggressiveCountStrategy(ruleSet, bettingUnit),
-//                                            playerStrategy,
-//                                            bankroll,
-//                                            ruleSet,
-//                                            orderedPlayerList.get(2)
-//            );
-//
-//            Player playerFour = new Player(new reKoConservativeCountStrategy(ruleSet, bettingUnit),
-//                                           playerStrategy,
-//                                           bankroll,
-//                                           ruleSet,
-//                                           orderedPlayerList.get(3)
-//            );
-//
-//            Player playerFive = new Player(new reKoModerateCountStrategy(ruleSet, bettingUnit),
-//                                           playerStrategy,
-//                                           bankroll,
-//                                           ruleSet,
-//                                           orderedPlayerList.get(4)
-//            );
-//
-//            Player playerSix = new Player(new reKoStandardCountStrategy(ruleSet, bettingUnit),
-//                                          playerStrategy,
-//                                          bankroll,
-//                                          ruleSet,
-//                                          orderedPlayerList.get(5)
-//            );
+            Player playerThree = new Player(new SpeedCountAggressiveCountStrategy(ruleSet, bettingUnit),
+                                            playerStrategy,
+                                            bankroll,
+                                            ruleSet,
+                                            orderedPlayerList.get(2)
+            );
+
+            Player playerFour = new Player(new reKoConservativeCountStrategy(ruleSet, bettingUnit),
+                                           playerStrategy,
+                                           bankroll,
+                                           ruleSet,
+                                           orderedPlayerList.get(3)
+            );
+
+            Player playerFive = new Player(new reKoModerateCountStrategy(ruleSet, bettingUnit),
+                                           playerStrategy,
+                                           bankroll,
+                                           ruleSet,
+                                           orderedPlayerList.get(4)
+            );
+
+            Player playerSix = new Player(new reKoStandardCountStrategy(ruleSet, bettingUnit),
+                                          playerStrategy,
+                                          bankroll,
+                                          ruleSet,
+                                          orderedPlayerList.get(5)
+            );
 //
 //            Player playerSeven = new Player(new NoCountStrategy(ruleSet, bettingUnit),
 //                                            new NoOpPlayerStrategy(),
@@ -254,11 +273,11 @@ public class App {
 
             Game game = new Game.Builder()
                                 .withPlayer(playerOne)
-                                .withPlayer(playerTwo)
+//                                .withPlayer(playerTwo)
 //                                .withPlayer(playerThree)
-//                                .withPlayer(playerFour)
-//                                .withPlayer(playerFive)
-//                                .withPlayer(playerSix)
+                                .withPlayer(playerFour)
+                                .withPlayer(playerFive)
+                                .withPlayer(playerSix)
 //                                .withPlayer(playerSeven)
                                 .withRuleSet(ruleSet)
                                 .withResetBankRollAfterRounds(true)
