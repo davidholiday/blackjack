@@ -43,7 +43,7 @@ public class App {
 
     public static final RuntimeInfo RUNTIME_INFO = new RuntimeInfo();
 
-    public static final int SINGLE_WORKER_ROUND_THRESHOLD = 20000;
+    public static final int SINGLE_WORKER_ROUND_THRESHOLD = 1;
 
     public static final int NUMBER_OF_WORKERS = RUNTIME_INFO.AVAILABLE_PROCESSORS * 2;
 
@@ -188,8 +188,8 @@ public class App {
                                          .withRule(Rule.BLACKJACK_PAYS_THREE_TO_TWO)
                                          .withRule(Rule.SIX_DECK_SHOE)
                                          .withRule(Rule.PLAYER_CAN_DOUBLE_ON_ANY_FIRST_TWO_CARDS)
-                                         .withRule(Rule.PLAYER_CAN_DOUBLE_AFTER_SPLIT)
-                                         .withRule(Rule.DEALER_CAN_HIT_SOFT_17)
+                                         //.withRule(Rule.PLAYER_CAN_DOUBLE_AFTER_SPLIT)
+                                         //.withRule(Rule.DEALER_CAN_HIT_SOFT_17)
                     /*
                     15:17:54.532 [main] ERROR com.github.davidholiday.App - something went wrong executing the batch job
                     java.util.concurrent.ExecutionException: java.lang.IllegalArgumentException: PLAYER_FOUR$H1 is trying to SPLIT an hand that isn't a pair!
@@ -212,8 +212,8 @@ public class App {
                                          .build();
 
             PlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
-            double bettingUnit = 15;
-            double bankroll = 10000;
+            double bettingUnit = 10;
+            double bankroll = 5000;
 
             Player playerOne = new Player(new NoCountStrategy(ruleSet, bettingUnit),
                                           playerStrategy,
@@ -263,21 +263,21 @@ public class App {
                                           ruleSet,
                                           orderedPlayerList.get(5)
             );
-//
-//            Player playerSeven = new Player(new NoCountStrategy(ruleSet, bettingUnit),
-//                                            new NoOpPlayerStrategy(),
-//                                            bankroll,
-//                                            ruleSet,
-//                                            orderedPlayerList.get(6)
-//            );
+
+            Player playerSeven = new Player(new NoCountStrategy(ruleSet, bettingUnit),
+                                            new NoOpPlayerStrategy(),
+                                            bankroll,
+                                            ruleSet,
+                                            orderedPlayerList.get(6)
+            );
 
             Game game = new Game.Builder()
                                 .withPlayer(playerOne)
 //                                .withPlayer(playerTwo)
 //                                .withPlayer(playerThree)
-                                .withPlayer(playerFour)
-                                .withPlayer(playerFive)
-                                .withPlayer(playerSix)
+//                                .withPlayer(playerFour)
+//                                .withPlayer(playerFive)
+//                                .withPlayer(playerSix)
 //                                .withPlayer(playerSeven)
                                 .withRuleSet(ruleSet)
                                 .withResetBankRollAfterRounds(true)

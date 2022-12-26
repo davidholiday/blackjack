@@ -313,6 +313,11 @@ public class Game implements Callable<Map<String, String>> {
             }
         }
 
+        // ensures all player agents start the new batch with fresh counts. this also is triggered by the shoe being
+        // reshuffled. there may be a case where the batch completes before the shoe gets reshuffled. this call
+        // double triple ensures that all agents start each batch as if they just sat down and started playing 
+        resetPlayerCounts();
+
         //
         // we reset the 'wasRuined' flag at the top of the round cycle.
         //
@@ -348,6 +353,19 @@ public class Game implements Callable<Map<String, String>> {
 
     public int getDiscardTrayDeckSize() {
         return dealer.getDiscardTrayDeckSize();
+    }
+
+    public void resetPlayerCounts() {
+        for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {
+            LOG.info("resetting count for player {} who is using count strategy {}",
+                     agentMapEntry.getKey(),
+                     agentMapEntry.getValue().getCountStrategyName()
+            );
+
+            agentMapEntry.getValue().resetBankroll();
+
+            LOG.info("count for player {} is now {}", agentMapEntry.getKey(), agentMapEntry.getValue().getCount());
+        }
     }
 
 }
