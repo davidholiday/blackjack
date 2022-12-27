@@ -275,7 +275,7 @@ public class App {
                                 .withPlayer(playerOne)
 //                                .withPlayer(playerTwo)
 //                                .withPlayer(playerThree)
-//                                .withPlayer(playerFour)
+                                  .withPlayer(playerFour)
 //                                .withPlayer(playerFive)
 //                                .withPlayer(playerSix)
 //                                .withPlayer(playerSeven)

@@ -142,7 +142,7 @@ public abstract class Agent {
 
     void updateCount(ActionToken actionToken) { countStrategy.updateCount(actionToken); }
 
-    void resetCount() {
+    public void resetCount() {
         countStrategy.resetCount();
     }
 
