@@ -1,10 +1,10 @@
 package com.github.davidholiday;
 
 import com.github.davidholiday.agent.AgentPosition;
+import com.github.davidholiday.agent.Dealer;
 import com.github.davidholiday.agent.Player;
 import com.github.davidholiday.agent.strategy.count.*;
 import com.github.davidholiday.agent.strategy.count.reko.reKoConservativeCountStrategy;
-import com.github.davidholiday.agent.strategy.count.reko.reKoFlatBetExperimentCountStrategy;
 import com.github.davidholiday.agent.strategy.count.reko.reKoModerateCountStrategy;
 import com.github.davidholiday.agent.strategy.count.reko.reKoStandardCountStrategy;
 import com.github.davidholiday.agent.strategy.count.speedcount.SpeedCountAggressiveCountStrategy;
@@ -12,7 +12,8 @@ import com.github.davidholiday.agent.strategy.count.speedcount.SpeedCountConserv
 import com.github.davidholiday.agent.strategy.play.BasicFourSixEightDeckPlayerStrategy;
 import com.github.davidholiday.agent.strategy.play.NoOpPlayerStrategy;
 import com.github.davidholiday.agent.strategy.play.PlayerStrategy;
-import com.github.davidholiday.agent.strategy.play.reKoFlatBetExperimentPlayStrategy;
+import com.github.davidholiday.agent.strategy.play.StandardDealerStrategy;
+import com.github.davidholiday.cardcollection.Shoe;
 import com.github.davidholiday.game.Game;
 import com.github.davidholiday.game.Rule;
 import com.github.davidholiday.game.RuleSet;
@@ -43,7 +44,7 @@ public class App {
 
     public static final RuntimeInfo RUNTIME_INFO = new RuntimeInfo();
 
-    public static final int SINGLE_WORKER_ROUND_THRESHOLD = 1;
+    public static final int SINGLE_WORKER_BATCH_THRESHOLD = 100000;
 
     public static final int NUMBER_OF_WORKERS = RUNTIME_INFO.AVAILABLE_PROCESSORS * 2;
 
@@ -69,16 +70,16 @@ public class App {
         // what we want is to create between (1) and (RUNTIME_INFO.AVAILABLE_PROCESSORS * 2) game objects
         // for the workers to chew on per evolution
         int gameListSize =
-                totalRounds <= SINGLE_WORKER_ROUND_THRESHOLD
+                totalRounds <= SINGLE_WORKER_BATCH_THRESHOLD
                         ? totalRounds
-                        : Math.min((totalRounds / SINGLE_WORKER_ROUND_THRESHOLD), RUNTIME_INFO.AVAILABLE_PROCESSORS * 2);
+                        : Math.min((totalRounds / SINGLE_WORKER_BATCH_THRESHOLD), RUNTIME_INFO.AVAILABLE_PROCESSORS * 2);
         // to deal with very low values of totalRounds...
         gameListSize = (gameListSize < 1) ? 1 : gameListSize;
 
 
         // this is how many rounds of blackjack each game obj will perform
         // also - this is the amount of 'work' each worker will undertake per evolution
-        int roundsPerWorker = Math.min((totalRounds / NUMBER_OF_WORKERS), SINGLE_WORKER_ROUND_THRESHOLD);
+        int roundsPerWorker = Math.min((totalRounds / NUMBER_OF_WORKERS), SINGLE_WORKER_BATCH_THRESHOLD);
         // to deal with very low values of totalRounds...
         roundsPerWorker = roundsPerWorker == 0 ? 1 : roundsPerWorker;
 
@@ -186,7 +187,7 @@ public class App {
 
             RuleSet ruleSet = new RuleSet.Builder()
                                          .withRule(Rule.BLACKJACK_PAYS_THREE_TO_TWO)
-                                         .withRule(Rule.SIX_DECK_SHOE)
+                                         .withRule(Rule.TWO_DECK_SHOE)
                                          .withRule(Rule.PLAYER_CAN_DOUBLE_ON_ANY_FIRST_TWO_CARDS)
                                          //.withRule(Rule.PLAYER_CAN_DOUBLE_AFTER_SPLIT)
                                          //.withRule(Rule.DEALER_CAN_HIT_SOFT_17)
@@ -212,8 +213,10 @@ public class App {
                                          .build();
 
             PlayerStrategy playerStrategy = new BasicFourSixEightDeckPlayerStrategy();
-            double bettingUnit = 10;
+            double bettingUnit = 15;
             double bankroll = 5000;
+
+            Dealer dealer = new Dealer(new StandardDealerStrategy(), new Shoe(2), ruleSet);
 
             Player playerOne = new Player(new NoCountStrategy(ruleSet, bettingUnit),
                                           playerStrategy,
@@ -275,10 +278,11 @@ public class App {
                                 .withPlayer(playerOne)
 //                                .withPlayer(playerTwo)
 //                                .withPlayer(playerThree)
-                                  .withPlayer(playerFour)
+//                                .withPlayer(playerFour)
 //                                .withPlayer(playerFive)
 //                                .withPlayer(playerSix)
 //                                .withPlayer(playerSeven)
+                                .withDealer(dealer)
                                 .withRuleSet(ruleSet)
                                 .withResetBankRollAfterRounds(true)
                                 .withNumRounds(roundsPerWorker)

@@ -46,6 +46,8 @@ public class Game implements Callable<Map<String, String>> {
     private static final Logger LOG = LoggerFactory.getLogger(Game.class);
 
     private Dealer dealer;
+
+
     private Map<AgentPosition, Player> playerMap;
 
     private Map<AgentPosition, Agent> agentMap;
@@ -118,6 +120,12 @@ public class Game implements Callable<Map<String, String>> {
             this.resetBankRollAfterRounds = resetBankRollAfterRounds;
             return this;
         }
+
+//        public Builder withShoe(Shoe shoe) {
+//            // because the dealer 'owns' the shoe
+//            this.dealer = new Dealer(standardDealerStrategy, shoe, ruleSet);
+//            return this;
+//        }
 
         public Game build() {
             Game game = new Game();
@@ -305,6 +313,19 @@ public class Game implements Callable<Map<String, String>> {
                 rv.put(endBankrollKey, Double.toString(bankroll));
             }
         }
+
+        /**
+         * FOR JOEY
+         */
+        Dealer dealer = (Dealer)agentMap.get(AgentPosition.DEALER);
+        // the -1 is to account for the dealer
+        double avgPairsDealtPerRound = (new Double(dealer.getDealtPairCount()) / (agentMap.size() - 1)) / numRounds;
+        LOG.warn("dealtPairCount: {}  numRounds: {}  numPlayers {}", dealer.getDealtPairCount(), numRounds, agentMap.size() - 1);
+        rv.put("AVG_PAIRS_DEALT_PER_BATCH", Double.toString(avgPairsDealtPerRound));
+        dealer.resetDealtPairCount();
+        /**
+         *
+         */
 
         if (resetBankRollAfterRounds) {
             for (Map.Entry<AgentPosition, Agent> agentMapEntry : agentMap.entrySet()) {

@@ -93,6 +93,18 @@ public class Dealer extends Agent {
                 DEALER
         ).collect(Collectors.toList());
 
+    /**
+     * FOR JOEY
+     */
+    private int dealtPairCount = 0;
+    public void resetDealtPairCount() { dealtPairCount = 0; }
+    public int getDealtPairCount() { return dealtPairCount; }
+    boolean recordedDealtPairCount = false;
+    /**
+     *
+     */
+
+
     public Dealer(PlayStrategy playStrategy, Shoe shoe, RuleSet ruleSet) {
         super(new NoCountStrategy(ruleSet, 0), playStrategy, Integer.MAX_VALUE, ruleSet, DEALER);
         this.shoe = shoe;
@@ -157,6 +169,14 @@ public class Dealer extends Agent {
                 allPlayersUpdatedCount = false;
                 adjudicationPhase = false;
                 insuranceBetsSettled = false;
+
+                /**
+                 * FOR JOEY
+                 */
+                recordedDealtPairCount = false;
+                /**
+                 *
+                 */
 
                 if (reshuffleFlag) {
                     LOG.info("reshuffle flag is set - shuffling and cutting shoe...");
@@ -231,6 +251,28 @@ public class Dealer extends Agent {
                 }
                 // fall into CHECK_FOR_DEALER_BLACKJACK
             case CHECK_FOR_DEALER_BLACKJACK:
+
+                /**
+                 * FOR JOEY
+                 */
+                if (recordedDealtPairCount == false) {
+                    for(var hand : actionToken.getPlayerHandMap().values()) {
+                        if (hand.isPair()) {
+
+                            List<Card> cardList = hand.getAllCards(false);
+                            //if (cardList.get(0).getCardSuit() == cardList.get(1).getCardSuit()) {
+                                dealtPairCount += 1;
+                            //}
+                        }
+                    }
+                    recordedDealtPairCount = true;
+                }
+
+                /**
+                 *
+                 */
+
+
                 if (getHandInternal().isBlackJack() && adjudicationPhase == false) {
                     LOG.info("*!* DEALER HAS BLACKJACK-- ADJUDICATING GAME *!*");
                     adjudicationPhase = true;
